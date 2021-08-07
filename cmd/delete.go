@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/spf13/afero"
@@ -18,6 +19,7 @@ var (
 		Use:   "delete",
 		Short: "deletes a resource",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			out := os.Stdout
 			fs := &afero.Afero{Fs: afero.NewOsFs()}
 
 			rawContent, err := fs.ReadFile(deleteCmdOpts.File)
@@ -32,9 +34,13 @@ var (
 
 			switch kind {
 			case v1alpha1.ClusterKind:
-				return handleCluster(true, rawContent)
+				fmt.Fprintf(out, "Deleting resources associated with cluster manifest %s, please wait\n\n", deleteCmdOpts.File)
+
+				return handleCluster(out, true, rawContent)
 			case v1alpha1.ApplicationKind:
-				return handleApplication(true, rawContent)
+				fmt.Fprintf(out, "Deleting resources associated with application manifest %s, please wait\n\n", deleteCmdOpts.File)
+
+				return handleApplication(out, true, rawContent)
 			default:
 				return fmt.Errorf("unknown kind %s", kind)
 			}

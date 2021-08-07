@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -29,6 +30,7 @@ var (
 		Use:   "apply",
 		Short: "applies a manifest",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			out := os.Stdout
 			fs := &afero.Afero{Fs: afero.NewOsFs()}
 
 			rawContent, err := fs.ReadFile(applyCmdOpts.File)
@@ -43,9 +45,13 @@ var (
 
 			switch kind {
 			case v1alpha1.ClusterKind:
-				return handleCluster(false, rawContent)
+				fmt.Fprintf(out, "Applying cluster manifest %s, please wait\n\n", applyCmdOpts.File)
+
+				return handleCluster(out, false, rawContent)
 			case v1alpha1.ApplicationKind:
-				return handleApplication(false, rawContent)
+				fmt.Fprintf(out, "Applying application manifest %s, please wait\n\n", applyCmdOpts.File)
+
+				return handleApplication(out, false, rawContent)
 			default:
 				return fmt.Errorf("unknown kind %s", kind)
 			}
@@ -53,7 +59,7 @@ var (
 	}
 )
 
-func handleCluster(purge bool, content []byte) error {
+func handleCluster(out io.Writer, purge bool, content []byte) error {
 	var manifest v1alpha1.Cluster
 
 	err := yaml.Unmarshal(content, &manifest)
@@ -68,10 +74,10 @@ func handleCluster(purge bool, content []byte) error {
 		return fmt.Errorf("authenticating with cloud provider: %w", err)
 	}
 
-	spin := spinner.NewSpinner(os.Stdout)
+	spin := spinner.NewSpinner(out)
 
 	opts := reconciliation.SchedulerOpts{
-		Out:                             os.Stdout,
+		Out:                             out,
 		PurgeFlag:                       purge,
 		ClusterDeclaration:              manifest,
 		ReconciliationLoopDelayFunction: func() { time.Sleep(config.DefaultReconciliationLoopDelayDuration) },
@@ -92,7 +98,7 @@ func handleCluster(purge bool, content []byte) error {
 	return err
 }
 
-func handleApplication(_ bool, content []byte) error {
+func handleApplication(_ io.Writer, _ bool, content []byte) error {
 	var manifest v1alpha1.Application
 
 	err := yaml.Unmarshal(content, &manifest)
