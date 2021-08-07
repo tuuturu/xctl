@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/deifyed/xctl/cmd/handlers"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -36,11 +38,11 @@ var (
 			case v1alpha1.ClusterKind:
 				fmt.Fprintf(out, "Deleting resources associated with cluster manifest %s, please wait\n\n", deleteCmdOpts.File)
 
-				return handleCluster(out, true, rawContent)
+				return handlers.HandleCluster(out, true, rawContent)
 			case v1alpha1.ApplicationKind:
 				fmt.Fprintf(out, "Deleting resources associated with application manifest %s, please wait\n\n", deleteCmdOpts.File)
 
-				return handleApplication(out, true, rawContent)
+				return handlers.HandleApplication(out, true, rawContent)
 			default:
 				return fmt.Errorf("unknown kind %s", kind)
 			}
