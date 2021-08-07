@@ -23,7 +23,7 @@ func (c *clusterReconciler) Reconcile(ctx reconciliation.Context) (reconciliatio
 
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
-		err := c.clusterService.DeleteCluster(ctx.Ctx, ctx.ClusterDeclaration)
+		err := c.clusterService.DeleteCluster(ctx.Ctx, ctx.ClusterDeclaration.Metadata.Name)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("deleting cluster: %w", err)
 		}
