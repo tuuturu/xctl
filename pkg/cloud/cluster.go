@@ -15,4 +15,5 @@ type ClusterService interface {
 	DeleteCluster(ctx context.Context, clusterName string) error
 	GetCluster(ctx context.Context, clusterName string) (Cluster, error)
 	HasCluster(ctx context.Context, clusterName string) (bool, error)
+	GetKubeConfig(ctx context.Context, clusterName string) ([]byte, error)
 }

@@ -99,6 +99,24 @@ func (p *provider) HasCluster(ctx context.Context, clusterName string) (bool, er
 	return true, nil
 }
 
+func (p *provider) GetKubeConfig(ctx context.Context, clusterName string) ([]byte, error) {
+	cluster, err := p.getCluster(ctx, clusterName)
+	if err != nil {
+		if errors.Is(err, config.ErrNotFound) {
+			return []byte{}, fmt.Errorf("could not find cluster with name %s", clusterName)
+		}
+
+		return []byte{}, fmt.Errorf("querying clusters: %w", err)
+	}
+
+	cfg, err := p.client.GetLKEClusterKubeconfig(ctx, cluster.ID)
+	if err != nil {
+		return []byte{}, fmt.Errorf("acquiring kube config: %w", err)
+	}
+
+	return []byte(cfg.KubeConfig), nil
+}
+
 func (p *provider) getCluster(ctx context.Context, clusterName string) (linodego.LKECluster, error) {
 	clusters, err := p.client.ListLKEClusters(ctx, &linodego.ListOptions{})
 	if err != nil {
