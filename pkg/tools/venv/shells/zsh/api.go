@@ -22,25 +22,17 @@ func (s *shell) Command(env []string) (*exec.Cmd, error) {
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 
-	modifiedEnv := venv.MergeVariables(env, []string{fmt.Sprintf("ZDOTDIR=%s", s.tmpDir)})
+	modifiedEnv := venv.MergeVariables(env, []string{fmt.Sprintf("ZDOTDIR=%s", s.workDir)})
 
 	cmd.Env = modifiedEnv
 
 	return cmd, nil
 }
 
-func (s *shell) Teardown() error {
-	err := s.fs.RemoveAll(s.tmpDir)
-	if err != nil {
-		return fmt.Errorf("removing venv config directory: %w", err)
-	}
-
-	return nil
-}
-
-func NewZshShell(fs *afero.Afero, binPath string) venv.Shell {
+func NewZshShell(fs *afero.Afero, workDir, binPath string) venv.Shell {
 	return &shell{
-		shellBinPath: binPath,
 		fs:           fs,
+		workDir:      workDir,
+		shellBinPath: binPath,
 	}
 }

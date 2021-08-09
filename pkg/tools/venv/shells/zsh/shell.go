@@ -19,12 +19,7 @@ func (s *shell) initialize() (err error) {
 		return fmt.Errorf("opening zsh config file: %w", err)
 	}
 
-	s.tmpDir, err = s.fs.TempDir("", "xctl")
-	if err != nil {
-		return fmt.Errorf("creating temporary directory: %w", err)
-	}
-
-	err = s.fs.WriteReader(path.Join(s.tmpDir, zshConfigFilename), f)
+	err = s.fs.WriteReader(path.Join(s.workDir, zshConfigFilename), f)
 	if err != nil {
 		return fmt.Errorf("copying zsh config: %w", err)
 	}

@@ -7,5 +7,5 @@ type shell struct {
 
 	shellBinPath string
 
-	tmpDir string
+	workDir string
 }
