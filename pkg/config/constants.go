@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"time"
 )
 
@@ -12,11 +11,4 @@ const (
 	DefaultMaxReconciliationRequeues = 3
 	// DefaultReconciliationLoopDelayDuration defines the amount of time to wait between each reconciliation
 	DefaultReconciliationLoopDelayDuration = 1 * time.Second
-)
-
-var (
-	// ErrNotFound indicates that something is missing
-	ErrNotFound = errors.New("not found")
-	// ErrTimeout indicates that something exceeded its deadline
-	ErrTimeout = errors.New("timeout")
 )
