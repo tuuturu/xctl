@@ -35,7 +35,7 @@ var (
 
 			switch kind {
 			case v1alpha1.ClusterKind:
-				fmt.Fprintf(out, "Applying cluster manifest %s, please wait\n\n", applyCmdOpts.File)
+				fmt.Fprintf(out, "Applying cluster manifest, please wait\n\n")
 
 				return handlers.HandleCluster(out, false, rawContent)
 			case v1alpha1.ApplicationKind:

@@ -7,9 +7,14 @@ import (
 	"github.com/briandowns/spinner"
 )
 
-// Interesting charsets: 7 , 13 , 16 , 47 , 50 , 59 , 69 , 78
+// Interesting charsets: 7 , 13 , 16 , 59 , 69
+// 7: Deathstar 5/10
+// 13: clean box 6/10
+// 16: evil progress bar 7/10
+// 59: dots 6/10
+// 69: thicker dots 7/10
 const (
-	charsetIndex = 7
+	charsetIndex = 16
 	speed        = 100 * time.Millisecond
 	color        = "red"
 )

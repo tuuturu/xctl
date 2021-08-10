@@ -32,6 +32,7 @@ func HandleCluster(out io.Writer, purge bool, content []byte) error {
 	}
 
 	spin := spinner.NewSpinner(out)
+	spin.FinalMSG = "✅"
 
 	opts := reconciliation.SchedulerOpts{
 		Out:                             out,
@@ -39,7 +40,7 @@ func HandleCluster(out io.Writer, purge bool, content []byte) error {
 		ClusterDeclaration:              manifest,
 		ReconciliationLoopDelayFunction: func() { time.Sleep(config.DefaultReconciliationLoopDelayDuration) },
 		QueueStepFunc: func(identifier string) {
-			spin.Suffix = fmt.Sprintf(" reconciling %s", identifier)
+			spin.Suffix = fmt.Sprintf(" Reconciling %s", identifier)
 		},
 	}
 
@@ -48,9 +49,12 @@ func HandleCluster(out io.Writer, purge bool, content []byte) error {
 	)
 
 	spin.Start()
-	defer spin.Stop()
 
 	_, err = scheduler.Run(context.Background())
+
+	spin.Stop()
+
+	fmt.Fprintf(out, "\n\nCluster reconciliation complete")
 
 	return err
 }

@@ -36,7 +36,7 @@ var (
 
 			switch kind {
 			case v1alpha1.ClusterKind:
-				fmt.Fprintf(out, "Deleting resources associated with cluster manifest %s, please wait\n\n", deleteCmdOpts.File)
+				fmt.Fprintf(out, "Deleting resources associated with cluster manifest, please wait\n\n")
 
 				return handlers.HandleCluster(out, true, rawContent)
 			case v1alpha1.ApplicationKind:
