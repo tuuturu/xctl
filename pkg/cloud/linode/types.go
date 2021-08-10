@@ -12,3 +12,5 @@ const (
 type provider struct {
 	client linodego.Client
 }
+
+type pollTestFn func() (ready bool, err error)

@@ -6,13 +6,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pkg/errors"
-
-	"github.com/deifyed/xctl/pkg/config"
-
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud"
+	"github.com/deifyed/xctl/pkg/config"
 	"github.com/linode/linodego"
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )
 
@@ -29,6 +27,7 @@ func (p *provider) Authenticate() error {
 	}
 
 	p.client = linodego.NewClient(oauth2Client)
+	p.client.SetDebug(false)
 
 	return nil
 }
@@ -49,16 +48,16 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 		return fmt.Errorf("creating cluster: %w", err)
 	}
 
-	_, err = p.client.WaitForLKEClusterStatus(ctx, cluster.ID, linodego.LKEClusterReady, defaultTimeoutSeconds)
+	err = p.awaitCreation(ctx, cluster.ID)
 	if err != nil {
-		return fmt.Errorf("waiting for cluster to become ready: %w", err)
+		return fmt.Errorf("awaiting creation of cluster: %w", err)
 	}
 
 	return nil
 }
 
 func (p *provider) DeleteCluster(ctx context.Context, clusterName string) error {
-	lkeCluster, err := p.getCluster(ctx, clusterName)
+	cluster, err := p.getCluster(ctx, clusterName)
 	if err != nil {
 		if errors.Is(err, config.ErrNotFound) {
 			return nil
@@ -67,9 +66,14 @@ func (p *provider) DeleteCluster(ctx context.Context, clusterName string) error 
 		return fmt.Errorf("querying clusters: %w", err)
 	}
 
-	err = p.client.DeleteLKECluster(ctx, lkeCluster.ID)
+	err = p.client.DeleteLKECluster(ctx, cluster.ID)
 	if err != nil {
 		return fmt.Errorf("deleting cluster: %w", err)
+	}
+
+	err = p.awaitDeletion(ctx, clusterName)
+	if err != nil {
+		return fmt.Errorf("awaiting creation of cluster: %w", err)
 	}
 
 	return nil
@@ -115,21 +119,6 @@ func (p *provider) GetKubeConfig(ctx context.Context, clusterName string) ([]byt
 	}
 
 	return []byte(cfg.KubeConfig), nil
-}
-
-func (p *provider) getCluster(ctx context.Context, clusterName string) (linodego.LKECluster, error) {
-	clusters, err := p.client.ListLKEClusters(ctx, &linodego.ListOptions{})
-	if err != nil {
-		return linodego.LKECluster{}, fmt.Errorf("retrieving existing LKE clusters: %w", err)
-	}
-
-	for _, cluster := range clusters {
-		if cluster.Label == clusterName {
-			return cluster, nil
-		}
-	}
-
-	return linodego.LKECluster{}, config.ErrNotFound
 }
 
 func NewLinodeProvider() cloud.Provider {
