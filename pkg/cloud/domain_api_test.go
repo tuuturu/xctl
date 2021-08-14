@@ -127,3 +127,34 @@ func TestDomain_String(t *testing.T) {
 		})
 	}
 }
+
+func TestDomain_Validate(t *testing.T) {
+	testCases := []struct {
+		name       string
+		withDomain Domain
+		expectErr  string
+	}{
+		{
+			name:       "Should accept a primary domain",
+			withDomain: Domain{Host: "tuuturu.org"},
+		},
+		{
+			name:       "Should accept a domain with subdomain",
+			withDomain: Domain{Host: "cluster.tuuturu.org"},
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.withDomain.Validate()
+
+			if tc.expectErr == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.Equal(t, tc.expectErr, err.Error())
+			}
+		})
+	}
+}
