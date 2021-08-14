@@ -51,7 +51,7 @@ func HandleCluster(out io.Writer, purge bool, clusterManifestSource io.Reader) e
 
 	scheduler := reconciliation.NewScheduler(opts,
 		clusterrec.NewDomainReconciler(provider),
-		// clusterrec.NewClusterReconciler(provider),
+		clusterrec.NewClusterReconciler(provider),
 	)
 
 	spin.Start()
