@@ -17,7 +17,12 @@ type SubdomainServiceCRUDer interface {
 	HasSubdomain(ctx context.Context, fqdn string) (bool, error)
 }
 
+type PrimaryDomainCRUDer interface {
+	HasPrimaryDomain(ctx context.Context, fqdn string) (bool, error)
+}
+
 type DomainService interface {
+	PrimaryDomainCRUDer
 	SubdomainServiceCRUDer
 }
 
