@@ -9,7 +9,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func HandleApplication(_ io.Writer, _ bool, applicationManifestSource io.Reader) error {
+func handleApplication(_ io.Writer, _ bool, applicationManifestSource io.Reader) error {
 	var manifest v1alpha1.Application
 
 	content, err := io.ReadAll(applicationManifestSource)

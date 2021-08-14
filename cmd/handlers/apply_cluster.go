@@ -16,7 +16,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func HandleCluster(out io.Writer, purge bool, clusterManifestSource io.Reader) error {
+func handleCluster(out io.Writer, purge bool, clusterManifestSource io.Reader) error {
 	var manifest v1alpha1.Cluster
 
 	content, err := io.ReadAll(clusterManifestSource)
@@ -50,7 +50,6 @@ func HandleCluster(out io.Writer, purge bool, clusterManifestSource io.Reader) e
 	}
 
 	scheduler := reconciliation.NewScheduler(opts,
-		clusterrec.NewDomainReconciler(provider),
 		clusterrec.NewClusterReconciler(provider),
 	)
 
