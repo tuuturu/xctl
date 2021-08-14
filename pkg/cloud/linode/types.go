@@ -1,6 +1,8 @@
 package linode
 
-import "github.com/linode/linodego"
+import (
+	"github.com/linode/linodego"
+)
 
 const (
 	// linodeType4GB defines a Linode with 4GB ram, 80GB storage

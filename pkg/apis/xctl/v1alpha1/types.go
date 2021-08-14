@@ -14,13 +14,10 @@ type Metadata struct {
 type Cluster struct {
 	TypeMeta `json:",inline"`
 	Metadata Metadata `json:"metadata"`
+	URL      string
 }
 
 type Application struct {
 	TypeMeta `json:",inline"`
 	Metadata Metadata `json:"metadata"`
-}
-
-type typeParser struct {
-	TypeMeta `json:",inline"`
 }
