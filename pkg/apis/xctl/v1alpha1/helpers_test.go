@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -60,7 +61,9 @@ func TestInferKindFromManifest(t *testing.T) {
 		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
-			kind, err := InferKindFromManifest(tc.withManifest)
+			buf := bytes.NewReader(tc.withManifest)
+
+			kind, err := InferKindFromManifest(buf)
 			assert.NoError(t, err)
 
 			assert.Equal(t, tc.expectKind, kind)

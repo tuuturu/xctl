@@ -16,10 +16,15 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func HandleCluster(out io.Writer, purge bool, content []byte) error {
+func HandleCluster(out io.Writer, purge bool, clusterManifestSource io.Reader) error {
 	var manifest v1alpha1.Cluster
 
-	err := yaml.Unmarshal(content, &manifest)
+	content, err := io.ReadAll(clusterManifestSource)
+	if err != nil {
+		return fmt.Errorf("reading cluster manifest: %w", err)
+	}
+
+	err = yaml.Unmarshal(content, &manifest)
 	if err != nil {
 		return fmt.Errorf("parsing cluster manifest: %w", err)
 	}
@@ -45,7 +50,8 @@ func HandleCluster(out io.Writer, purge bool, content []byte) error {
 	}
 
 	scheduler := reconciliation.NewScheduler(opts,
-		clusterrec.NewClusterReconciler(provider),
+		clusterrec.NewDomainReconciler(provider),
+		// clusterrec.NewClusterReconciler(provider),
 	)
 
 	spin.Start()

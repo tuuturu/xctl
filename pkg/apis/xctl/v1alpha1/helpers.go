@@ -2,14 +2,23 @@ package v1alpha1
 
 import (
 	"fmt"
+	"io"
 
 	"sigs.k8s.io/yaml"
 )
 
-func InferKindFromManifest(data []byte) (string, error) {
-	var parser typeParser
+// InferKindFromManifest knows how to determine the kind of a manifest
+func InferKindFromManifest(reader io.Reader) (string, error) {
+	var parser struct {
+		TypeMeta `json:",inline"`
+	}
 
-	err := yaml.Unmarshal(data, &parser) //nolint:typecheck
+	content, err := io.ReadAll(reader)
+	if err != nil {
+		return "", fmt.Errorf("reading data: %w", err)
+	}
+
+	err = yaml.Unmarshal(content, &parser)
 	if err != nil {
 		return "", fmt.Errorf("unmarshalling data: %w", err)
 	}

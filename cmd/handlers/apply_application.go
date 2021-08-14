@@ -9,10 +9,15 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func HandleApplication(_ io.Writer, _ bool, content []byte) error {
+func HandleApplication(_ io.Writer, _ bool, applicationManifestSource io.Reader) error {
 	var manifest v1alpha1.Application
 
-	err := yaml.Unmarshal(content, &manifest)
+	content, err := io.ReadAll(applicationManifestSource)
+	if err != nil {
+		return fmt.Errorf("reading cluster manifest: %w", err)
+	}
+
+	err = yaml.Unmarshal(content, &manifest)
 	if err != nil {
 		return fmt.Errorf("parsing application manifest: %w", err)
 	}

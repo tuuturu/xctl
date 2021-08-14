@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/deifyed/xctl/cmd/handlers"
@@ -20,16 +21,22 @@ var (
 	deleteCmd     = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "delete",
 		Short: "deletes a resource",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			out := os.Stdout
 			fs := &afero.Afero{Fs: afero.NewOsFs()}
 
-			rawContent, err := fs.ReadFile(deleteCmdOpts.File)
-			if err != nil {
-				return fmt.Errorf("reading file: %w", err)
+			var manifestSource io.Reader
+
+			if applyCmdOpts.File == "-" {
+				manifestSource = os.Stdin
+			} else {
+				manifestSource, err = fs.Open(applyCmdOpts.File)
+				if err != nil {
+					return fmt.Errorf("opening manifest file: %w", err)
+				}
 			}
 
-			kind, err := v1alpha1.InferKindFromManifest(rawContent)
+			kind, err := v1alpha1.InferKindFromManifest(manifestSource)
 			if err != nil {
 				return fmt.Errorf("inferring kind: %w", err)
 			}
@@ -38,11 +45,11 @@ var (
 			case v1alpha1.ClusterKind:
 				fmt.Fprintf(out, "Deleting resources associated with cluster manifest, please wait\n\n")
 
-				return handlers.HandleCluster(out, true, rawContent)
+				return handlers.HandleCluster(out, true, manifestSource)
 			case v1alpha1.ApplicationKind:
 				fmt.Fprintf(out, "Deleting resources associated with application manifest %s, please wait\n\n", deleteCmdOpts.File)
 
-				return handlers.HandleApplication(out, true, rawContent)
+				return handlers.HandleApplication(out, true, manifestSource)
 			default:
 				return fmt.Errorf("unknown kind %s", kind)
 			}
