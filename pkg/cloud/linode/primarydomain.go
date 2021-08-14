@@ -12,7 +12,12 @@ import (
 func (p *provider) HasPrimaryDomain(ctx context.Context, fqdn string) (bool, error) {
 	domain := cloud.Domain{Host: fqdn}
 
-	_, err := p.getLinodeDomain(ctx, domain.PrimaryDomain())
+	err := domain.Validate()
+	if err != nil {
+		return false, fmt.Errorf("validating domain: %w", err)
+	}
+
+	_, err = p.getLinodeDomain(ctx, domain.PrimaryDomain())
 	if err != nil {
 		if errors.Is(err, config.ErrNotFound) {
 			return false, nil
