@@ -14,7 +14,7 @@ type Metadata struct {
 type Cluster struct {
 	TypeMeta `json:",inline"`
 	Metadata Metadata `json:"metadata"`
-	URL      string
+	URL      string   `json:"url"`
 }
 
 type Application struct {
