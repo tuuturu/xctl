@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/spf13/afero"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
 
@@ -37,6 +39,7 @@ func (c *Scheduler) Run(ctx context.Context) (Result, error) {
 func (c *Scheduler) metadata(ctx context.Context) Context {
 	return Context{
 		Ctx:                    ctx,
+		Filesystem:             c.fs,
 		Out:                    c.out,
 		ClusterDeclaration:     c.clusterDeclaration,
 		ApplicationDeclaration: c.applicationDeclaration,
@@ -47,6 +50,7 @@ func (c *Scheduler) metadata(ctx context.Context) Context {
 // NewScheduler initializes a Scheduler
 func NewScheduler(opts SchedulerOpts, reconcilers ...Reconciler) Scheduler {
 	return Scheduler{
+		fs:  opts.Filesystem,
 		out: opts.Out,
 
 		purgeFlag:              opts.PurgeFlag,
@@ -61,6 +65,7 @@ func NewScheduler(opts SchedulerOpts, reconcilers ...Reconciler) Scheduler {
 
 // SchedulerOpts contains required data for scheduling reconciliations
 type SchedulerOpts struct {
+	Filesystem *afero.Afero
 	// Out provides reconcilers a way to express data
 	Out io.Writer
 
@@ -76,6 +81,7 @@ type SchedulerOpts struct {
 
 // Scheduler knows how to run reconcilers in a reasonable way
 type Scheduler struct {
+	fs  *afero.Afero
 	out io.Writer
 
 	purgeFlag              bool

@@ -5,6 +5,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/spf13/afero"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 
 	"github.com/pkg/errors"
@@ -34,8 +36,9 @@ const (
 
 // Context represents metadata required by most if not all operations on services
 type Context struct {
-	Ctx context.Context
-	Out io.Writer
+	Ctx        context.Context
+	Filesystem *afero.Afero
+	Out        io.Writer
 
 	ClusterDeclaration     v1alpha1.Cluster
 	ApplicationDeclaration v1alpha1.Application

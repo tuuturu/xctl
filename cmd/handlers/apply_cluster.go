@@ -6,6 +6,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/spf13/afero"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud/linode"
 	"github.com/deifyed/xctl/pkg/config"
@@ -16,7 +18,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func handleCluster(out io.Writer, purge bool, clusterManifestSource io.Reader) error {
+func handleCluster(fs *afero.Afero, out io.Writer, purge bool, clusterManifestSource io.Reader) error {
 	var manifest v1alpha1.Cluster
 
 	content, err := io.ReadAll(clusterManifestSource)
@@ -40,6 +42,7 @@ func handleCluster(out io.Writer, purge bool, clusterManifestSource io.Reader) e
 	spin.FinalMSG = "✅"
 
 	opts := reconciliation.SchedulerOpts{
+		Filesystem:                      fs,
 		Out:                             out,
 		PurgeFlag:                       purge,
 		ClusterDeclaration:              manifest,

@@ -1,13 +1,20 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/deifyed/xctl/cmd/handlers"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
 var (
-	applyCmdOpts = handlers.ApplyRunEOpts{Purge: false} //nolint:gochecknoglobals
-	applyCmd     = &cobra.Command{                      //nolint:gochecknoglobals
+	applyCmdOpts = handlers.ApplyRunEOpts{ //nolint:gochecknoglobals
+		Filesystem: &afero.Afero{Fs: afero.NewOsFs()},
+		Out:        os.Stdout,
+		Purge:      false,
+	}
+	applyCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "apply",
 		Short: "applies a manifest",
 		RunE:  handlers.ApplyRunE(&applyCmdOpts),

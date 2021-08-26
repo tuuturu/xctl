@@ -1,14 +1,21 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/deifyed/xctl/cmd/handlers"
+	"github.com/spf13/afero"
 
 	"github.com/spf13/cobra"
 )
 
 var (
-	deleteCmdOpts = handlers.ApplyRunEOpts{Purge: true} //nolint:gochecknoglobals
-	deleteCmd     = &cobra.Command{                     //nolint:gochecknoglobals
+	deleteCmdOpts = handlers.ApplyRunEOpts{ //nolint:gochecknoglobals
+		Filesystem: &afero.Afero{Fs: afero.NewOsFs()},
+		Out:        os.Stdout,
+		Purge:      true,
+	}
+	deleteCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "delete",
 		Short: "deletes a resource",
 		RunE:  handlers.ApplyRunE(&deleteCmdOpts),
