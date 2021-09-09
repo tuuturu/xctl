@@ -10,9 +10,10 @@ import (
 
 var (
 	applyCmdOpts = handlers.ApplyRunEOpts{ //nolint:gochecknoglobals
-		Filesystem: &afero.Afero{Fs: afero.NewOsFs()},
-		Out:        os.Stdout,
-		Purge:      false,
+		InternalFilesystem: &afero.Afero{Fs: afero.NewMemMapFs()},
+		ExternalFilesystem: &afero.Afero{Fs: afero.NewOsFs()},
+		Out:                os.Stdout,
+		Purge:              false,
 	}
 	applyCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "apply",

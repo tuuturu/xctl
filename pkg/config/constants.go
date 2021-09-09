@@ -20,3 +20,16 @@ const ( // Domain
 	// DefaultSubdomainTTLSeconds defines the default time to live for a new domain
 	DefaultSubdomainTTLSeconds = 300
 )
+
+const ( // Internal filesystem directories
+	// DefaultAbsoluteRootPath defines the root of the internal filesystem
+	DefaultAbsoluteRootPath = "/"
+	// DefaultConfigDirName defines the default location for config files
+	DefaultConfigDirName = "config"
+	// DefaultKubeconfigFilename defines the name of the kubeconfig in the internal FS
+	DefaultKubeconfigFilename = "kubeconfig.yaml"
+	// DefaultManifestDir defines the name of the manifest directory
+	DefaultManifestDir = "manifests"
+	// DefaultClusterManifestFilename defines the name of the cluster manifest file
+	DefaultClusterManifestFilename = "cluster.yaml"
+)

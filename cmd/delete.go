@@ -11,9 +11,10 @@ import (
 
 var (
 	deleteCmdOpts = handlers.ApplyRunEOpts{ //nolint:gochecknoglobals
-		Filesystem: &afero.Afero{Fs: afero.NewOsFs()},
-		Out:        os.Stdout,
-		Purge:      true,
+		InternalFilesystem: &afero.Afero{Fs: afero.NewMemMapFs()},
+		ExternalFilesystem: &afero.Afero{Fs: afero.NewOsFs()},
+		Out:                os.Stdout,
+		Purge:              true,
 	}
 	deleteCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "delete",
