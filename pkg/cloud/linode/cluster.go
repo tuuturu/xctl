@@ -24,6 +24,10 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 		K8sVersion: defaultKubernetesVersion,
 	})
 	if err != nil {
+		if errorIsNotAuthenticated(err) {
+			return config.ErrNotAuthenticated
+		}
+
 		return fmt.Errorf("creating cluster: %w", err)
 	}
 
@@ -38,11 +42,14 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 func (p *provider) DeleteCluster(ctx context.Context, clusterName string) error {
 	cluster, err := p.getCluster(ctx, clusterName)
 	if err != nil {
-		if errors.Is(err, config.ErrNotFound) {
+		switch {
+		case errors.Is(err, config.ErrNotFound):
 			return nil
+		case errorIsNotAuthenticated(err):
+			return config.ErrNotAuthenticated
+		default:
+			return fmt.Errorf("querying clusters: %w", err)
 		}
-
-		return fmt.Errorf("querying clusters: %w", err)
 	}
 
 	err = p.client.DeleteLKECluster(ctx, cluster.ID)
@@ -61,6 +68,10 @@ func (p *provider) DeleteCluster(ctx context.Context, clusterName string) error 
 func (p *provider) GetCluster(ctx context.Context, clusterName string) (cloud.Cluster, error) {
 	lkeCluster, err := p.getCluster(ctx, clusterName)
 	if err != nil {
+		if errorIsNotAuthenticated(err) {
+			return cloud.Cluster{}, config.ErrNotAuthenticated
+		}
+
 		return cloud.Cluster{}, fmt.Errorf("querying clusters: %w", err)
 	}
 
@@ -72,11 +83,14 @@ func (p *provider) GetCluster(ctx context.Context, clusterName string) (cloud.Cl
 func (p *provider) HasCluster(ctx context.Context, clusterName string) (bool, error) {
 	_, err := p.getCluster(ctx, clusterName)
 	if err != nil {
-		if errors.Is(err, config.ErrNotFound) {
+		switch {
+		case errors.Is(err, config.ErrNotFound):
 			return false, nil
+		case errorIsNotAuthenticated(err):
+			return false, config.ErrNotAuthenticated
+		default:
+			return false, fmt.Errorf("querying clusters: %w", err)
 		}
-
-		return false, fmt.Errorf("querying clusters: %w", err)
 	}
 
 	return true, nil

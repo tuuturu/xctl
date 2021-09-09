@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/deifyed/xctl/cmd/helpers"
+
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +19,9 @@ var rootCmd = &cobra.Command{ //nolint:gochecknoglobals
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err)
+		userError := helpers.ErrorTranslator(err)
+
+		_, _ = fmt.Fprintln(os.Stderr, userError)
 
 		os.Exit(1)
 	}
