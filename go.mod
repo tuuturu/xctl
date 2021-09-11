@@ -14,5 +14,8 @@ require (
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069 // indirect
+	helm.sh/helm/v3 v3.6.3
+	k8s.io/cli-runtime v0.21.0 // indirect
+	rsc.io/letsencrypt v0.0.3 // indirect
 	sigs.k8s.io/yaml v1.2.0
 )

@@ -21,6 +21,11 @@ const ( // Domain
 	DefaultSubdomainTTLSeconds = 300
 )
 
+const ( // Helm
+	// DefaultHelmActionTimeout defines the default timeout for Helm operations
+	DefaultHelmActionTimeout = 5 * time.Minute
+)
+
 const ( // Internal filesystem directories
 	// DefaultAbsoluteRootPath defines the root of the internal filesystem
 	DefaultAbsoluteRootPath = "/"

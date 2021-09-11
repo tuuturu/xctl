@@ -1,10 +1,12 @@
 package binary
 
 import (
+	"bytes"
 	"fmt"
-	"os"
 	"os/exec"
 	"path"
+
+	"github.com/deifyed/xctl/pkg/config"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/helm"
@@ -19,7 +21,7 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 
 	tmpValuesPath := path.Join(tmpDir, fmt.Sprintf("%s-values.yaml", plugin.Metadata.Name))
 
-	err = e.fs.WriteFile(tmpValuesPath, []byte(plugin.Spec.Values), 0o777)
+	err = e.fs.WriteFile(tmpValuesPath, []byte(plugin.Spec.Values), 0o744)
 	if err != nil {
 		return fmt.Errorf("creating temporary values file: %w", err)
 	}
@@ -31,6 +33,7 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 		fmt.Sprintf("--values=%s", tmpValuesPath),
 		"--atomic",
+		"--debug",
 	)
 
 	err = cmd.Run()
@@ -57,27 +60,32 @@ func (e externalBinaryHelm) Delete(plugin v1alpha1.Plugin) error {
 }
 
 func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
+	println(fmt.Sprintf("with %s", e.kubeConfigPath))
+
 	cmd := exec.Command(e.binaryPath,
 		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 		"get",
 		"manifest",
 		plugin.Metadata.Name,
+		"--debug",
 	)
+
+	stderr := bytes.Buffer{}
+	cmd.Stderr = &stderr
 
 	err := cmd.Run()
 	if err != nil {
-		return false, fmt.Errorf("running Helm get on %s: %w", plugin.Metadata.Name, err)
+		return false, fmt.Errorf("running Helm get: %s", stderr.String())
 	}
 
 	return true, nil
 }
 
 func NewExternalBinaryHelm(fs *afero.Afero) helm.Client {
-	kubeConfigPath := os.Getenv("KUBECONFIG")
 	binaryPath := "/usr/bin/helm"
 
 	return &externalBinaryHelm{
-		kubeConfigPath: kubeConfigPath,
+		kubeConfigPath: config.GetAbsoluteKubeconfigPath(),
 		binaryPath:     binaryPath,
 		fs:             fs,
 	}
