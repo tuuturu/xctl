@@ -1,4 +1,4 @@
-# Xctl - A tool for managing infrastructure
+# Xctl - A tool for managing a Kubernetes based infrastructure
 
 Inspired by the tool [okctl](https://github.com/oslokommune/okctl) made by Oslo Kommune in Norway.
 
