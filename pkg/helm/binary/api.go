@@ -60,8 +60,6 @@ func (e externalBinaryHelm) Delete(plugin v1alpha1.Plugin) error {
 }
 
 func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
-	println(fmt.Sprintf("with %s", e.kubeConfigPath))
-
 	cmd := exec.Command(e.binaryPath,
 		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 		"get",
