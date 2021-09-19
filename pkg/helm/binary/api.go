@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path"
-
-	"github.com/deifyed/xctl/pkg/config"
+	"strings"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/helm"
@@ -75,6 +74,10 @@ func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
 
 	err := cmd.Run()
 	if err != nil {
+		if strings.HasPrefix(stderr.String(), "Error: release: not found") {
+			return false, nil
+		}
+
 		return false, fmt.Errorf("running Helm get: %s", stderr.String())
 	}
 
