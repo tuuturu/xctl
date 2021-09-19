@@ -86,11 +86,11 @@ func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
 	return true, nil
 }
 
-func NewExternalBinaryHelm(fs *afero.Afero) helm.Client {
+func NewExternalBinaryHelm(fs *afero.Afero, kubeConfigPath string) helm.Client {
 	binaryPath := "/usr/bin/helm"
 
 	return &externalBinaryHelm{
-		kubeConfigPath: config.GetAbsoluteKubeconfigPath(),
+		kubeConfigPath: kubeConfigPath,
 		binaryPath:     binaryPath,
 		fs:             fs,
 	}
