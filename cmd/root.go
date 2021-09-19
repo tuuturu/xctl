@@ -11,7 +11,7 @@ import (
 
 var rootCmd = &cobra.Command{ //nolint:gochecknoglobals
 	Use:   "xctl",
-	Short: "xctl provisions things",
+	Short: "xctl provisions a known and complete production environment",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return nil
 	},
