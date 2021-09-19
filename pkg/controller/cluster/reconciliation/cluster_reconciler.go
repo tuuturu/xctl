@@ -2,6 +2,7 @@ package reconciliation
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/deifyed/xctl/pkg/cloud"
@@ -59,7 +60,12 @@ func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.Clu
 		return fmt.Errorf("getting kubeconfig: %w", err)
 	}
 
-	err = fs.WriteFile(config.GetAbsoluteKubeconfigPath(), rawConfig, 0o744)
+	decodedConfig, err := base64.StdEncoding.DecodeString(string(rawConfig))
+	if err != nil {
+		return fmt.Errorf("decoding kubeconfig: %w", err)
+	}
+
+	err = fs.WriteFile(config.GetAbsoluteKubeconfigPath(), decodedConfig, 0o766)
 	if err != nil {
 		return fmt.Errorf("writing kubeconfig: %w", err)
 	}
