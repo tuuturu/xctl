@@ -5,11 +5,11 @@ import (
 
 	"github.com/deifyed/xctl/pkg/config"
 
-	"github.com/deifyed/xctl/pkg/helm/binary"
+	"github.com/deifyed/xctl/pkg/clients/helm/binary"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
+	"github.com/deifyed/xctl/pkg/clients/helm"
 	"github.com/deifyed/xctl/pkg/cloud"
-	"github.com/deifyed/xctl/pkg/helm"
 
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
 )

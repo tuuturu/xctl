@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/helm"
+	"github.com/deifyed/xctl/pkg/clients/helm"
 	"github.com/spf13/afero"
 )
 
