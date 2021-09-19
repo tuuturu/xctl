@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"strings"
+
+	"github.com/deifyed/xctl/pkg/config"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 
@@ -32,7 +33,7 @@ type venvOpts struct {
 }
 
 var (
-	venvCmdOpts = venvOpts{
+	venvCmdOpts = venvOpts{ //nolint:gochecknoglobals
 		io: xctl.IOStreams{
 			In:  os.Stdin,
 			Out: os.Stdout,
@@ -52,26 +53,31 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.Background()
 
-			workDir, err := venvCmdOpts.fs.TempDir("/tmp", "xctl")
-			if err != nil {
-				return fmt.Errorf("creating temporary directory: %w", err)
-			}
-
 			provider := linode.NewLinodeProvider()
 
-			err = provider.Authenticate()
+			err := provider.Authenticate()
 			if err != nil {
 				return fmt.Errorf("authenticating with cloud provider: %w", err)
 			}
 
-			err = setupKubeconfig(ctx, provider, venvCmdOpts.fs, venvCmdOpts.clusterManifest.Metadata.Name, workDir)
+			kubeConfigPath, err := ensureKubeConfig(ensureKubeConfigOpts{
+				fs:          venvCmdOpts.fs,
+				ctx:         ctx,
+				provider:    provider,
+				clusterName: venvCmdOpts.clusterManifest.Metadata.Name,
+			})
 			if err != nil {
 				return fmt.Errorf("setting up kubeconfig: %w", err)
 			}
 
 			env := venv.MergeVariables(os.Environ(), []string{
-				fmt.Sprintf("KUBECONFIG=%s", path.Join(workDir, "config.yaml")),
+				fmt.Sprintf("KUBECONFIG=%s", kubeConfigPath),
 			})
+
+			workDir, err := venvCmdOpts.fs.TempDir("/tmp", "xctl")
+			if err != nil {
+				return fmt.Errorf("creating temporary directory: %w", err)
+			}
 
 			shellCmd, err := acquireShellCommand(venvCmdOpts.fs, workDir, env)
 			if err != nil {
@@ -83,11 +89,6 @@ var (
 			err = shellCmd.Run()
 			if err != nil {
 				return fmt.Errorf("running shell: %w", err)
-			}
-
-			err = teardown(venvCmdOpts.fs, workDir)
-			if err != nil {
-				return fmt.Errorf("tearing down virtual environment: %w", err)
 			}
 
 			fmt.Fprintf(venvCmdOpts.io.Out, "Successfully exited virtual environment\n")
@@ -136,27 +137,39 @@ func acquireShellCommand(fs *afero.Afero, workDir string, env []string) (*exec.C
 	return shellCommand, nil
 }
 
-// setupKubeconfig fetches a kubeconfig from provider and stores it b64 decoded in workdir as config.yaml
-func setupKubeconfig(ctx context.Context, provider cloud.Provider, fs *afero.Afero, clusterName, workDir string) error {
-	kubeConfig, err := provider.GetKubeConfig(ctx, clusterName)
+type ensureKubeConfigOpts struct {
+	fs  *afero.Afero
+	ctx context.Context
+
+	provider    cloud.ClusterService
+	clusterName string
+}
+
+// ensureKubeConfig fetches a kubeconfig from provider and stores it b64 decoded in workdir as config.yaml
+func ensureKubeConfig(opts ensureKubeConfigOpts) (string, error) {
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(opts.clusterName)
 	if err != nil {
-		return fmt.Errorf("acquiring kubeconfig: %w", err)
+		return "", fmt.Errorf("acquiring KubeConfig path: %w", err)
+	}
+
+	if _, err := os.Stat(kubeConfigPath); err == nil {
+		return kubeConfigPath, nil
+	}
+
+	kubeConfig, err := opts.provider.GetKubeConfig(opts.ctx, opts.clusterName)
+	if err != nil {
+		return "", fmt.Errorf("acquiring kubeconfig: %w", err)
 	}
 
 	decodedConfig, err := base64.StdEncoding.DecodeString(string(kubeConfig))
 	if err != nil {
-		return fmt.Errorf("decoding kubeconfig: %w", err)
+		return "", fmt.Errorf("decoding kubeconfig: %w", err)
 	}
 
-	err = fs.WriteFile(path.Join(workDir, "config.yaml"), decodedConfig, 0o644)
+	err = opts.fs.WriteFile(kubeConfigPath, decodedConfig, 0o600)
 	if err != nil {
-		return fmt.Errorf("writing kubeconfig: %w", err)
+		return "", fmt.Errorf("writing kubeconfig: %w", err)
 	}
 
-	return nil
-}
-
-// teardown deletes the folder workdir and all of it's content
-func teardown(fs *afero.Afero, workDir string) error {
-	return fs.RemoveAll(workDir)
+	return kubeConfigPath, nil
 }
