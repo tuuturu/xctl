@@ -27,12 +27,13 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 	}
 
 	cmd := exec.Command(e.binaryPath,
+		fmt.Sprintf("--namespace=%s", plugin.Metadata.Namespace),
+		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 		"install",
+		"--atomic",
 		plugin.Metadata.Name,
 		plugin.Spec.Helm.Chart,
-		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 		fmt.Sprintf("--values=%s", tmpValuesPath),
-		"--atomic",
 	)
 
 	err = cmd.Run()
@@ -45,9 +46,10 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 
 func (e externalBinaryHelm) Delete(plugin v1alpha1.Plugin) error {
 	cmd := exec.Command(e.binaryPath,
+		fmt.Sprintf("--namespace=%s", plugin.Metadata.Namespace),
+		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 		"uninstall",
 		plugin.Metadata.Name,
-		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 	)
 
 	err := cmd.Run()
@@ -60,11 +62,11 @@ func (e externalBinaryHelm) Delete(plugin v1alpha1.Plugin) error {
 
 func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
 	cmd := exec.Command(e.binaryPath,
+		fmt.Sprintf("--namespace=%s", plugin.Metadata.Namespace),
 		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 		"get",
 		"manifest",
 		plugin.Metadata.Name,
-		"--debug",
 	)
 
 	stderr := bytes.Buffer{}
