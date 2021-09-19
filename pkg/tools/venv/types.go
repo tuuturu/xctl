@@ -1,7 +1,11 @@
 package venv
 
-import "os/exec"
+import (
+	"os/exec"
+
+	"github.com/deifyed/xctl/pkg/apis/xctl"
+)
 
 type Shell interface {
-	Command(env []string) (*exec.Cmd, error)
+	Command(io xctl.IOStreams, env []string) (*exec.Cmd, error)
 }

@@ -9,12 +9,14 @@ import (
 	"path"
 	"strings"
 
-	"github.com/deifyed/xctl/cmd/helpers"
+	"github.com/deifyed/xctl/pkg/apis/xctl"
+
+	"github.com/deifyed/xctl/pkg/cloud/linode"
+
+	"github.com/deifyed/xctl/cmd/preruns"
 	"github.com/deifyed/xctl/pkg/cloud"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-
-	"github.com/deifyed/xctl/pkg/cloud/linode"
 
 	"github.com/deifyed/xctl/pkg/tools/venv"
 	"github.com/deifyed/xctl/pkg/tools/venv/shells/zsh"
@@ -23,23 +25,30 @@ import (
 )
 
 type venvOpts struct {
+	io                     xctl.IOStreams
 	fs                     *afero.Afero
 	clusterDeclarationPath string
 	clusterManifest        v1alpha1.Cluster
 }
 
 var (
-	venvCmdOpts = venvOpts{ //nolint:gochecknoglobals
+	venvCmdOpts = venvOpts{
+		io: xctl.IOStreams{
+			In:  os.Stdin,
+			Out: os.Stdout,
+			Err: os.Stderr,
+		},
 		fs: &afero.Afero{Fs: afero.NewOsFs()},
 	}
 	venvCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "venv",
-		Short: "activates a virtual environment",
-		PreRunE: helpers.ClusterManifestIniter(
-			venvCmdOpts.fs,
-			&venvCmdOpts.clusterDeclarationPath,
-			&venvCmdOpts.clusterManifest,
-		),
+		Short: "activates a virtual environment enabling manipulation of the production environment",
+		PreRunE: preruns.ClusterManifestIniter(preruns.ClusterManifestIniterOpts{
+			Io:              venvCmdOpts.io,
+			Fs:              venvCmdOpts.fs,
+			ClusterManifest: &venvCmdOpts.clusterManifest,
+			SourcePath:      &venvCmdOpts.clusterDeclarationPath,
+		}),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.Background()
 
@@ -69,7 +78,7 @@ var (
 				return fmt.Errorf("acquiring shell: %w", err)
 			}
 
-			fmt.Printf("Launching virtual environment\n")
+			fmt.Fprintf(venvCmdOpts.io.Out, "Launching virtual environment\n")
 
 			err = shellCmd.Run()
 			if err != nil {
@@ -81,7 +90,7 @@ var (
 				return fmt.Errorf("tearing down virtual environment: %w", err)
 			}
 
-			fmt.Printf("Successfully exited virtual environment\n")
+			fmt.Fprintf(venvCmdOpts.io.Out, "Successfully exited virtual environment\n")
 
 			return nil
 		},
@@ -103,6 +112,7 @@ func init() {
 	rootCmd.AddCommand(venvCmd)
 }
 
+// acquireShellCommand figures out what the preferred shell is and returns an exec.Cmd version of it
 func acquireShellCommand(fs *afero.Afero, workDir string, env []string) (*exec.Cmd, error) {
 	shellPath, err := venv.GetCurrentShell(fs)
 	if err != nil {
@@ -113,12 +123,12 @@ func acquireShellCommand(fs *afero.Afero, workDir string, env []string) (*exec.C
 
 	switch {
 	case strings.HasSuffix(shellPath, "zsh"):
-		shell = zsh.NewZshShell(venvCmdOpts.fs, workDir, shellPath)
+		shell = zsh.NewZshShell(fs, workDir, shellPath)
 	default:
 		return nil, fmt.Errorf("handling shell %s. Not a known shell", shellPath)
 	}
 
-	shellCommand, err := shell.Command(env)
+	shellCommand, err := shell.Command(venvCmdOpts.io, env)
 	if err != nil {
 		return nil, fmt.Errorf("acquiring shell command: %w", err)
 	}
@@ -126,6 +136,7 @@ func acquireShellCommand(fs *afero.Afero, workDir string, env []string) (*exec.C
 	return shellCommand, nil
 }
 
+// setupKubeconfig fetches a kubeconfig from provider and stores it b64 decoded in workdir as config.yaml
 func setupKubeconfig(ctx context.Context, provider cloud.Provider, fs *afero.Afero, clusterName, workDir string) error {
 	kubeConfig, err := provider.GetKubeConfig(ctx, clusterName)
 	if err != nil {
@@ -145,6 +156,7 @@ func setupKubeconfig(ctx context.Context, provider cloud.Provider, fs *afero.Afe
 	return nil
 }
 
+// teardown deletes the folder workdir and all of it's content
 func teardown(fs *afero.Afero, workDir string) error {
 	return fs.RemoveAll(workDir)
 }

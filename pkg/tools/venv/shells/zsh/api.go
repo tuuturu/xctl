@@ -2,15 +2,16 @@ package zsh
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
+
+	"github.com/deifyed/xctl/pkg/apis/xctl"
 
 	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/tools/venv"
 )
 
-func (s *shell) Command(env []string) (*exec.Cmd, error) {
+func (s *shell) Command(io xctl.IOStreams, env []string) (*exec.Cmd, error) {
 	err := s.initialize()
 	if err != nil {
 		return nil, fmt.Errorf("initializing shell: %w", err)
@@ -18,9 +19,9 @@ func (s *shell) Command(env []string) (*exec.Cmd, error) {
 
 	cmd := exec.Command(s.shellBinPath)
 
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
+	cmd.Stderr = io.Err
+	cmd.Stdout = io.Out
+	cmd.Stdin = io.In
 
 	modifiedEnv := venv.MergeVariables(env, []string{fmt.Sprintf("ZDOTDIR=%s", s.workDir)})
 

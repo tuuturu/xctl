@@ -9,7 +9,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func handleApplication(_ io.Writer, _ bool, applicationManifestSource io.Reader) error {
+func handleApplication(out io.Writer, _ bool, applicationManifestSource io.Reader) error {
 	var manifest v1alpha1.Application
 
 	content, err := io.ReadAll(applicationManifestSource)
@@ -22,7 +22,7 @@ func handleApplication(_ io.Writer, _ bool, applicationManifestSource io.Reader)
 		return fmt.Errorf("parsing application manifest: %w", err)
 	}
 
-	println(fmt.Sprintf("finished handling %s", manifest.Metadata.Name))
+	fmt.Fprintf(out, "finished handling %s", manifest.Metadata.Name)
 
 	return nil
 }

@@ -4,11 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"os"
 
-	"github.com/deifyed/xctl/pkg/config"
-
-	"github.com/deifyed/xctl/cmd/helpers"
+	"github.com/deifyed/xctl/pkg/apis/xctl"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/spf13/afero"
@@ -16,11 +13,10 @@ import (
 )
 
 type ApplyRunEOpts struct {
-	ExternalFilesystem *afero.Afero
-	InternalFilesystem *afero.Afero
-	Out                io.Writer
-	File               string
-	Purge              bool
+	Filesystem *afero.Afero
+	Io         xctl.IOStreams
+	File       string
+	Purge      bool
 }
 
 func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
@@ -28,9 +24,9 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 		var originalManifestSource io.Reader
 
 		if opts.File == "-" {
-			originalManifestSource = os.Stdin
+			originalManifestSource = opts.Io.In
 		} else {
-			originalManifestSource, err = opts.ExternalFilesystem.Open(opts.File)
+			originalManifestSource, err = opts.Filesystem.Open(opts.File)
 			if err != nil {
 				return fmt.Errorf("opening manifest file: %w", err)
 			}
@@ -46,23 +42,13 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 
 		switch kind {
 		case v1alpha1.ClusterKind:
-			err = helpers.CopyToFs(
-				opts.ExternalFilesystem,
-				opts.InternalFilesystem,
-				opts.File,
-				config.GetAbsoluteInternalClusterManifestPath(),
-			)
-			if err != nil {
-				return fmt.Errorf("copying cluster manifest to internal fs: %w", err)
-			}
+			fmt.Fprintf(opts.Io.Out, "Applying cluster manifest, please wait\n\n")
 
-			fmt.Fprintf(opts.Out, "Applying cluster manifest, please wait\n\n")
-
-			return handleCluster(opts.InternalFilesystem, opts.Out, opts.Purge, manifestSource)
+			return handleCluster(opts.Filesystem, opts.Io.Out, opts.Purge, manifestSource)
 		case v1alpha1.ApplicationKind:
-			fmt.Fprintf(opts.Out, "Applying application manifest %s, please wait\n\n", opts.File)
+			fmt.Fprintf(opts.Io.Out, "Applying application manifest %s, please wait\n\n", opts.File)
 
-			return handleApplication(opts.Out, opts.Purge, manifestSource)
+			return handleApplication(opts.Io.Out, opts.Purge, manifestSource)
 		default:
 			return fmt.Errorf("unknown kind %s", kind)
 		}

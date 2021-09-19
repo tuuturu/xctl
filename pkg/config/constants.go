@@ -4,6 +4,9 @@ import (
 	"time"
 )
 
+// ApplicationName refers to the xctl project name
+const ApplicationName = "xctl"
+
 const ( // Controller / reconciliation
 	// DefaultMaxReconciliationRequeues defines the maximum amount of times to requeue a reconciler
 	DefaultMaxReconciliationRequeues = 3
@@ -21,20 +24,9 @@ const ( // Domain
 	DefaultSubdomainTTLSeconds = 300
 )
 
-const ( // Helm
-	// DefaultHelmActionTimeout defines the default timeout for Helm operations
-	DefaultHelmActionTimeout = 5 * time.Minute
-)
-
 const ( // Internal filesystem directories
-	// DefaultAbsoluteRootPath defines the root of the internal filesystem
-	DefaultAbsoluteRootPath = "/"
-	// DefaultConfigDirName defines the default location for config files
-	DefaultConfigDirName = "config"
+	// DefaultClustersDir defines the folder containing cluster directories
+	DefaultClustersDir = "clusters"
 	// DefaultKubeconfigFilename defines the name of the kubeconfig in the internal FS
 	DefaultKubeconfigFilename = "kubeconfig.yaml"
-	// DefaultManifestDir defines the name of the manifest directory
-	DefaultManifestDir = "manifests"
-	// DefaultClusterManifestFilename defines the name of the cluster manifest file
-	DefaultClusterManifestFilename = "cluster.yaml"
 )

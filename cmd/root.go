@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 
-	"github.com/deifyed/xctl/cmd/helpers"
+	"github.com/deifyed/xctl/cmd/preruns"
 
 	"github.com/spf13/cobra"
 )
@@ -17,11 +18,11 @@ var rootCmd = &cobra.Command{ //nolint:gochecknoglobals
 	},
 }
 
-func Execute() {
+func Execute(errOut io.Writer) {
 	if err := rootCmd.Execute(); err != nil {
-		userError := helpers.ErrorTranslator(err)
+		userError := preruns.ErrorTranslator(err)
 
-		_, _ = fmt.Fprintln(os.Stderr, userError)
+		_, _ = fmt.Fprintln(errOut, userError)
 
 		os.Exit(1)
 	}

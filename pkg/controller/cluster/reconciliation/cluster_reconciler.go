@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"os"
+	"path"
 
 	"github.com/deifyed/xctl/pkg/cloud"
 	"github.com/deifyed/xctl/pkg/config"
@@ -48,6 +50,16 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 			return reconciliation.Result{}, fmt.Errorf("deleting cluster: %w", err)
 		}
 
+		clusterDir, err := config.GetAbsoluteXCTLClusterDir(rctx.ClusterDeclaration.Metadata.Name)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("acquiring cluster directory: %w", err)
+		}
+
+		err = rctx.Filesystem.RemoveAll(clusterDir)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("deleting cluster directory: %w", err)
+		}
+
 		return reconciliation.Result{Requeue: false}, nil
 	}
 
@@ -65,7 +77,17 @@ func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.Clu
 		return fmt.Errorf("decoding kubeconfig: %w", err)
 	}
 
-	err = fs.WriteFile(config.GetAbsoluteKubeconfigPath(), decodedConfig, 0o766)
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(clusterName)
+	if err != nil {
+		return fmt.Errorf("acquiring KubeConfigPath: %w", err)
+	}
+
+	err = os.MkdirAll(path.Dir(kubeConfigPath), 0o700)
+	if err != nil {
+		return fmt.Errorf("preparing folder structure: %w", err)
+	}
+
+	err = fs.WriteFile(kubeConfigPath, decodedConfig, 0o600)
 	if err != nil {
 		return fmt.Errorf("writing kubeconfig: %w", err)
 	}

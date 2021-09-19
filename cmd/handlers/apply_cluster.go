@@ -6,8 +6,6 @@ import (
 	"io"
 	"time"
 
-	"github.com/deifyed/xctl/pkg/plugins/vault"
-
 	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -56,7 +54,6 @@ func handleCluster(fs *afero.Afero, out io.Writer, purge bool, clusterManifestSo
 
 	scheduler := reconciliation.NewScheduler(opts,
 		clusterrec.NewClusterReconciler(provider),
-		vault.NewVaultReconciler(provider),
 	)
 
 	spin.Start()

@@ -3,7 +3,9 @@ package vault
 import (
 	"fmt"
 
-	"github.com/deifyed/xctl/pkg/helm/sdk"
+	"github.com/deifyed/xctl/pkg/config"
+
+	"github.com/deifyed/xctl/pkg/helm/binary"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud"
@@ -17,11 +19,12 @@ type vaultReconciler struct {
 }
 
 func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
-	helmClient := sdk.NewHelmClient(sdk.NewHelmClientOpts{
-		DebugOut: nil,
-		Debug:    false,
-		Fs:       rctx.Filesystem,
-	})
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
+	if err != nil {
+		return reconciliation.Result{}, fmt.Errorf("acquiring KubeConfig path: %w", err)
+	}
+
+	helmClient := binary.NewExternalBinaryHelm(rctx.Filesystem, kubeConfigPath)
 	plugin := NewVaultPlugin()
 
 	action, err := v.determineAction(rctx, helmClient, plugin)

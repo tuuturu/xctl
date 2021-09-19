@@ -1,9 +1,11 @@
-package helpers
+package preruns
 
 import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/deifyed/xctl/pkg/apis/xctl"
 
 	"sigs.k8s.io/yaml"
 
@@ -12,18 +14,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type ClusterManifestIniterOpts struct {
+	Io xctl.IOStreams
+	Fs *afero.Afero
+
+	ClusterManifest *v1alpha1.Cluster
+
+	SourcePath *string
+}
+
 // ClusterManifestIniter initializes a cluster manifest struct based on a filepath or stdin
-func ClusterManifestIniter(fs *afero.Afero, sourcePath *string, clusterManifest *v1alpha1.Cluster) func(cmd *cobra.Command, args []string) error { //nolint:lll
+func ClusterManifestIniter(opts ClusterManifestIniterOpts) func(cmd *cobra.Command, args []string) error { //nolint:lll
 	return func(cmd *cobra.Command, args []string) error {
 		var (
 			source io.Reader
 			err    error
 		)
 
-		if *sourcePath == "-" {
-			source = os.Stdin
+		if *opts.SourcePath == "-" {
+			source = opts.Io.In
 		} else {
-			source, err = fs.OpenFile(*sourcePath, os.O_RDONLY, 0o755)
+			source, err = opts.Fs.OpenFile(*opts.SourcePath, os.O_RDONLY, 0o755)
 			if err != nil {
 				return fmt.Errorf("opening cluster manifest: %w", err)
 			}
@@ -34,7 +45,7 @@ func ClusterManifestIniter(fs *afero.Afero, sourcePath *string, clusterManifest 
 			return fmt.Errorf("reading cluster manifest: %w", err)
 		}
 
-		err = yaml.Unmarshal(rawManifest, clusterManifest)
+		err = yaml.Unmarshal(rawManifest, opts.ClusterManifest)
 		if err != nil {
 			return fmt.Errorf("unmarshalling cluster manifest: %w", err)
 		}

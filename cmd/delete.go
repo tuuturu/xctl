@@ -4,17 +4,20 @@ import (
 	"os"
 
 	"github.com/deifyed/xctl/cmd/handlers"
+	"github.com/deifyed/xctl/pkg/apis/xctl"
 	"github.com/spf13/afero"
-
 	"github.com/spf13/cobra"
 )
 
 var (
 	deleteCmdOpts = handlers.ApplyRunEOpts{ //nolint:gochecknoglobals
-		InternalFilesystem: &afero.Afero{Fs: afero.NewMemMapFs()},
-		ExternalFilesystem: &afero.Afero{Fs: afero.NewOsFs()},
-		Out:                os.Stdout,
-		Purge:              true,
+		Io: xctl.IOStreams{
+			In:  os.Stdin,
+			Out: os.Stdout,
+			Err: os.Stderr,
+		},
+		Filesystem: &afero.Afero{Fs: afero.NewOsFs()},
+		Purge:      true,
 	}
 	deleteCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "delete",
