@@ -20,7 +20,7 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 
 	tmpValuesPath := path.Join(tmpDir, fmt.Sprintf("%s-values.yaml", plugin.Metadata.Name))
 
-	err = e.fs.WriteFile(tmpValuesPath, []byte(plugin.Spec.Values), 0o744)
+	err = e.fs.WriteFile(tmpValuesPath, []byte(plugin.Spec.Values), 0o600)
 	if err != nil {
 		return fmt.Errorf("creating temporary values file: %w", err)
 	}
