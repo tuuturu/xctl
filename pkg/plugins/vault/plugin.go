@@ -10,6 +10,7 @@ func NewVaultPlugin() v1alpha1.Plugin {
 	plugin := v1alpha1.NewPlugin(vaultPluginName)
 
 	plugin.Metadata.Name = vaultPluginName
+	plugin.Metadata.Namespace = "kube-system"
 	plugin.Spec.HelmChart = "hashicorp/vault"
 	plugin.Spec.Values = vaultValuesTemplate
 
