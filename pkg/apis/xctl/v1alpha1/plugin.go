@@ -21,8 +21,10 @@ type PluginSpec struct {
 type PluginSpecHelm struct {
 	// Chart defines the URL where the chart can be found
 	Chart string `json:"chart"`
-	// Values to apply to the chart
+	// Values defines the values to apply to the chart
 	Values string `json:"values"`
+	// PostInstallScript defines a script to be run post install
+	PostInstallScript string `json:"postInstallScript"`
 }
 
 // NewPlugin initializes a plugin
