@@ -3,6 +3,7 @@ package binary
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os/exec"
 	"path"
 	"strings"
@@ -71,6 +72,7 @@ func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
 
 	stderr := bytes.Buffer{}
 	cmd.Stderr = &stderr
+	cmd.Stdout = io.Discard
 
 	err := cmd.Run()
 	if err != nil {
