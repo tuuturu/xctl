@@ -1,4 +1,4 @@
-package preruns
+package helpers
 
 import (
 	"github.com/deifyed/xctl/pkg/config"

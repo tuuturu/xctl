@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/deifyed/xctl/cmd/preruns"
+	"github.com/deifyed/xctl/cmd/helpers"
 
 	"github.com/spf13/cobra"
 )
@@ -20,7 +20,7 @@ var rootCmd = &cobra.Command{ //nolint:gochecknoglobals
 
 func Execute(errOut io.Writer) {
 	if err := rootCmd.Execute(); err != nil {
-		userError := preruns.ErrorTranslator(err)
+		userError := helpers.ErrorTranslator(err)
 
 		_, _ = fmt.Fprintln(errOut, userError)
 
