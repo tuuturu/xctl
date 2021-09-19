@@ -21,7 +21,7 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 
 	tmpValuesPath := path.Join(tmpDir, fmt.Sprintf("%s-values.yaml", plugin.Metadata.Name))
 
-	err = e.fs.WriteFile(tmpValuesPath, []byte(plugin.Spec.Values), 0o600)
+	err = e.fs.WriteFile(tmpValuesPath, []byte(plugin.Spec.Helm.Values), 0o600)
 	if err != nil {
 		return fmt.Errorf("creating temporary values file: %w", err)
 	}
@@ -29,11 +29,10 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 	cmd := exec.Command(e.binaryPath,
 		"install",
 		plugin.Metadata.Name,
-		plugin.Spec.HelmChart,
+		plugin.Spec.Helm.Chart,
 		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 		fmt.Sprintf("--values=%s", tmpValuesPath),
 		"--atomic",
-		"--debug",
 	)
 
 	err = cmd.Run()
