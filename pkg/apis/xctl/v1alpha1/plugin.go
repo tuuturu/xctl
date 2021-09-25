@@ -15,6 +15,8 @@ type PluginSpec struct {
 	Helm PluginSpecHelm `json:"helm"`
 	// Secrets requests secrets from a path in the secret manager and populates a secret named after the plugin
 	Secrets map[string]string `json:"secrets"`
+	// PostInstallScript defines a script to be run post install
+	Hooks PluginSpecHooks `json:"hooks"`
 }
 
 // PluginSpecHelm contains necessary information for installing a Helm chart
@@ -23,8 +25,11 @@ type PluginSpecHelm struct {
 	Chart string `json:"chart"`
 	// Values defines the values to apply to the chart
 	Values string `json:"values"`
-	// PostInstallScript defines a script to be run post install
-	PostInstallScript string `json:"postInstallScript"`
+}
+
+// PluginSpecHooks contains scripts ran at certain plugin life cycle events
+type PluginSpecHooks struct {
+	Post string `json:"post"`
 }
 
 // NewPlugin initializes a plugin
