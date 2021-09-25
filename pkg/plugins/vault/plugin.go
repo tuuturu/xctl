@@ -13,9 +13,21 @@ func NewVaultPlugin() v1alpha1.Plugin {
 	plugin.Metadata.Namespace = "kube-system"
 	plugin.Spec.Helm.Chart = "hashicorp/vault"
 	plugin.Spec.Helm.Values = vaultValuesTemplate
+	plugin.Spec.Hooks.Post = postInstallScript
 
 	return plugin
 }
+
+// postInstallScript stores the unseal keys in a k8s secret and unseals the vault
+const postInstallScript = `
+kubectl -n kube-system exec vault-0 -- vault operator init > /tmp/vault-credentials
+kubectl -n kube-system create secret generic vault-init --from-file=vault-init=/tmp/vault-credentials
+
+for item in $(cat /tmp/vault-credentials | grep Unseal | cut -d' ' -f4 | head -3)
+do
+	kubectl -n kube-system exec vault-o -- vault operator unseal $item
+done
+`
 
 const vaultValuesTemplate = `
 # Available parameters and their default values for the Vault chart.
