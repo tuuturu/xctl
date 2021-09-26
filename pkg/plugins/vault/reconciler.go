@@ -46,6 +46,11 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("uninstalling vault: %w", err)
 		}
 
+		err = runScript(rctx.Filesystem, kubeConfigPath, []byte(plugin.Spec.Hooks.PostUninstall))
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("running post uninstall script: %w", err)
+		}
+
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionWait:
 		return reconciliation.Result{Requeue: true}, nil
@@ -54,6 +59,23 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 	}
 
 	return reconciliation.Result{Requeue: false}, reconciliation.ErrIndecisive
+}
+
+func runScript(fs *afero.Afero, kubeConfigPath string, rawScript []byte) error {
+	if len(rawScript) == 0 {
+		return nil
+	}
+
+	runner := script.NewScriptRunner(fs, map[string]string{
+		"KUBECONFIG": kubeConfigPath,
+	})
+
+	_, err := runner.Execute(rawScript)
+	if err != nil {
+		return fmt.Errorf("executing script: %w", err)
+	}
+
+	return nil
 }
 
 func (v vaultReconciler) determineAction(rctx reconciliation.Context, helmClient helm.Client, plugin v1alpha1.Plugin) (

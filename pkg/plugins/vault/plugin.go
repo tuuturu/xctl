@@ -13,10 +13,16 @@ func NewVaultPlugin() v1alpha1.Plugin {
 	plugin.Metadata.Namespace = "kube-system"
 	plugin.Spec.Helm.Chart = "hashicorp/vault"
 	plugin.Spec.Helm.Values = vaultValuesTemplate
-	plugin.Spec.Hooks.Post = postInstallScript
+
+	plugin.Spec.Hooks.PostUninstall = postUninstallScript
 
 	return plugin
 }
+
+// postUninstall cleans up created secret if it hasn't been deleted
+const postUninstallScript = `
+kubectl -n kube-system delete secret vault-init
+`
 
 // postInstallScript stores the unseal keys in a k8s secret and unseals the vault
 const postInstallScript = `
@@ -27,6 +33,11 @@ for item in $(cat /tmp/vault-credentials | grep Unseal | cut -d' ' -f4 | head -3
 do
 	kubectl -n kube-system exec vault-o -- vault operator unseal $item
 done
+`
+
+// postUninstall cleans up created secret if it hasn't been deleted
+const postUninstallScript = `
+kubectl -n kube-system delete secret vault-init || true
 `
 
 const vaultValuesTemplate = `
