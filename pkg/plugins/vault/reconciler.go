@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/deifyed/xctl/pkg/config"
+	"github.com/deifyed/xctl/pkg/tools/script"
+	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/clients/helm/binary"
 
@@ -37,6 +39,11 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 		err = helmClient.Install(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing vault: %w", err)
+		}
+
+		err = runScript(rctx.Filesystem, kubeConfigPath, []byte(plugin.Spec.Hooks.PostInstall))
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("running post install script: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
