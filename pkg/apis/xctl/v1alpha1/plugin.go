@@ -29,7 +29,10 @@ type PluginSpecHelm struct {
 
 // PluginSpecHooks contains scripts ran at certain plugin life cycle events
 type PluginSpecHooks struct {
-	Post string `json:"post"`
+	// PostInstall will trigger after all components in the plugin is successfully installed
+	PostInstall string `json:"postInstall"`
+	// PostUninstall will trigger after all components in the plugin is successfully uninstalled
+	PostUninstall string `json:"postUninstall"`
 }
 
 // NewPlugin initializes a plugin
