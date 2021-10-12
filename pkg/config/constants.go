@@ -29,4 +29,6 @@ const ( // Internal filesystem directories
 	DefaultClustersDir = "clusters"
 	// DefaultKubeconfigFilename defines the name of the kubeconfig in the internal FS
 	DefaultKubeconfigFilename = "kubeconfig.yaml"
+	// DefaultBinariesDir defines the name of the directory containing binaries
+	DefaultBinariesDir = "binaries"
 )

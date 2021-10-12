@@ -34,3 +34,12 @@ func GetAbsoluteKubeconfigPath(clusterName string) (string, error) {
 
 	return path.Join(clusterDir, DefaultKubeconfigFilename), nil
 }
+
+func GetAbsoluteBinariesDir() (string, error) {
+	xctlDir, err := GetAbsoluteXCTLDir()
+	if err != nil {
+		return "", fmt.Errorf("acquiring xctl directory: %w", err)
+	}
+
+	return path.Join(xctlDir, DefaultBinariesDir), nil
+}

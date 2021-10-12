@@ -17,24 +17,6 @@ func NewVaultPlugin() v1alpha1.Plugin {
 	return plugin
 }
 
-// postInstallScript stores the unseal keys in a k8s secret and unseals the vault
-const postInstallScript = `
-kubectl -n kube-system exec vault-0 -- vault operator init > /tmp/vault-init
-kubectl -n kube-system create secret generic vault-init --from-file=/tmp/vault-init
-
-for item in $(cat /tmp/vault-init | grep Unseal | cut -d' ' -f4 | head -3)
-do
-	kubectl -n kube-system exec vault-0 -- vault operator unseal $item
-done
-
-rm /tmp/vault-init
-`
-
-// postUninstall cleans up created secret if it hasn't been deleted
-const postUninstallScript = `
-kubectl -n kube-system delete secret vault-init || true
-`
-
 const vaultValuesTemplate = `
 # Available parameters and their default values for the Vault chart.
 

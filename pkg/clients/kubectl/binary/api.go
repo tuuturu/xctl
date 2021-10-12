@@ -3,6 +3,7 @@ package binary
 import (
 	"bytes"
 	"fmt"
+	"github.com/spf13/afero"
 	"io"
 	"os/exec"
 
@@ -79,12 +80,17 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 	}, nil
 }
 
-func NewKubectlBinaryClient(logger *logrus.Logger, kubectlPath, kubeConfigPath string) kubectl.Client {
+func NewKubectlBinaryClient(logger *logrus.Logger, fs *afero.Afero, kubeConfigPath string) (kubectl.Client, error) {
+	kubectlPath, err := getKubectlPath(fs)
+	if err != nil {
+		return nil, fmt.Errorf("acquiring kubectl path: %w", err)
+	}
+
 	return &kubectlBinaryClient{
 		logger:      logger,
 		kubectlPath: kubectlPath,
 		env: map[string]string{
 			kubeConfigPathKey: kubeConfigPath,
 		},
-	}
+	}, nil
 }
