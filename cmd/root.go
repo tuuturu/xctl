@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/deifyed/xctl/cmd/helpers"
@@ -18,11 +17,11 @@ var rootCmd = &cobra.Command{ //nolint:gochecknoglobals
 	},
 }
 
-func Execute(errOut io.Writer) {
+func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		userError := helpers.ErrorTranslator(err)
 
-		_, _ = fmt.Fprintln(errOut, userError)
+		_, _ = fmt.Fprintln(os.Stderr, userError)
 
 		os.Exit(1)
 	}
