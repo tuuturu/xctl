@@ -18,6 +18,8 @@ var rootCmd = &cobra.Command{ //nolint:gochecknoglobals
 }
 
 func Execute() {
+	helpers.InitializeLogging()
+
 	if err := rootCmd.Execute(); err != nil {
 		userError := helpers.ErrorTranslator(err)
 
