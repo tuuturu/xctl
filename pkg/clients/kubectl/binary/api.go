@@ -16,7 +16,7 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts) error {
 		opts.Command,
 	))
 
-	cmd.Env = []string{fmt.Sprintf("KUBECONFIG=%s", k.kubeConfigPath)}
+	cmd.Env = k.envAsArray()
 
 	if opts.Stdout != nil {
 		cmd.Stdout = opts.Stdout
@@ -42,7 +42,7 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 		opts.PortTo,
 	))
 
-	cmd.Env = []string{fmt.Sprintf("KUBECONFIG=%s", k.kubeConfigPath)}
+	cmd.Env = k.envAsArray()
 
 	stderr := bytes.Buffer{}
 	cmd.Stderr = &stderr
@@ -59,7 +59,9 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 
 func NewKubectlBinaryClient(kubectlPath, kubeConfigPath string) kubectl.Client {
 	return &kubectlBinaryClient{
-		kubectlPath:    kubectlPath,
-		kubeConfigPath: kubeConfigPath,
+		kubectlPath: kubectlPath,
+		env: map[string]string{
+			kubeConfigPathKey: kubeConfigPath,
+		},
 	}
 }

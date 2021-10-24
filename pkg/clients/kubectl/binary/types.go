@@ -1,6 +1,8 @@
 package binary
 
+const kubeConfigPathKey = "KUBECONFIG"
+
 type kubectlBinaryClient struct {
-	kubectlPath    string
-	kubeConfigPath string
+	kubectlPath string
+	env         map[string]string
 }
