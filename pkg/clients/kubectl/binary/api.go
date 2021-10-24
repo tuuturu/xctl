@@ -3,7 +3,10 @@ package binary
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os/exec"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/deifyed/xctl/pkg/clients/kubectl"
 )
@@ -16,18 +19,30 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts) error {
 		opts.Command,
 	))
 
-	cmd.Env = k.envAsArray()
-
-	if opts.Stdout != nil {
-		cmd.Stdout = opts.Stdout
-	}
-
 	stderr := bytes.Buffer{}
+	stdout := bytes.Buffer{}
+
+	cmd.Env = k.envAsArray()
+	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
 	err := cmd.Run()
 	if err != nil {
+		k.logger.WithFields(logrus.Fields{
+			"stdout": stdout.String(),
+			"stderr": stderr.String(),
+		}).Debug("executing command")
+
 		return fmt.Errorf("executing pod command: %s", stderr.String())
+	}
+
+	if opts.Stdout == nil {
+		return nil
+	}
+
+	_, err = io.Copy(cmd.Stdout, &stdout)
+	if err != nil {
+		return fmt.Errorf("pushing stdout data: %w", err)
 	}
 
 	return nil
@@ -42,14 +57,21 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 		opts.PortTo,
 	))
 
-	cmd.Env = k.envAsArray()
-
 	stderr := bytes.Buffer{}
+	stdout := bytes.Buffer{}
+
+	cmd.Env = k.envAsArray()
+	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
 	err := cmd.Start()
 	if err != nil {
-		return nil, fmt.Errorf("executing pod command: %s", stderr.String())
+		k.logger.WithFields(logrus.Fields{
+			"stdout": stdout.String(),
+			"stderr": stderr.String(),
+		}).Debug("executing command")
+
+		return nil, fmt.Errorf("executing pod command: %s", err)
 	}
 
 	return func() error {
@@ -57,8 +79,9 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 	}, nil
 }
 
-func NewKubectlBinaryClient(kubectlPath, kubeConfigPath string) kubectl.Client {
+func NewKubectlBinaryClient(logger *logrus.Logger, kubectlPath, kubeConfigPath string) kubectl.Client {
 	return &kubectlBinaryClient{
+		logger:      logger,
 		kubectlPath: kubectlPath,
 		env: map[string]string{
 			kubeConfigPathKey: kubeConfigPath,
