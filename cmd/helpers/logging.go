@@ -1,8 +1,9 @@
 package helpers
 
 import (
-	"github.com/sirupsen/logrus"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 func InitializeLogging() {

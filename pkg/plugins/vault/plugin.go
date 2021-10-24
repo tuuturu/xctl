@@ -14,9 +14,6 @@ func NewVaultPlugin() v1alpha1.Plugin {
 	plugin.Spec.Helm.Chart = "hashicorp/vault"
 	plugin.Spec.Helm.Values = vaultValuesTemplate
 
-	plugin.Spec.Hooks.PostInstall = postInstallScript
-	plugin.Spec.Hooks.PostUninstall = postUninstallScript
-
 	return plugin
 }
 
