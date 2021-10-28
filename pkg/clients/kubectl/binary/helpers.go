@@ -36,7 +36,6 @@ func getKubectlPath(fs *afero.Afero) (string, error) {
 	return path, nil
 }
 
-
 func (k kubectlBinaryClient) envAsArray() []string {
 	env := make([]string, len(k.env))
 	index := 0
