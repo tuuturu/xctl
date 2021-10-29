@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strconv"
 
 	"github.com/spf13/afero"
 
@@ -14,12 +15,13 @@ import (
 )
 
 func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts) error {
-	cmd := exec.Command(k.kubectlPath, fmt.Sprintf(
-		"--namespace %s exec -it %s -- %s",
-		opts.Pod.Namespace,
+	cmd := exec.Command(k.kubectlPath, "exec",
+		"-it",
+		"--namespace", opts.Pod.Namespace,
 		opts.Pod.Name,
-		opts.Command,
-	))
+		"--",
+		string(opts.Command),
+	)
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
@@ -30,7 +32,7 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts) error {
 
 	err := cmd.Run()
 	if err != nil {
-		k.logger.WithFields(logrus.Fields{
+		logrus.WithFields(logrus.Fields{
 			"stdout": stdout.String(),
 			"stderr": stderr.String(),
 		}).Debug("executing command")
@@ -51,13 +53,11 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts) error {
 }
 
 func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.StopFn, error) {
-	cmd := exec.Command(k.kubectlPath, fmt.Sprintf(
-		"--namespace %s port-forward %s %d:%d",
-		opts.Pod.Namespace,
+	cmd := exec.Command(k.kubectlPath, "port-forward",
+		"--namespace", opts.Pod.Namespace,
 		opts.Pod.Name,
-		opts.PortFrom,
-		opts.PortTo,
-	))
+		fmt.Sprintf("%s:%s", strconv.Itoa(opts.PortFrom), strconv.Itoa(opts.PortTo)),
+	)
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
@@ -68,7 +68,7 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 
 	err := cmd.Start()
 	if err != nil {
-		k.logger.WithFields(logrus.Fields{
+		logrus.WithFields(logrus.Fields{
 			"stdout": stdout.String(),
 			"stderr": stderr.String(),
 		}).Debug("executing command")
@@ -81,14 +81,13 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 	}, nil
 }
 
-func New(logger *logrus.Logger, fs *afero.Afero, kubeConfigPath string) (kubectl.Client, error) {
+func New(fs *afero.Afero, kubeConfigPath string) (kubectl.Client, error) {
 	kubectlPath, err := getKubectlPath(fs)
 	if err != nil {
 		return nil, fmt.Errorf("acquiring kubectl path: %w", err)
 	}
 
 	return &kubectlBinaryClient{
-		logger:      logger,
 		kubectlPath: kubectlPath,
 		env: map[string]string{
 			kubeConfigPathKey: kubeConfigPath,
