@@ -3,7 +3,6 @@ package vault
 import (
 	"fmt"
 
-	"github.com/deifyed/xctl/pkg/clients/helm/binary"
 	"github.com/deifyed/xctl/pkg/config"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -23,24 +22,33 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 		return reconciliation.Result{}, fmt.Errorf("acquiring KubeConfig path: %w", err)
 	}
 
-	helmClient := binary.NewExternalBinaryHelm(rctx.Filesystem, kubeConfigPath)
+	clients, err := prepareClients(rctx.Filesystem, kubeConfigPath)
+	if err != nil {
+		return reconciliation.Result{}, fmt.Errorf("preparing clients: %w", err)
+	}
+
 	plugin := NewVaultPlugin()
 
-	action, err := v.determineAction(rctx, helmClient, plugin)
+	action, err := v.determineAction(rctx, clients.helm, plugin)
 	if err != nil {
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
 
 	switch action {
 	case reconciliation.ActionCreate:
-		err = helmClient.Install(plugin)
+		err = clients.helm.Install(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing vault: %w", err)
 		}
 
+		err = initializeVault(clients.kubectl, clients.vault)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("initializing vault: %w", err)
+		}
+
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
-		err = helmClient.Delete(plugin)
+		err = clients.helm.Delete(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("uninstalling vault: %w", err)
 		}
