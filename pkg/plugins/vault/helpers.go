@@ -1,7 +1,9 @@
 package vault
 
 import (
+	"bytes"
 	"fmt"
+	"net/url"
 
 	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
 	kubectlBinary "github.com/deifyed/xctl/pkg/clients/kubectl/binary"
@@ -43,6 +45,100 @@ func initializeVault(kubectlClient kubectl.Client, vaultClient vault.Client) err
 	}
 
 	return nil
+}
+
+func activateKubernetesEngine(vaultClient vault.Client, kubectlClient kubectl.Client) error {
+	podSelector := kubectl.Pod{Name: "vault-0", Namespace: "kube-system"}
+
+	stopFn, err := kubectlClient.PortForward(kubectl.PortForwardOpts{
+		Pod:      podSelector,
+		PortFrom: vault.DefaultPort,
+		PortTo:   vault.DefaultPort,
+	})
+	if err != nil {
+		return fmt.Errorf("port forwarding vault: %w", err)
+	}
+
+	defer func() {
+		_ = stopFn()
+	}()
+
+	err = vaultClient.EnableKubernetesAuthentication()
+	if err != nil {
+		return fmt.Errorf("enabling Kubernetes authentication: %w", err)
+	}
+
+	host, err := acquireKubernetesHost(kubectlClient, podSelector)
+	if err != nil {
+		return fmt.Errorf("acquiring Kubernetes host: %w", err)
+	}
+
+	serviceToken, err := acquireServiceUserToken(kubectlClient, podSelector)
+	if err != nil {
+		return fmt.Errorf("acquiring service user token: %w", err)
+	}
+
+	caCert, err := acquireKubernetesCACertificate(kubectlClient, podSelector)
+	if err != nil {
+		return fmt.Errorf("acquiring Kubernetes CA certificate: %w", err)
+	}
+
+	err = vaultClient.ConfigureKubernetesAuthentication(vault.ConfigureKubernetesAuthenticationOpts{
+		Host:             host,
+		TokenReviewerJWT: serviceToken,
+		CACert:           caCert,
+		Issuer:           kubectl.DefaultKubernetesIssuer,
+	})
+	if err != nil {
+		return fmt.Errorf("configuring Kubernetes authentication: %w", err)
+	}
+
+	return nil
+}
+
+func acquireKubernetesHost(client kubectl.Client, podSelector kubectl.Pod) (url.URL, error) {
+	buf := bytes.Buffer{}
+
+	err := client.PodExec(kubectl.PodExecOpts{
+		Pod:    podSelector,
+		Stdout: &buf,
+	}, "printenv", "KUBERNETES_PORT_443_TCP_ADDR")
+	if err != nil {
+		return url.URL{}, fmt.Errorf("executing pod command: %w", err)
+	}
+
+	return url.URL{
+		Scheme: "https",
+		Host:   fmt.Sprintf("%s:443", buf.String()),
+	}, nil
+}
+
+func acquireServiceUserToken(client kubectl.Client, podSelector kubectl.Pod) (string, error) {
+	buf := bytes.Buffer{}
+
+	err := client.PodExec(kubectl.PodExecOpts{
+		Pod:    podSelector,
+		Stdout: &buf,
+	}, "cat", "/var/run/secrets/kubernetes.io/serviceaccount/token")
+	if err != nil {
+		return "", fmt.Errorf("executing pod command: %w", err)
+	}
+
+	return buf.String(), nil
+}
+
+func acquireKubernetesCACertificate(client kubectl.Client, podSelector kubectl.Pod) (string, error) {
+	buf := bytes.Buffer{}
+
+	err := client.PodExec(kubectl.PodExecOpts{
+		Pod:    podSelector,
+		Stdout: &buf,
+	}, "cat", "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
+	if err != nil {
+		return "", fmt.Errorf("executing pod command: %w", err)
+	}
+
+	return buf.String(), nil
 }
 
 func prepareClients(fs *afero.Afero, kubeConfigPath string) (clientContainer, error) {

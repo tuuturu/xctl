@@ -37,8 +37,6 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
 
-	// action = "delete"
-
 	switch action {
 	case reconciliation.ActionCreate:
 		log.Debug("installing")
@@ -53,6 +51,13 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 		err = initializeVault(clients.kubectl, clients.vault)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("initializing vault: %w", err)
+		}
+
+		log.Debug("activating Kubernetes engine")
+
+		err = activateKubernetesEngine(clients.vault, clients.kubectl)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("activating Kubernetes engine: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
