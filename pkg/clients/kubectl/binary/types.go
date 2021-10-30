@@ -1,6 +1,9 @@
 package binary
 
-const kubeConfigPathKey = "KUBECONFIG"
+const (
+	kubeConfigPathKey      = "KUBECONFIG"
+	portforwardWaitSeconds = 1
+)
 
 type kubectlBinaryClient struct {
 	env         map[string]string

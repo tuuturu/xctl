@@ -2,7 +2,6 @@ package vault
 
 import (
 	"fmt"
-	"time"
 
 	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
 	kubectlBinary "github.com/deifyed/xctl/pkg/clients/kubectl/binary"
@@ -28,8 +27,6 @@ func initializeVault(kubectlClient kubectl.Client, vaultClient vault.Client) err
 	defer func() {
 		_ = stopFn()
 	}()
-
-	time.Sleep(3 * time.Second)
 
 	initResponse, err := vaultClient.Initialize()
 	if err != nil {
