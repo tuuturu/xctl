@@ -14,10 +14,6 @@ import (
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
 )
 
-type vaultReconciler struct {
-	cloudProvider cloud.Provider
-}
-
 func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {
