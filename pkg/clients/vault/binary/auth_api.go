@@ -10,8 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const defaultIssuer = "https://kubernetes.default.svc.cluster.local"
-
 func (c *client) EnableKubernetesAuthentication() error {
 	cmd := exec.Command(c.vaultPath, "auth", "enable", "kubernetes")
 
@@ -42,7 +40,7 @@ func (c *client) ConfigureKubernetesAuthentication(opts vault.ConfigureKubernete
 		fmt.Sprintf("kubernetes_host=%s", opts.Host.String()),
 		fmt.Sprintf("token_reviewer_jwt=%s", opts.TokenReviewerJWT),
 		fmt.Sprintf("kubernetes_ca_cert=%s", opts.CACert),
-		fmt.Sprintf("issuer=%s", defaultIssuer),
+		fmt.Sprintf("issuer=%s", opts.Issuer.String()),
 	}
 
 	cmd := exec.Command(c.vaultPath, args...)

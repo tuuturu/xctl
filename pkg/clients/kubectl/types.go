@@ -1,6 +1,15 @@
 package kubectl
 
-import "io"
+import (
+	"io"
+	"net/url"
+)
+
+// DefaultKubernetesIssuer is the default issuer for Kubernetes found in .well-known
+var DefaultKubernetesIssuer = url.URL{ //nolint:gochecknoglobals
+	Scheme: "https",
+	Host:   "kubernetes.default.svc.cluster.local",
+}
 
 type PodExecOpts struct {
 	Pod    Pod
