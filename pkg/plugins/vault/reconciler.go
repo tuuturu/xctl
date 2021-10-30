@@ -3,6 +3,8 @@ package vault
 import (
 	"fmt"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/deifyed/xctl/pkg/config"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -34,15 +36,19 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
 
+	// action = "delete"
+
 	switch action {
 	case reconciliation.ActionCreate:
 		logrus.Debug("installing Vault")
+
 		err = clients.helm.Install(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing vault: %w", err)
 		}
 
 		logrus.Debug("Initializing Vault")
+
 		err = initializeVault(clients.kubectl, clients.vault)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("initializing vault: %w", err)
