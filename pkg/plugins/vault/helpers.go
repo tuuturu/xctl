@@ -33,10 +33,10 @@ func initializeVault(kubectlClient kubectl.Client, vaultClient vault.Client) err
 		return fmt.Errorf("running init: %w", err)
 	}
 
-	vaultClient.SetToken(initResponse.Token)
+	vaultClient.SetToken(initResponse.RootToken)
 
 	for index := 0; index < 3; index++ {
-		err = vaultClient.Unseal(initResponse.Keys[index])
+		err = vaultClient.Unseal(initResponse.UnsealKeysB64[index])
 		if err != nil {
 			return fmt.Errorf("unsealing: %w", err)
 		}

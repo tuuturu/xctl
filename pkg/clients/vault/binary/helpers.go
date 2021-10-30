@@ -2,9 +2,9 @@ package binary
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
-	"regexp"
 
 	"github.com/deifyed/xctl/pkg/clients/vault"
 
@@ -14,11 +14,6 @@ import (
 )
 
 const version = "1.8.4"
-
-var (
-	keyRe   = regexp.MustCompile(`Unseal\sKey\s\d:\s(?P<key>.+)`)
-	tokenRe = regexp.MustCompile(`Token:\s(?P<token>.+)`)
-)
 
 func getVaultPath(fs *afero.Afero) (string, error) {
 	binariesDir, err := config.GetAbsoluteBinariesDir()
@@ -42,7 +37,7 @@ func getVaultPath(fs *afero.Afero) (string, error) {
 }
 
 func parseInitializationResponse(reader io.Reader) (vault.InitializationResponse, error) {
-	result := vault.InitializationResponse{Keys: make([]string, 5)}
+	response := vault.InitializationResponse{}
 	buffer := bytes.Buffer{}
 
 	_, err := io.Copy(&buffer, reader)
@@ -50,13 +45,10 @@ func parseInitializationResponse(reader io.Reader) (vault.InitializationResponse
 		return vault.InitializationResponse{}, fmt.Errorf("preparing buffer: %w", err)
 	}
 
-	tokenMatch := tokenRe.FindStringSubmatch(buffer.String())
-	result.Token = tokenMatch[tokenRe.SubexpIndex("token")]
-
-	keyMatch := keyRe.FindAllStringSubmatch(buffer.String(), 5)
-	for index, match := range keyMatch {
-		result.Keys[index] = match[keyRe.SubexpIndex("key")]
+	err = json.Unmarshal(buffer.Bytes(), &response)
+	if err != nil {
+		return vault.InitializationResponse{}, fmt.Errorf("unmarshalling response: %w", err)
 	}
 
-	return result, nil
+	return response, nil
 }

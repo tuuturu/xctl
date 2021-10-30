@@ -11,7 +11,7 @@ import (
 )
 
 func (c *client) Initialize() (vault.InitializationResponse, error) {
-	cmd := exec.Command(c.vaultPath, "operator", "init")
+	cmd := exec.Command(c.vaultPath, "operator", "init", "-format=json")
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}

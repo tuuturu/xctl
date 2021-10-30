@@ -18,13 +18,13 @@ func TestParsing(t *testing.T) {
 			name:       "Should work",
 			withOutput: dummyOutput,
 			expect: vault.InitializationResponse{
-				Token: "s.wgDHeT2gswN31rznFXURzxwq",
-				Keys: []string{
-					"QgmZGT7XznOgVcB8eXAF9rbD+7H+4HLEOHTMhLoKeckH",
-					"Dy+CKlHP/QeK8I8tG/STLa6XPKewkU/WUwiEo5nOXX+C",
-					"P521aeZ+cVLuF1paOezQ+pHY8mg/lYdfcq9c0Uv36rQw",
-					"uIXO/UkipDMdp8zJ87Uj96QhY98WIPWSRgpQVCCN5tOP",
-					"lGzI21QHGHtUGEx+V0oeSjm27yh5VMRoRGRO9T3dbD4b",
+				RootToken: "s.CCo5VpuY1S9qHOZbN2n9eHs2",
+				UnsealKeysB64: []string{
+					"GiT/H48inyWI1Y7kyW7fq7nX37iAkwo/iAolQNUWkdnx",
+					"J3fOIecFDXtbGLbe93/oN5vLpvjXuZj703Pmt5Q5MPXN",
+					"5/SgmglMsoQAtEThFvrx9CqXVs/IfZ/lJCeyT5cCpLVm",
+					"C9p2QR/oOpP5xtswWeuNf1V0dJNRMPfmFuCRNwReNd5H",
+					"pF5blqYQQe45idTsbAJKTK3jkdNqFQlhzwI6tW7WRi6W",
 				},
 			},
 		},
@@ -43,22 +43,27 @@ func TestParsing(t *testing.T) {
 }
 
 const dummyOutput = `
-Unseal Key 1: QgmZGT7XznOgVcB8eXAF9rbD+7H+4HLEOHTMhLoKeckH
-Unseal Key 2: Dy+CKlHP/QeK8I8tG/STLa6XPKewkU/WUwiEo5nOXX+C
-Unseal Key 3: P521aeZ+cVLuF1paOezQ+pHY8mg/lYdfcq9c0Uv36rQw
-Unseal Key 4: uIXO/UkipDMdp8zJ87Uj96QhY98WIPWSRgpQVCCN5tOP
-Unseal Key 5: lGzI21QHGHtUGEx+V0oeSjm27yh5VMRoRGRO9T3dbD4b
-
-Initial Root Token: s.wgDHeT2gswN31rznFXURzxwq
-
-Vault initialized with 5 key shares and a key threshold of 3. Please securely
-distribute the key shares printed above. When the Vault is re-sealed,
-restarted, or stopped, you must supply at least 3 of these keys to unseal it
-before it can start servicing requests.
-
-Vault does not store the generated master key. Without at least 3 keys to
-reconstruct the master key, Vault will remain permanently sealed!
-
-It is possible to generate new unseal keys, provided you have a quorum of
-existing unseal keys shares. See "vault operator rekey" for more information.
+{
+  "unseal_keys_b64": [
+    "GiT/H48inyWI1Y7kyW7fq7nX37iAkwo/iAolQNUWkdnx",
+    "J3fOIecFDXtbGLbe93/oN5vLpvjXuZj703Pmt5Q5MPXN",
+    "5/SgmglMsoQAtEThFvrx9CqXVs/IfZ/lJCeyT5cCpLVm",
+    "C9p2QR/oOpP5xtswWeuNf1V0dJNRMPfmFuCRNwReNd5H",
+    "pF5blqYQQe45idTsbAJKTK3jkdNqFQlhzwI6tW7WRi6W"
+  ],
+  "unseal_keys_hex": [
+    "1a24ff1f8f229f2588d58ee4c96edfabb9d7dfb880930a3f880a2540d51691d9f1",
+    "2777ce21e7050d7b5b18b6def77fe8379bcba6f8d7b998fbd373e6b7943930f5cd",
+    "e7f4a09a094cb28400b444e116faf1f42a9756cfc87d9fe52427b24f9702a4b566",
+    "0bda76411fe83a93f9c6db3059eb8d7f557474935130f7e616e09137045e35de47",
+    "a45e5b96a61041ee3989d4ec6c024a4cade391d36a150961cf023ab56ed6462e96"
+  ],
+  "unseal_shares": 5,
+  "unseal_threshold": 3,
+  "recovery_keys_b64": [],
+  "recovery_keys_hex": [],
+  "recovery_keys_shares": 5,
+  "recovery_keys_threshold": 3,
+  "root_token": "s.CCo5VpuY1S9qHOZbN2n9eHs2"
+}
 `
