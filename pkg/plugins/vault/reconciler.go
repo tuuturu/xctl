@@ -36,11 +36,13 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 
 	switch action {
 	case reconciliation.ActionCreate:
+		logrus.Debug("installing Vault")
 		err = clients.helm.Install(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing vault: %w", err)
 		}
 
+		logrus.Debug("Initializing Vault")
 		err = initializeVault(clients.kubectl, clients.vault)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("initializing vault: %w", err)
