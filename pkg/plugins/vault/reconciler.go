@@ -14,6 +14,11 @@ import (
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
 )
 
+var log = logrus.WithFields(logrus.Fields{
+	"phase": "reconciliation",
+	"tag":   "vault",
+})
+
 func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {
@@ -36,14 +41,14 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 
 	switch action {
 	case reconciliation.ActionCreate:
-		logrus.Debug("installing Vault")
+		log.Debug("installing")
 
 		err = clients.helm.Install(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing vault: %w", err)
 		}
 
-		logrus.Debug("Initializing Vault")
+		log.Debug("initializing")
 
 		err = initializeVault(clients.kubectl, clients.vault)
 		if err != nil {
@@ -52,6 +57,8 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
+		log.Debug("deleting")
+
 		err = clients.helm.Delete(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("uninstalling vault: %w", err)
