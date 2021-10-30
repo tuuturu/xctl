@@ -52,3 +52,16 @@ func parseInitializationResponse(reader io.Reader) (vault.InitializationResponse
 
 	return response, nil
 }
+
+func (c *client) envAsArray() []string {
+	env := make([]string, len(c.env))
+	index := 0
+
+	for key, value := range c.env {
+		env[index] = fmt.Sprintf("%s=%s", key, value)
+
+		index++
+	}
+
+	return env
+}
