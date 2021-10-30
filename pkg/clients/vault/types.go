@@ -1,5 +1,7 @@
 package vault
 
+import "net/url"
+
 const DefaultPort = 8200
 
 type InitializationResponse struct {
@@ -7,8 +9,25 @@ type InitializationResponse struct {
 	UnsealKeysB64 []string `json:"unseal_keys_b64"`
 }
 
-type Client interface {
+type ConfigureKubernetesAuthenticationOpts struct {
+	Host             url.URL
+	TokenReviewerJWT string
+	CACert           string
+	Issuer           url.URL
+}
+
+type Operator interface {
 	Initialize() (InitializationResponse, error)
-	SetToken(token string)
 	Unseal(key string) error
+}
+
+type Auth interface {
+	EnableKubernetesAuthentication() error
+	ConfigureKubernetesAuthentication(ConfigureKubernetesAuthenticationOpts) error
+}
+
+type Client interface {
+	Auth
+	Operator
+	SetToken(token string)
 }
