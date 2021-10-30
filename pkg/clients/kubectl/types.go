@@ -3,10 +3,8 @@ package kubectl
 import "io"
 
 type PodExecOpts struct {
-	Pod Pod
-
-	Command []byte
-	Stdout  io.Writer
+	Pod    Pod
+	Stdout io.Writer
 }
 
 type PortForwardOpts struct {
@@ -26,7 +24,7 @@ type StopFn func() error
 
 type Client interface {
 	// PodExec executes a script within a specified pod
-	PodExec(PodExecOpts) error
+	PodExec(PodExecOpts, ...string) error
 	// PortForward opens a port forwarding connection and returns a function to close that connection
 	PortForward(PortForwardOpts) (StopFn, error)
 }

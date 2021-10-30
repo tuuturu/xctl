@@ -15,14 +15,16 @@ import (
 	"github.com/deifyed/xctl/pkg/clients/kubectl"
 )
 
-func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts) error {
-	cmd := exec.Command(k.kubectlPath, "exec",
+func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) error {
+	staticArgs := []string{
+		"exec",
 		"-it",
 		"--namespace", opts.Pod.Namespace,
 		opts.Pod.Name,
 		"--",
-		string(opts.Command),
-	)
+	}
+
+	cmd := exec.Command(k.kubectlPath, append(staticArgs, args...)...)
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
