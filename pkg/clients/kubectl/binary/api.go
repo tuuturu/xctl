@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/tools/logging"
+
 	"github.com/spf13/afero"
 
 	"github.com/sirupsen/logrus"
@@ -16,6 +18,8 @@ import (
 )
 
 func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) error {
+	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "podexec")
+
 	staticArgs := []string{
 		"exec",
 		"-it",
@@ -35,7 +39,7 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) e
 
 	err := cmd.Run()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
+		log.WithFields(logrus.Fields{
 			"stdout": stdout.String(),
 			"stderr": stderr.String(),
 		}).Debug("executing command")
@@ -56,6 +60,8 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) e
 }
 
 func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.StopFn, error) {
+	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "portforward")
+
 	cmd := exec.Command(k.kubectlPath, "port-forward",
 		"--namespace", opts.Pod.Namespace,
 		opts.Pod.Name,
@@ -71,7 +77,7 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 
 	err := cmd.Start()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
+		log.WithFields(logrus.Fields{
 			"stdout": stdout.String(),
 			"stderr": stderr.String(),
 		}).Debug("executing command")

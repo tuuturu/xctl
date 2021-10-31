@@ -3,6 +3,8 @@ package vault
 import (
 	"fmt"
 
+	"github.com/deifyed/xctl/pkg/tools/logging"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/deifyed/xctl/pkg/config"
@@ -14,12 +16,9 @@ import (
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
 )
 
-var log = logrus.WithFields(logrus.Fields{
-	"phase": "reconciliation",
-	"tag":   "vault",
-})
-
 func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
+	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "reconciliation")
+
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("acquiring KubeConfig path: %w", err)

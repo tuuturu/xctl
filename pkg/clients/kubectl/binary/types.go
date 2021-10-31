@@ -1,6 +1,7 @@
 package binary
 
 const (
+	logFeature             = "kubectl/binary"
 	kubeConfigPathKey      = "KUBECONFIG"
 	portforwardWaitSeconds = 1
 )

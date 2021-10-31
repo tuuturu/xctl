@@ -7,6 +7,8 @@ import (
 	"github.com/deifyed/xctl/pkg/cloud"
 )
 
+const logFeature = "plugin/vault"
+
 type vaultReconciler struct {
 	cloudProvider cloud.Provider
 }
