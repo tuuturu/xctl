@@ -15,7 +15,6 @@ To be the quickest way to provision a complete and familiar infrastructure for y
 - [ ] Inbound traffic
     - [x] Nginx Ingress Controller for routing traffic
     - [ ] Certbot for your TLS needs
-    - [ ] ExternalDNS for automatic DNS handling
 - [ ] Secrets
     - [ ] Vault as the secret manager
     - [ ] External Secrets for accessing secrets
