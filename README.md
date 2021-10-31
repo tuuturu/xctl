@@ -4,8 +4,24 @@ Inspired by the tool [okctl](https://github.com/oslokommune/okctl) made by Oslo 
 
 ## Vision
 
-A tool for setting up and managing an infrastructure for their applications. The infrastructure should contain all
-necessary tools for managing applications throughout their life cycle.
+To be the quickest way to provision a complete and familiar infrastructure for your production needs.
 
-## Supported providers:
-- Linode
+## Supported cloud providers:
+- [x] Linode
+
+## What does xctl provision?
+
+- [x] Kubernetes as the platform
+- [ ] Inbound traffic
+    - [ ] Nginx Ingress Controller for routing traffic
+    - [ ] Certbot for your TLS needs
+    - [ ] ExternalDNS for automatic DNS handling
+- [ ] Secrets
+    - [ ] Vault as the secret manager
+    - [ ] External Secrets for accessing secrets
+- [ ] Monitoring
+    - [ ] Prometheus for scraping metrics
+    - [ ] Promtail for scraping container logs
+    - [ ] Grafana for visualizing logs and metrics
+- [ ] CI/CD
+    - [ ] ArgoCD
