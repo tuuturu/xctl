@@ -23,6 +23,10 @@ type PortForwardOpts struct {
 	PortTo   int
 }
 
+type ApplyOpts struct {
+	Manifest interface{}
+}
+
 type Pod struct {
 	Name      string
 	Namespace string
@@ -36,4 +40,5 @@ type Client interface {
 	PodExec(PodExecOpts, ...string) error
 	// PortForward opens a port forwarding connection and returns a function to close that connection
 	PortForward(PortForwardOpts) (StopFn, error)
+	Apply(ApplyOpts) error
 }

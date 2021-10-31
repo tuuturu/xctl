@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"time"
 
+	"sigs.k8s.io/yaml"
+
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/spf13/afero"
@@ -90,6 +92,37 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 	return func() error {
 		return cmd.Process.Kill()
 	}, nil
+}
+
+func (k kubectlBinaryClient) Apply(opts kubectl.ApplyOpts) error {
+	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "apply")
+
+	raw, err := yaml.Marshal(opts.Manifest)
+	if err != nil {
+		return fmt.Errorf("marshalling manifest: %w", err)
+	}
+
+	cmd := exec.Command(k.kubectlPath, "apply", "-")
+
+	stderr := bytes.Buffer{}
+	stdout := bytes.Buffer{}
+
+	cmd.Env = k.envAsArray()
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	cmd.Stdin = bytes.NewReader(raw)
+
+	err = cmd.Run()
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"stdout": stdout.String(),
+			"stderr": stderr.String(),
+		}).Debug("executing command")
+
+		return fmt.Errorf("executing pod command: %s", err)
+	}
+
+	return nil
 }
 
 func New(fs *afero.Afero, kubeConfigPath string) (kubectl.Client, error) {
