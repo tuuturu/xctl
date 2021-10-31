@@ -3,7 +3,7 @@ package binary
 const (
 	logFeature             = "kubectl/binary"
 	kubeConfigPathKey      = "KUBECONFIG"
-	portforwardWaitSeconds = 1
+	portforwardWaitSeconds = 2
 )
 
 type kubectlBinaryClient struct {
