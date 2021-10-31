@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/deifyed/xctl/pkg/tools/logging"
+	"github.com/sirupsen/logrus"
+
 	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
 	kubectlBinary "github.com/deifyed/xctl/pkg/clients/kubectl/binary"
 	vaultBinary "github.com/deifyed/xctl/pkg/clients/vault/binary"
@@ -14,10 +17,21 @@ import (
 	"github.com/deifyed/xctl/pkg/clients/vault"
 )
 
-func initializeVault(kubectlClient kubectl.Client, vaultClient vault.Client) error {
+func installVault(clients clientContainer) error {
+	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "installing")
+
+	log.Debug("installing Helm chart")
+
+	err := clients.helm.Install(NewVaultPlugin())
+	if err != nil {
+		return fmt.Errorf("installing Helm chart: %w", err)
+	}
+
 	podSelector := kubectl.Pod{Name: "vault-0", Namespace: "kube-system"}
 
-	stopFn, err := kubectlClient.PortForward(kubectl.PortForwardOpts{
+	log.Debug("port forwarding vault container")
+
+	stopFn, err := clients.kubectl.PortForward(kubectl.PortForwardOpts{
 		Pod:      podSelector,
 		PortFrom: vault.DefaultPort,
 		PortTo:   vault.DefaultPort,
@@ -30,6 +44,31 @@ func initializeVault(kubectlClient kubectl.Client, vaultClient vault.Client) err
 		_ = stopFn()
 	}()
 
+	log.Debug("initializing Vault")
+
+	err = initializeVault(clients.vault)
+	if err != nil {
+		return fmt.Errorf("initializing vault: %w", err)
+	}
+
+	log.Debug("activating Kubernetes engine")
+
+	err = activateKubernetesEngine(clients.vault, clients.kubectl, podSelector)
+	if err != nil {
+		return fmt.Errorf("activating Kubernetes engine: %w", err)
+	}
+
+	log.Debug("enabling kv-v2")
+
+	err = clients.vault.EnableKv2()
+	if err != nil {
+		return fmt.Errorf("enabling kv-v2: %w", err)
+	}
+
+	return nil
+}
+
+func initializeVault(vaultClient vault.Client) error {
 	initResponse, err := vaultClient.Initialize()
 	if err != nil {
 		return fmt.Errorf("running init: %w", err)
@@ -47,23 +86,8 @@ func initializeVault(kubectlClient kubectl.Client, vaultClient vault.Client) err
 	return nil
 }
 
-func activateKubernetesEngine(vaultClient vault.Client, kubectlClient kubectl.Client) error {
-	podSelector := kubectl.Pod{Name: "vault-0", Namespace: "kube-system"}
-
-	stopFn, err := kubectlClient.PortForward(kubectl.PortForwardOpts{
-		Pod:      podSelector,
-		PortFrom: vault.DefaultPort,
-		PortTo:   vault.DefaultPort,
-	})
-	if err != nil {
-		return fmt.Errorf("port forwarding vault: %w", err)
-	}
-
-	defer func() {
-		_ = stopFn()
-	}()
-
-	err = vaultClient.EnableKubernetesAuthentication()
+func activateKubernetesEngine(vaultClient vault.Client, kubectlClient kubectl.Client, podSelector kubectl.Pod) error {
+	err := vaultClient.EnableKubernetesAuthentication()
 	if err != nil {
 		return fmt.Errorf("enabling Kubernetes authentication: %w", err)
 	}

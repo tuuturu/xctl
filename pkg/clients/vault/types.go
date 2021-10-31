@@ -16,6 +16,12 @@ type ConfigureKubernetesAuthenticationOpts struct {
 	Issuer           url.URL
 }
 
+type Secreter interface {
+	EnableKv2() error
+	Put(string, map[string]string) error
+	Get(string) (map[string]string, error)
+}
+
 type Operator interface {
 	Initialize() (InitializationResponse, error)
 	Unseal(key string) error
@@ -29,5 +35,6 @@ type Auth interface {
 type Client interface {
 	Auth
 	Operator
+	Secreter
 	SetToken(token string)
 }

@@ -40,23 +40,9 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 	case reconciliation.ActionCreate:
 		log.Debug("installing")
 
-		err = clients.helm.Install(plugin)
+		err = installVault(clients)
 		if err != nil {
-			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing vault: %w", err)
-		}
-
-		log.Debug("initializing")
-
-		err = initializeVault(clients.kubectl, clients.vault)
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("initializing vault: %w", err)
-		}
-
-		log.Debug("activating Kubernetes engine")
-
-		err = activateKubernetesEngine(clients.vault, clients.kubectl)
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("activating Kubernetes engine: %w", err)
+			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
