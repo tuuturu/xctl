@@ -16,7 +16,7 @@ To be the quickest way to provision a complete and familiar infrastructure for y
     - [x] Nginx Ingress Controller for routing traffic
     - [ ] Certbot for your TLS needs
 - [ ] Secrets
-    - [ ] Vault as the secret manager
+    - [x] Vault as the secret manager
     - [ ] External Secrets for accessing secrets
 - [ ] Monitoring
     - [ ] Prometheus for scraping metrics
