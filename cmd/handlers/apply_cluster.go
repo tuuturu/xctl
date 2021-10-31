@@ -6,6 +6,8 @@ import (
 	"io"
 	"time"
 
+	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
+
 	"github.com/deifyed/xctl/pkg/plugins/vault"
 
 	"github.com/spf13/afero"
@@ -57,6 +59,7 @@ func handleCluster(fs *afero.Afero, out io.Writer, purge bool, clusterManifestSo
 	scheduler := reconciliation.NewScheduler(opts,
 		clusterrec.NewClusterReconciler(provider),
 		vault.NewVaultReconciler(provider),
+		ingress.NewNginxIngressControllerReconciler(provider),
 	)
 
 	spin.Start()

@@ -13,7 +13,7 @@ To be the quickest way to provision a complete and familiar infrastructure for y
 
 - [x] Kubernetes as the platform
 - [ ] Inbound traffic
-    - [ ] Nginx Ingress Controller for routing traffic
+    - [x] Nginx Ingress Controller for routing traffic
     - [ ] Certbot for your TLS needs
     - [ ] ExternalDNS for automatic DNS handling
 - [ ] Secrets
