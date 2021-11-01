@@ -12,9 +12,9 @@ To be the quickest way to provision a complete and familiar infrastructure for y
 ## What does xctl provision?
 
 - [x] Kubernetes as the platform
-- [ ] Inbound traffic
+- [x] Inbound traffic
     - [x] Nginx Ingress Controller for routing traffic
-    - [ ] Certbot for your TLS needs
+    - [x] Certbot for your TLS needs
 - [ ] Secrets
     - [x] Vault as the secret manager
     - [ ] External Secrets for accessing secrets
