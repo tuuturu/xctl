@@ -23,4 +23,4 @@ To be the quickest way to provision a complete and familiar infrastructure for y
     - [ ] Promtail for scraping container logs
     - [ ] Grafana for visualizing logs and metrics
 - [ ] CI/CD
-    - [ ] ArgoCD
+    - [ ] ArgoCD for continuous deployment
