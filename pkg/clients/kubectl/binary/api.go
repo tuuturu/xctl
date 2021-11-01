@@ -102,7 +102,7 @@ func (k kubectlBinaryClient) Apply(opts kubectl.ApplyOpts) error {
 		return fmt.Errorf("marshalling manifest: %w", err)
 	}
 
-	cmd := exec.Command(k.kubectlPath, "apply", "-")
+	cmd := exec.Command(k.kubectlPath, "apply", "-f", "-")
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
