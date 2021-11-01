@@ -7,6 +7,11 @@ import (
 	"os"
 	"path"
 
+	"github.com/deifyed/xctl/pkg/clients/helm"
+
+	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
+	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
+
 	"github.com/deifyed/xctl/pkg/cloud"
 	"github.com/deifyed/xctl/pkg/config"
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
@@ -45,7 +50,26 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 			return reconciliation.Result{Requeue: false}, nil
 		}
 
-		err := c.clusterService.DeleteCluster(rctx.Ctx, rctx.ClusterDeclaration.Metadata.Name)
+		kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("acquiring KubeConfig path: %w", err)
+		}
+
+		helmClient, err := helmBinary.New(rctx.Filesystem, kubeConfigPath)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("acquiring helm client: %w", err)
+		}
+
+		ok, err := ensureDependencies(helmClient)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("checking dependencies: %w", err)
+		}
+
+		if !ok {
+			return reconciliation.Result{Requeue: true}, nil
+		}
+
+		err = c.clusterService.DeleteCluster(rctx.Ctx, rctx.ClusterDeclaration.Metadata.Name)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("deleting cluster: %w", err)
 		}
@@ -64,6 +88,19 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 	}
 
 	return reconciliation.Result{}, reconciliation.ErrIndecisive
+}
+
+func ensureDependencies(helmClient helm.Client) (bool, error) {
+	ingressControllerExists, err := helmClient.Exists(ingress.NewNginxIngressControllerPlugin())
+	if err != nil {
+		return false, fmt.Errorf("acquiring ingress controller existence: %w", err)
+	}
+
+	if ingressControllerExists {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.ClusterService, clusterName string) error {
