@@ -40,8 +40,6 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
 
-	// action = "create"
-
 	switch action {
 	case reconciliation.ActionCreate:
 		log.Debug("installing")
@@ -105,7 +103,7 @@ func (n nginxIngressController) determineAction(opts determineActionOpts) (
 			return reconciliation.ActionNoop, nil
 		}
 
-		return reconciliation.ActionCreate, nil
+		return reconciliation.ActionDelete, nil
 	}
 
 	return reconciliation.ActionNoop, reconciliation.ErrIndecisive

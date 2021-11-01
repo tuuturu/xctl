@@ -99,7 +99,7 @@ func (v vaultReconciler) determineAction(rctx reconciliation.Context, helmClient
 			return reconciliation.ActionNoop, nil
 		}
 
-		return reconciliation.ActionCreate, nil
+		return reconciliation.ActionDelete, nil
 	}
 
 	return reconciliation.ActionNoop, reconciliation.ErrIndecisive
