@@ -6,6 +6,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/plugins/certbot"
+
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
 	"github.com/deifyed/xctl/pkg/plugins/vault"
@@ -60,6 +62,7 @@ func handleCluster(fs *afero.Afero, out io.Writer, purge bool, clusterManifestSo
 		clusterrec.NewClusterReconciler(provider),
 		vault.NewVaultReconciler(provider),
 		ingress.NewNginxIngressControllerReconciler(provider),
+		certbot.NewCertbotReconciler(provider),
 	)
 
 	spin.Start()
