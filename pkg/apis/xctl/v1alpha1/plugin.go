@@ -17,8 +17,16 @@ type PluginSpec struct {
 	Secrets map[string]string `json:"secrets"`
 }
 
+// PluginSpecHelmRepository contains information about a Helm repository
+type PluginSpecHelmRepository struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
 // PluginSpecHelm contains necessary information for installing a Helm chart
 type PluginSpecHelm struct {
+	// Repository defines the repository that contains the chart
+	Repository PluginSpecHelmRepository `json:"repository"`
 	// Chart defines the URL where the chart can be found
 	Chart string `json:"chart"`
 	// Values defines the values to apply to the chart
