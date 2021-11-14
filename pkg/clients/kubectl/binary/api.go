@@ -90,6 +90,8 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 	time.Sleep(portForwardWaitSeconds * time.Second)
 
 	return func() error {
+		log.Debug("terminating port forward")
+
 		return cmd.Process.Kill()
 	}, nil
 }
