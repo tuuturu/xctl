@@ -87,7 +87,7 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 		return nil, fmt.Errorf("executing pod command: %s", err)
 	}
 
-	time.Sleep(portforwardWaitSeconds * time.Second)
+	time.Sleep(portForwardWaitSeconds * time.Second)
 
 	return func() error {
 		return cmd.Process.Kill()
