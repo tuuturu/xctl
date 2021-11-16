@@ -40,5 +40,6 @@ type Client interface {
 	PodExec(PodExecOpts, ...string) error
 	// PortForward opens a port forwarding connection and returns a function to close that connection
 	PortForward(PortForwardOpts) (StopFn, error)
+	// Apply applies a manifest to the contextual cluster
 	Apply(ApplyOpts) error
 }
