@@ -9,6 +9,8 @@ import (
 type Cluster struct {
 	// Name represents a way to identify a Cluster
 	Name string
+	// Ready represents whether the cluster is ready to be operated
+	Ready bool
 }
 
 type ClusterService interface {
