@@ -7,13 +7,19 @@ import (
 )
 
 type Cluster struct {
+	// Name represents a way to identify a Cluster
 	Name string
 }
 
 type ClusterService interface {
+	// CreateCluster knows how to create a cluster
 	CreateCluster(ctx context.Context, manifest v1alpha1.Cluster) error
+	// DeleteCluster knows how to delete a cluster
 	DeleteCluster(ctx context.Context, clusterName string) error
+	// GetCluster knows how to retrieve information regarding a Cluster
 	GetCluster(ctx context.Context, clusterName string) (Cluster, error)
+	// HasCluster knows if a cluster exists
 	HasCluster(ctx context.Context, clusterName string) (bool, error)
+	// GetKubeConfig knows how to retrieve a KubeConfig
 	GetKubeConfig(ctx context.Context, clusterName string) ([]byte, error)
 }
