@@ -33,7 +33,7 @@ type handleClusterOpts struct {
 }
 
 func handleCluster(opts handleClusterOpts) error {
-	var manifest v1alpha1.Cluster
+	manifest := v1alpha1.NewDefaultCluster()
 
 	content, err := io.ReadAll(opts.clusterManifestSource)
 	if err != nil {

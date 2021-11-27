@@ -2,16 +2,16 @@ package v1alpha1
 
 const ClusterKind = "Cluster"
 
-type Plugins struct {
+type ClusterSpecPlugins struct {
 	CertBot                bool `json:"certBot"`
 	NginxIngressController bool `json:"nginxIngressController"`
 	Vault                  bool `json:"vault"`
 }
 
 type ClusterSpec struct {
-	RootDomain string  `json:"rootDomain"`
-	AdminEmail string  `json:"adminEmail"`
-	Plugins    Plugins `json:"plugins"`
+	RootDomain string             `json:"rootDomain"`
+	AdminEmail string             `json:"adminEmail"`
+	Plugins    ClusterSpecPlugins `json:"plugins"`
 }
 
 type Cluster struct {
@@ -20,14 +20,14 @@ type Cluster struct {
 	Spec     ClusterSpec `json:"spec"`
 }
 
-func NewCluster() Cluster {
+func NewDefaultCluster() Cluster {
 	return Cluster{
 		TypeMeta: TypeMeta{
 			Kind:       ClusterKind,
 			APIVersion: apiVersion,
 		},
 		Spec: ClusterSpec{
-			Plugins: Plugins{
+			Plugins: ClusterSpecPlugins{
 				CertBot:                true,
 				NginxIngressController: true,
 				Vault:                  true,
