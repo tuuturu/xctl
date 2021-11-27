@@ -104,7 +104,7 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 
 		return reconciliation.ActionCreate, nil
 	case reconciliation.ActionDelete:
-		if !vaultExists {
+		if !clusterExists || !vaultExists {
 			return reconciliation.ActionNoop, nil
 		}
 
