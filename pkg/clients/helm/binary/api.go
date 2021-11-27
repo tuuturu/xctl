@@ -36,6 +36,7 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
 		"install",
 		"--atomic",
+		"--wait",
 		plugin.Metadata.Name,
 		plugin.Spec.Helm.Chart,
 		fmt.Sprintf("--values=%s", tmpValuesPath),
