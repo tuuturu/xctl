@@ -25,26 +25,26 @@ func (p *provider) getCluster(ctx context.Context, clusterName string) (linodego
 	return linodego.LKECluster{}, config.ErrNotFound
 }
 
-func (p *provider) await(test pollTestFn) error {
+func (p *provider) await(test pollTestFn) (err error) {
 	timeout := time.Now().Add(defaultTimeoutSeconds * time.Second)
 	delayFunction := func() { time.Sleep(defaultDelaySeconds * time.Second) }
 
-	for {
+	var ready bool
+
+	for !ready {
+		delayFunction()
+
 		if time.Now().After(timeout) {
 			return config.ErrTimeout
 		}
 
-		delayFunction()
-
-		ready, err := test()
+		ready, err = test()
 		if err != nil {
 			return err
 		}
-
-		if ready {
-			return nil
-		}
 	}
+
+	return nil
 }
 
 func (p *provider) awaitCreation(ctx context.Context, clusterID int) error {
