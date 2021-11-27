@@ -86,10 +86,8 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 	return reconciliation.Result{Requeue: false}, reconciliation.ErrIndecisive
 }
 
-func (n certbotReconciler) determineAction(opts determineActionOpts) (
-	reconciliation.Action, error,
-) {
-	indication := reconciliation.DetermineUserIndication(opts.Ctx, true)
+func (n certbotReconciler) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
+	indication := reconciliation.DetermineUserIndication(opts.Ctx, opts.Ctx.ClusterDeclaration.Spec.Plugins.CertBot)
 
 	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {

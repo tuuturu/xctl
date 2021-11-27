@@ -10,8 +10,6 @@ import (
 
 	"github.com/deifyed/xctl/pkg/config"
 
-	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/clients/helm"
 	"github.com/deifyed/xctl/pkg/cloud"
 
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
@@ -32,7 +30,11 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 
 	plugin := NewVaultPlugin()
 
-	action, err := v.determineAction(rctx, clients.helm, plugin)
+	action, err := v.determineAction(determineActionOpts{
+		rctx:       rctx,
+		helmClient: clients.helm,
+		plugin:     plugin,
+	})
 	if err != nil {
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
@@ -65,17 +67,15 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 	return reconciliation.Result{Requeue: false}, reconciliation.ErrIndecisive
 }
 
-func (v vaultReconciler) determineAction(rctx reconciliation.Context, helmClient helm.Client, plugin v1alpha1.Plugin) (
-	reconciliation.Action, error,
-) {
-	indication := reconciliation.DetermineUserIndication(rctx, true)
+func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
+	indication := reconciliation.DetermineUserIndication(opts.rctx, opts.rctx.ClusterDeclaration.Spec.Plugins.Vault)
 
 	var (
 		clusterExists = true
 		vaultExists   = true
 	)
 
-	cluster, err := v.cloudProvider.GetCluster(rctx.Ctx, rctx.ClusterDeclaration.Metadata.Name)
+	cluster, err := v.cloudProvider.GetCluster(opts.rctx.Ctx, opts.rctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {
 		switch {
 		case errors.Is(err, config.ErrNotFound):
@@ -86,7 +86,7 @@ func (v vaultReconciler) determineAction(rctx reconciliation.Context, helmClient
 	}
 
 	if clusterExists && cluster.Ready {
-		vaultExists, err = helmClient.Exists(plugin)
+		vaultExists, err = opts.helmClient.Exists(opts.plugin)
 		if err != nil {
 			return reconciliation.ActionNoop, fmt.Errorf("checking vault existence: %w", err)
 		}

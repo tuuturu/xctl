@@ -68,10 +68,11 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 	return reconciliation.Result{Requeue: false}, reconciliation.ErrIndecisive
 }
 
-func (n nginxIngressController) determineAction(opts determineActionOpts) (
-	reconciliation.Action, error,
-) {
-	indication := reconciliation.DetermineUserIndication(opts.Ctx, true)
+func (n nginxIngressController) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
+	indication := reconciliation.DetermineUserIndication(
+		opts.Ctx,
+		opts.Ctx.ClusterDeclaration.Spec.Plugins.NginxIngressController,
+	)
 
 	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {
