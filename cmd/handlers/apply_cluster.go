@@ -24,10 +24,17 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func handleCluster(fs *afero.Afero, out io.Writer, purge bool, clusterManifestSource io.Reader) error {
+type handleClusterOpts struct {
+	out                   io.Writer
+	fs                    *afero.Afero
+	clusterManifestSource io.Reader
+	purge                 bool
+}
+
+func handleCluster(opts handleClusterOpts) error {
 	var manifest v1alpha1.Cluster
 
-	content, err := io.ReadAll(clusterManifestSource)
+	content, err := io.ReadAll(opts.clusterManifestSource)
 	if err != nil {
 		return fmt.Errorf("reading cluster manifest: %w", err)
 	}
@@ -44,13 +51,13 @@ func handleCluster(fs *afero.Afero, out io.Writer, purge bool, clusterManifestSo
 		return fmt.Errorf("authenticating with cloud provider: %w", err)
 	}
 
-	spin := spinner.NewSpinner(out)
+	spin := spinner.NewSpinner(opts.out)
 	spin.FinalMSG = "✅"
 
-	opts := reconciliation.SchedulerOpts{
-		Filesystem:                      fs,
-		Out:                             out,
-		PurgeFlag:                       purge,
+	schedulerOpts := reconciliation.SchedulerOpts{
+		Filesystem:                      opts.fs,
+		Out:                             opts.out,
+		PurgeFlag:                       opts.purge,
 		ClusterDeclaration:              manifest,
 		ReconciliationLoopDelayFunction: func() { time.Sleep(config.DefaultReconciliationLoopDelayDuration) },
 		QueueStepFunc: func(identifier string) {
@@ -58,7 +65,7 @@ func handleCluster(fs *afero.Afero, out io.Writer, purge bool, clusterManifestSo
 		},
 	}
 
-	scheduler := reconciliation.NewScheduler(opts,
+	scheduler := reconciliation.NewScheduler(schedulerOpts,
 		clusterrec.NewClusterReconciler(provider),
 		vault.NewVaultReconciler(provider),
 		ingress.NewNginxIngressControllerReconciler(provider),
@@ -71,7 +78,7 @@ func handleCluster(fs *afero.Afero, out io.Writer, purge bool, clusterManifestSo
 
 	spin.Stop()
 
-	fmt.Fprintf(out, "\n\nCluster reconciliation complete")
+	fmt.Fprintf(opts.out, "\n\nCluster reconciliation complete")
 
 	return err
 }

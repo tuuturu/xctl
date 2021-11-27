@@ -44,7 +44,12 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 		case v1alpha1.ClusterKind:
 			fmt.Fprintf(opts.Io.Out, "Applying cluster manifest, please wait\n\n")
 
-			return handleCluster(opts.Filesystem, opts.Io.Out, opts.Purge, manifestSource)
+			return handleCluster(handleClusterOpts{
+				out:                   opts.Io.Out,
+				fs:                    opts.Filesystem,
+				clusterManifestSource: manifestSource,
+				purge:                 opts.Purge,
+			})
 		case v1alpha1.ApplicationKind:
 			fmt.Fprintf(opts.Io.Out, "Applying application manifest %s, please wait\n\n", opts.File)
 
