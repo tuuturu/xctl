@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -69,14 +70,22 @@ func (v vaultReconciler) determineAction(rctx reconciliation.Context, helmClient
 ) {
 	indication := reconciliation.DetermineUserIndication(rctx, true)
 
-	clusterExists, err := v.cloudProvider.HasCluster(rctx.Ctx, rctx.ClusterDeclaration.Metadata.Name)
+	var (
+		clusterExists = true
+		vaultExists   = true
+	)
+
+	cluster, err := v.cloudProvider.GetCluster(rctx.Ctx, rctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {
-		return reconciliation.ActionNoop, fmt.Errorf("checking cluster existence: %w", err)
+		switch {
+		case errors.Is(err, config.ErrNotFound):
+			clusterExists = false
+		default:
+			return reconciliation.ActionNoop, fmt.Errorf("checking cluster existence: %w", err)
+		}
 	}
 
-	vaultExists := false
-
-	if clusterExists {
+	if clusterExists && cluster.Ready {
 		vaultExists, err = helmClient.Exists(plugin)
 		if err != nil {
 			return reconciliation.ActionNoop, fmt.Errorf("checking vault existence: %w", err)
@@ -85,7 +94,7 @@ func (v vaultReconciler) determineAction(rctx reconciliation.Context, helmClient
 
 	switch indication {
 	case reconciliation.ActionCreate:
-		if !clusterExists {
+		if !clusterExists || !cluster.Ready {
 			return reconciliation.ActionWait, nil
 		}
 
