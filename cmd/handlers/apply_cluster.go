@@ -29,6 +29,7 @@ type handleClusterOpts struct {
 	fs                    *afero.Afero
 	clusterManifestSource io.Reader
 	purge                 bool
+	debug                 bool
 }
 
 func handleCluster(opts handleClusterOpts) error {
@@ -51,7 +52,14 @@ func handleCluster(opts handleClusterOpts) error {
 		return fmt.Errorf("authenticating with cloud provider: %w", err)
 	}
 
-	spin := spinner.NewSpinner(opts.out)
+	var spinnerOut io.Writer
+	if opts.debug {
+		spinnerOut = io.Discard
+	} else {
+		spinnerOut = opts.out
+	}
+
+	spin := spinner.NewSpinner(spinnerOut)
 	spin.FinalMSG = "✅"
 
 	schedulerOpts := reconciliation.SchedulerOpts{

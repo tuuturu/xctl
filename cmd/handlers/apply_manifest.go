@@ -17,6 +17,7 @@ type ApplyRunEOpts struct {
 	Io         xctl.IOStreams
 	File       string
 	Purge      bool
+	Debug      bool
 }
 
 func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
@@ -49,6 +50,7 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 				fs:                    opts.Filesystem,
 				clusterManifestSource: manifestSource,
 				purge:                 opts.Purge,
+				debug:                 opts.Debug,
 			})
 		case v1alpha1.ApplicationKind:
 			fmt.Fprintf(opts.Io.Out, "Applying application manifest %s, please wait\n\n", opts.File)

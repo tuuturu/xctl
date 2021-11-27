@@ -43,3 +43,9 @@ func GetAbsoluteBinariesDir() (string, error) {
 
 	return path.Join(xctlDir, DefaultBinariesDir), nil
 }
+
+func IsDebugMode() bool {
+	debugMode := os.Getenv("XCTL_DEBUG")
+
+	return debugMode == "true"
+}
