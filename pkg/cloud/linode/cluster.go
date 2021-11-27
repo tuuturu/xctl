@@ -76,7 +76,8 @@ func (p *provider) GetCluster(ctx context.Context, clusterName string) (cloud.Cl
 	}
 
 	return cloud.Cluster{
-		Name: lkeCluster.Label,
+		Name:  lkeCluster.Label,
+		Ready: lkeCluster.Status == linodego.LKEClusterReady,
 	}, nil
 }
 
