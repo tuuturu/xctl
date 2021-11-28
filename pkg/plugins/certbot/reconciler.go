@@ -11,8 +11,6 @@ import (
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/deifyed/xctl/pkg/config"
 
 	"github.com/deifyed/xctl/pkg/cloud"
@@ -21,7 +19,7 @@ import (
 )
 
 func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
-	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "reconciliation")
+	log := logging.GetLogger(logFeature, "reconciliation")
 
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {

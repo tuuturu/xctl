@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/deifyed/xctl/pkg/tools/logging"
-	"github.com/sirupsen/logrus"
-
 	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
 	kubectlBinary "github.com/deifyed/xctl/pkg/clients/kubectl/binary"
 	vaultBinary "github.com/deifyed/xctl/pkg/clients/vault/binary"
+	"github.com/deifyed/xctl/pkg/tools/logging"
 	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/clients/kubectl"
@@ -18,7 +16,7 @@ import (
 )
 
 func installVault(clients clientContainer) error {
-	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "installing")
+	log := logging.GetLogger(logFeature, "installing")
 
 	log.Debug("installing Helm chart")
 

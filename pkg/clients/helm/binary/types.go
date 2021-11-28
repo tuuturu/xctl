@@ -9,3 +9,8 @@ type externalBinaryHelm struct {
 	kubeConfigPath string
 	binaryPath     string
 }
+
+type commandLogFields struct {
+	Stdout string `json:"stdout"`
+	Stderr string `json:"stderr"`
+}

@@ -14,13 +14,11 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/deifyed/xctl/pkg/clients/kubectl"
 )
 
 func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) error {
-	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "podexec")
+	log := logging.GetLogger(logFeature, "podexec")
 
 	staticArgs := []string{
 		"exec",
@@ -41,10 +39,10 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) e
 
 	err := cmd.Run()
 	if err != nil {
-		log.WithFields(logrus.Fields{
-			"stdout": stdout.String(),
-			"stderr": stderr.String(),
-		}).Debug("executing command")
+		log.Debug("executing command", commandLogFields{
+			Stdout: stdout.String(),
+			Stderr: stderr.String(),
+		})
 
 		return fmt.Errorf("executing pod command: %s", stderr.String())
 	}
@@ -62,7 +60,7 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) e
 }
 
 func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.StopFn, error) {
-	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "portforward")
+	log := logging.GetLogger(logFeature, "portforward")
 
 	cmd := exec.Command(k.kubectlPath, "port-forward",
 		"--namespace", opts.Pod.Namespace,
@@ -79,10 +77,10 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 
 	err := cmd.Start()
 	if err != nil {
-		log.WithFields(logrus.Fields{
-			"stdout": stdout.String(),
-			"stderr": stderr.String(),
-		}).Debug("executing command")
+		log.Debug("executing command", commandLogFields{
+			Stdout: stdout.String(),
+			Stderr: stderr.String(),
+		})
 
 		return nil, fmt.Errorf("executing pod command: %s", err)
 	}
@@ -97,7 +95,7 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 }
 
 func (k kubectlBinaryClient) Apply(opts kubectl.ApplyOpts) error {
-	log := logging.CreateEntry(logrus.StandardLogger(), logFeature, "apply")
+	log := logging.GetLogger(logFeature, "apply")
 
 	raw, err := yaml.Marshal(opts.Manifest)
 	if err != nil {
@@ -116,10 +114,10 @@ func (k kubectlBinaryClient) Apply(opts kubectl.ApplyOpts) error {
 
 	err = cmd.Run()
 	if err != nil {
-		log.WithFields(logrus.Fields{
-			"stdout": stdout.String(),
-			"stderr": stderr.String(),
-		}).Debug("executing command")
+		log.Debug("executing command", commandLogFields{
+			Stdout: stdout.String(),
+			Stderr: stderr.String(),
+		})
 
 		return fmt.Errorf("executing pod command: %s", err)
 	}
