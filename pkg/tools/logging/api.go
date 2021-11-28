@@ -1,10 +1,14 @@
 package logging
 
-import "github.com/sirupsen/logrus"
+import (
+	"os"
+)
 
-func CreateEntry(logger *logrus.Logger, feature, activity string) *logrus.Entry {
-	return logger.WithFields(logrus.Fields{
-		"feature":  feature,
-		"activity": activity,
-	})
+func GetLogger(feature, activity string) Logger {
+	opts := loggerOpts{
+		Out:   os.Stdout,
+		Level: "debug",
+	}
+
+	return getLogrusWrapper(opts, feature, activity)
 }
