@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/tools/logging"
+
 	"github.com/deifyed/xctl/pkg/config"
 	"github.com/linode/linodego"
 	"github.com/pkg/errors"
@@ -48,19 +50,21 @@ func (p *provider) await(test pollTestFn) (err error) {
 }
 
 func (p *provider) awaitCreation(ctx context.Context, clusterID int) error {
+	log := logging.GetLogger(logFeature, "awaitCreation")
+
 	return p.await(func() (bool, error) {
-		pools, err := p.client.ListLKEClusterPools(ctx, clusterID, &linodego.ListOptions{})
+		ok, err := nodePoolCheck(ctx, p.client, clusterID)
 		if err != nil {
-			return false, fmt.Errorf("listing LKE cluster pools: %w", err)
+			return false, fmt.Errorf("checking node pools: %w", err)
 		}
 
-		for _, node := range pools[0].Linodes {
-			if node.Status == linodego.LKELinodeReady {
-				return true, nil
-			}
+		if !ok {
+			return false, nil
 		}
 
-		return false, nil
+		log.Debug("node pools are ready")
+
+		return true, nil
 	})
 }
 
@@ -77,4 +81,21 @@ func (p *provider) awaitDeletion(ctx context.Context, clusterName string) error 
 
 		return false, nil
 	})
+}
+
+func nodePoolCheck(ctx context.Context, client linodego.Client, clusterID int) (bool, error) {
+	pools, err := client.ListLKEClusterPools(ctx, clusterID, &linodego.ListOptions{})
+	if err != nil {
+		return false, fmt.Errorf("listing LKE cluster pools: %w", err)
+	}
+
+	for _, pool := range pools {
+		for _, node := range pool.Linodes {
+			if node.Status != linodego.LKELinodeReady {
+				return false, nil
+			}
+		}
+	}
+
+	return true, nil
 }
