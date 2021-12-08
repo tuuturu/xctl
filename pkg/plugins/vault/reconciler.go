@@ -11,6 +11,8 @@ import (
 	"github.com/deifyed/xctl/pkg/cloud"
 
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
+
+	"github.com/deifyed/xctl/pkg/clients/helm"
 )
 
 func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
@@ -43,6 +45,10 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 
 		err = installVault(clients)
 		if err != nil {
+			if errors.Is(err, helm.ErrUnreachable) {
+				return reconciliation.Result{Requeue: true}, nil
+			}
+
 			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
 		}
 
