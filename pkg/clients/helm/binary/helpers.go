@@ -2,6 +2,7 @@ package binary
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/deifyed/xctl/pkg/tools/binaries"
 
@@ -34,4 +35,10 @@ func getHelmPath(fs *afero.Afero) (string, error) {
 	}
 
 	return helmPath, nil
+}
+
+var reUnreachableErr = regexp.MustCompile(`.*EOF: Kubernetes cluster unreachable.*`)
+
+func isUnreachable(err error) bool {
+	return reUnreachableErr.MatchString(err.Error())
 }

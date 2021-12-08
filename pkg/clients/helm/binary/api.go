@@ -53,6 +53,10 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 			Stderr: stderr.String(),
 		})
 
+		if isUnreachable(err) {
+			return helm.ErrUnreachable
+		}
+
 		return fmt.Errorf("running Helm install on %s: %w", plugin.Metadata.Name, err)
 	}
 
