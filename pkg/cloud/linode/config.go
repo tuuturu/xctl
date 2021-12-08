@@ -2,6 +2,6 @@ package linode
 
 const (
 	defaultKubernetesVersion = "1.21"
-	defaultTimeoutSeconds    = 300
+	defaultTimeoutMinutes    = 10
 	defaultDelaySeconds      = 20
 )

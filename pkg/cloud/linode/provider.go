@@ -28,7 +28,7 @@ func (p *provider) getCluster(ctx context.Context, clusterName string) (linodego
 }
 
 func (p *provider) await(test pollTestFn) (err error) {
-	timeout := time.Now().Add(defaultTimeoutSeconds * time.Second)
+	timeout := time.Now().Add(defaultTimeoutMinutes * time.Minute)
 	delayFunction := func() { time.Sleep(defaultDelaySeconds * time.Second) }
 
 	var ready bool
