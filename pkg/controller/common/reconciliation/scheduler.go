@@ -8,10 +8,12 @@ import (
 	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
+	"github.com/deifyed/xctl/pkg/tools/logging"
 )
 
 // Run initiates scheduling of reconcilers
 func (c *Scheduler) Run(ctx context.Context) (Result, error) {
+	log := logging.GetLogger(logFeature, "run")
 	queue := NewQueue(c.reconcilers)
 	reconciliationContext := c.metadata(ctx)
 
@@ -24,6 +26,8 @@ func (c *Scheduler) Run(ctx context.Context) (Result, error) {
 		}
 
 		if result.Requeue {
+			log.Debug(fmt.Sprintf("requeueing %s", reconciler.String()))
+
 			err = queue.Push(reconciler)
 			if err != nil {
 				return Result{}, fmt.Errorf("passing requeue check for %s: %w", reconciler.String(), err)

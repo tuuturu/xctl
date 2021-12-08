@@ -12,6 +12,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const logFeature = "reconciliationScheduler"
+
 // Result contains information about the result of a Reconcile() call
 type Result struct {
 	// Requeue indicates if this Reconciliation must be run again
