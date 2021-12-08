@@ -59,7 +59,7 @@ func (p *provider) DeleteCluster(ctx context.Context, clusterName string) error 
 
 	err = p.awaitDeletion(ctx, clusterName)
 	if err != nil {
-		return fmt.Errorf("awaiting creation of cluster: %w", err)
+		return fmt.Errorf("awaiting deletion of cluster: %w", err)
 	}
 
 	return nil
