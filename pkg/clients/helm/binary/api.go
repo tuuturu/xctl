@@ -53,11 +53,14 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 			Stderr: stderr.String(),
 		})
 
-		if isUnreachable(err) {
+		switch {
+		case isUnreachable(err):
 			return helm.ErrUnreachable
+		case isConnectionTimedOut(err):
+			return helm.ErrTimeout
+		default:
+			return fmt.Errorf("running Helm install on %s: %w", plugin.Metadata.Name, err)
 		}
-
-		return fmt.Errorf("running Helm install on %s: %w", plugin.Metadata.Name, err)
 	}
 
 	return nil
@@ -93,7 +96,7 @@ func (e externalBinaryHelm) Delete(plugin v1alpha1.Plugin) error {
 }
 
 func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
-	log := logging.GetLogger(logFeature, "delete")
+	log := logging.GetLogger(logFeature, "exists")
 
 	cmd := exec.Command(e.binaryPath,
 		fmt.Sprintf("--namespace=%s", plugin.Metadata.Namespace),
