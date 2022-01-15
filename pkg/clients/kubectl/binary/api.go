@@ -82,6 +82,10 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 			Stderr: stderr.String(),
 		})
 
+		if isConnectionRefused(stderr.String()) {
+			return nil, kubectl.ErrConnectionRefused
+		}
+
 		return nil, fmt.Errorf("executing pod command: %s", err)
 	}
 
