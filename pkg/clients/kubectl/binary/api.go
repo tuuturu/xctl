@@ -28,7 +28,7 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) e
 		"--",
 	}
 
-	cmd := exec.Command(k.kubectlPath, append(staticArgs, args...)...)
+	cmd := exec.Command(k.kubectlPath, append(staticArgs, args...)...) //nolint:gosec
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
@@ -62,7 +62,7 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) e
 func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.StopFn, error) {
 	log := logging.GetLogger(logFeature, "portforward")
 
-	cmd := exec.Command(k.kubectlPath, "port-forward",
+	cmd := exec.Command(k.kubectlPath, "port-forward", //nolint:gosec
 		"--namespace", opts.Pod.Namespace,
 		opts.Pod.Name,
 		fmt.Sprintf("%s:%s", strconv.Itoa(opts.PortFrom), strconv.Itoa(opts.PortTo)),
@@ -102,7 +102,7 @@ func (k kubectlBinaryClient) Apply(opts kubectl.ApplyOpts) error {
 		return fmt.Errorf("marshalling manifest: %w", err)
 	}
 
-	cmd := exec.Command(k.kubectlPath, "apply", "-f", "-")
+	cmd := exec.Command(k.kubectlPath, "apply", "-f", "-") //nolint:gosec
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
