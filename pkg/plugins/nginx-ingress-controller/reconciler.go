@@ -1,7 +1,10 @@
 package ingress
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/deifyed/xctl/pkg/clients/helm"
 
 	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
 
@@ -14,6 +17,7 @@ import (
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
 )
 
+//nolint:funlen
 func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
@@ -33,6 +37,7 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 		Ctx:    rctx,
 		Helm:   helmClient,
 		Plugin: plugin,
+		Logger: log,
 	})
 	if err != nil {
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
@@ -44,7 +49,18 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 
 		err = helmClient.Install(plugin)
 		if err != nil {
-			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing helm chart: %w", err)
+			switch {
+			case errors.Is(err, helm.ErrTimeout):
+				log.Info("Requeuing due to timeout")
+
+				return reconciliation.Result{Requeue: true}, nil
+			case errors.Is(err, helm.ErrUnreachable):
+				log.Info("Requeuing due to cluster being unreachable")
+
+				return reconciliation.Result{Requeue: true}, nil
+			default:
+				return reconciliation.Result{Requeue: false}, fmt.Errorf("installing helm chart: %w", err)
+			}
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
@@ -67,6 +83,8 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 }
 
 func (n nginxIngressController) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
+	log := opts.Logger
+
 	indication := reconciliation.DetermineUserIndication(
 		opts.Ctx,
 		opts.Ctx.ClusterDeclaration.Spec.Plugins.NginxIngressController,
@@ -89,16 +107,22 @@ func (n nginxIngressController) determineAction(opts determineActionOpts) (recon
 	switch indication {
 	case reconciliation.ActionCreate:
 		if !clusterExists {
+			log.Debug("Waiting due to cluster not ready")
+
 			return reconciliation.ActionWait, nil
 		}
 
 		if ingressExists {
+			log.Debug("NOOP since component already exists")
+
 			return reconciliation.ActionNoop, nil
 		}
 
 		return reconciliation.ActionCreate, nil
 	case reconciliation.ActionDelete:
 		if !ingressExists {
+			log.Debug("NOOP since cluster is already taken down")
+
 			return reconciliation.ActionNoop, nil
 		}
 
