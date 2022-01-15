@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/deifyed/xctl/pkg/clients/kubectl"
+	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
 	"github.com/deifyed/xctl/pkg/clients/kubectl/binary"
 
@@ -42,6 +43,7 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 		Ctx:    rctx,
 		Helm:   helmClient,
 		Plugin: plugin,
+		Logger: log,
 	})
 	if err != nil {
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
@@ -85,6 +87,7 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 }
 
 func (n certbotReconciler) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
+	log := opts.Logger
 	indication := reconciliation.DetermineUserIndication(opts.Ctx, opts.Ctx.ClusterDeclaration.Spec.Plugins.CertBot)
 
 	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.ClusterDeclaration.Metadata.Name)
@@ -104,11 +107,28 @@ func (n certbotReconciler) determineAction(opts determineActionOpts) (reconcilia
 	switch indication {
 	case reconciliation.ActionCreate:
 		if !clusterExists {
+			log.Debug("Waiting due to cluster not ready")
+
 			return reconciliation.ActionWait, nil
 		}
 
 		if componentExists {
+			log.Debug("Noop due to existing component")
+
 			return reconciliation.ActionNoop, nil
+		}
+
+		ingressTester := func() (bool, error) {
+			return opts.Helm.Exists(ingress.NewNginxIngressControllerPlugin())
+		}
+
+		hasDependencies, err := reconciliation.AssertDependencyExistence(true, ingressTester)
+		if err != nil {
+			return reconciliation.ActionNoop, fmt.Errorf("asserting dependencies existence: %w", err)
+		}
+
+		if !hasDependencies {
+			return reconciliation.ActionWait, nil
 		}
 
 		return reconciliation.ActionCreate, nil
