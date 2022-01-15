@@ -7,6 +7,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/deifyed/xctl/pkg/tools/logging"
+
 	"github.com/deifyed/xctl/pkg/clients/helm"
 
 	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
@@ -23,6 +25,7 @@ type clusterReconciler struct {
 }
 
 func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
+	log := logging.GetLogger("cluster", "reconciliation")
 	action := reconciliation.DetermineUserIndication(rctx, true)
 
 	clusterExists, err := c.clusterService.HasCluster(rctx.Ctx, rctx.ClusterDeclaration.Metadata.Name)
@@ -32,6 +35,8 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 
 	switch action {
 	case reconciliation.ActionCreate:
+		log.Debug("creating")
+
 		if !clusterExists {
 			err = c.clusterService.CreateCluster(rctx.Ctx, rctx.ClusterDeclaration)
 			if err != nil {
@@ -46,6 +51,8 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
+		log.Debug("deleting")
+
 		if !clusterExists {
 			return reconciliation.Result{Requeue: false}, nil
 		}

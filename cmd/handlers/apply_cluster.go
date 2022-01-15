@@ -6,6 +6,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/tools/logging"
+
 	"github.com/deifyed/xctl/pkg/plugins/certbot"
 
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
@@ -33,6 +35,7 @@ type handleClusterOpts struct {
 }
 
 func handleCluster(opts handleClusterOpts) error {
+	log := logging.GetLogger("cmd", "cluster")
 	manifest := v1alpha1.NewDefaultCluster()
 
 	content, err := io.ReadAll(opts.clusterManifestSource)
@@ -69,6 +72,8 @@ func handleCluster(opts handleClusterOpts) error {
 		ClusterDeclaration:              manifest,
 		ReconciliationLoopDelayFunction: func() { time.Sleep(config.DefaultReconciliationLoopDelayDuration) },
 		QueueStepFunc: func(identifier string) {
+			log.Debug(fmt.Sprintf("reconciling %s", identifier))
+
 			spin.Suffix = fmt.Sprintf(" Reconciling %s", identifier)
 		},
 	}
