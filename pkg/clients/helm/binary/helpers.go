@@ -85,5 +85,9 @@ func generateInstallArgs(opts generateInstallArgsOpts) ([]string, error) {
 		args = append(args, fmt.Sprintf("--values=%s", valuesPath))
 	}
 
+	if opts.Plugin.Spec.Helm.Version != "" {
+		args = append(args, "--version=%s", opts.Plugin.Spec.Helm.Version)
+	}
+
 	return args, nil
 }

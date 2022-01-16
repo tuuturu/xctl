@@ -31,6 +31,8 @@ type PluginSpecHelm struct {
 	Chart string `json:"chart"`
 	// Values defines the values to apply to the chart
 	Values string `json:"values"`
+	// Version defines the chart version
+	Version string
 }
 
 // NewPlugin initializes a plugin
