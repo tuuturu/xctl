@@ -1,14 +1,22 @@
-GOLANGCI_LINT:
-	@which golangci-lint &>/dev/null || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.43.0
+GOPATH := $(shell go env GOPATH)
+GOBIN  := $(GOPATH)/bin
+
+GOLANGCILINT := $(GOBIN)/golangci-lint
+$(GOLANGCILINT):
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.43.0
+
+RICHGO := $(GOBIN)/richgo
+$(RICHGO):
+	$(GO) install github.com/kyoh86/richgo@v0.3.6
 
 fmt:
 	@goimports -w .
 	@gofmt -w .
 
-lint: GOLANGCI_LINT
+lint: $(GOLANGCILINT)
 	@golangci-lint run
 
-test:
-	@go test ./...
+test: $(RICHGO)
+	@go test ./... | tee >($(RICHGO) testfilter)
 
 check: fmt lint test
