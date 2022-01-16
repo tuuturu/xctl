@@ -2,7 +2,9 @@ package binary
 
 import (
 	"fmt"
-	"regexp"
+	"path"
+
+	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 
 	"github.com/deifyed/xctl/pkg/tools/binaries"
 
@@ -37,14 +39,51 @@ func getHelmPath(fs *afero.Afero) (string, error) {
 	return helmPath, nil
 }
 
-var reUnreachableErr = regexp.MustCompile(`.*EOF: Kubernetes cluster unreachable.*`)
+func generateTempFile(fs *afero.Afero, name string, content []byte) (string, error) {
+	tmpDir, err := fs.TempDir("/tmp", "xctl")
+	if err != nil {
+		return "", fmt.Errorf("creating temp dir for plugin values: %w", err)
+	}
 
-func isUnreachable(err error) bool {
-	return reUnreachableErr.MatchString(err.Error())
+	tmpValuesPath := path.Join(tmpDir, name)
+
+	err = fs.WriteFile(tmpValuesPath, content, 0o600)
+	if err != nil {
+		return "", fmt.Errorf("creating temporary values file: %w", err)
+	}
+
+	return tmpValuesPath, nil
 }
 
-var reTimedOutErr = regexp.MustCompile(`.*connection timed out.*`)
+type generateInstallArgsOpts struct {
+	KubeConfigPath string
+	Fs             *afero.Afero
+	Plugin         v1alpha1.Plugin
+}
 
-func isConnectionTimedOut(err error) bool {
-	return reTimedOutErr.MatchString(err.Error())
+func generateInstallArgs(opts generateInstallArgsOpts) ([]string, error) {
+	args := []string{
+		fmt.Sprintf("--namespace=%s", opts.Plugin.Metadata.Namespace),
+		fmt.Sprintf("--kubeconfig=%s", opts.KubeConfigPath),
+		"install",
+		"--atomic",
+		"--wait",
+		opts.Plugin.Metadata.Name,
+		opts.Plugin.Spec.Helm.Chart,
+	}
+
+	if opts.Plugin.Spec.Helm.Values != "" {
+		valuesPath, err := generateTempFile(
+			opts.Fs,
+			fmt.Sprintf("%s-values.yaml", opts.Plugin.Metadata.Name),
+			[]byte(opts.Plugin.Spec.Helm.Values),
+		)
+		if err != nil {
+			return []string{}, fmt.Errorf("generating temporary values file: %w", err)
+		}
+
+		args = append(args, fmt.Sprintf("--values=%s", valuesPath))
+	}
+
+	return args, nil
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
-	"path"
 	"strings"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -17,28 +16,16 @@ import (
 func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 	log := logging.GetLogger(logFeature, "install")
 
-	tmpDir, err := e.fs.TempDir("/tmp", "xctl")
+	args, err := generateInstallArgs(generateInstallArgsOpts{
+		KubeConfigPath: e.kubeConfigPath,
+		Fs:             e.fs,
+		Plugin:         plugin,
+	})
 	if err != nil {
-		return fmt.Errorf("creating temp dir for plugin values: %w", err)
+		return fmt.Errorf("preparing installation arguments: %w", err)
 	}
 
-	tmpValuesPath := path.Join(tmpDir, fmt.Sprintf("%s-values.yaml", plugin.Metadata.Name))
-
-	err = e.fs.WriteFile(tmpValuesPath, []byte(plugin.Spec.Helm.Values), 0o600)
-	if err != nil {
-		return fmt.Errorf("creating temporary values file: %w", err)
-	}
-
-	cmd := exec.Command(e.binaryPath,
-		fmt.Sprintf("--namespace=%s", plugin.Metadata.Namespace),
-		fmt.Sprintf("--kubeconfig=%s", e.kubeConfigPath),
-		"install",
-		"--atomic",
-		"--wait",
-		plugin.Metadata.Name,
-		plugin.Spec.Helm.Chart,
-		fmt.Sprintf("--values=%s", tmpValuesPath),
-	)
+	cmd := exec.Command(e.binaryPath, args...)
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
