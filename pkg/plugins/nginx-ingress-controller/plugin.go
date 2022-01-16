@@ -10,6 +10,7 @@ func NewNginxIngressControllerPlugin() v1alpha1.Plugin {
 	plugin.Metadata.Name = nginxIngressControllerPluginName
 	plugin.Metadata.Namespace = "kube-system"
 	plugin.Spec.Helm.Chart = "ingress-nginx/ingress-nginx"
+	plugin.Spec.Helm.Version = "4.0.15"
 
 	return plugin
 }
