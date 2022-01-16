@@ -3,6 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/deifyed/xctl/pkg/config"
+
 	"github.com/deifyed/xctl/cmd/handlers"
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 	"github.com/spf13/afero"
@@ -18,6 +20,7 @@ var (
 		},
 		Filesystem: &afero.Afero{Fs: afero.NewOsFs()},
 		Purge:      true,
+		Debug:      config.IsDebugMode(),
 	}
 	deleteCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "delete",
