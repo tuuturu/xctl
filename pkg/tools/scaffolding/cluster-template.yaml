@@ -1,0 +1,17 @@
+apiVersion: v1alpha1
+kind: Cluster
+
+metadata:
+  # Name of the cluster
+  name: TestCluster
+  # Associate following email with the cluster
+  email: mail@klokkinn.no
+
+spec:
+  # Associate following domain with the cluster
+  rootDomain: klokkinn.no
+
+  #plugins:
+  #  certBot: true
+  #  nginxIngressController: true
+  #  vault: true
