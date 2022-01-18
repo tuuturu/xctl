@@ -16,6 +16,16 @@ import (
 func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 	log := logging.GetLogger(logFeature, "install")
 
+	err := e.addRepository(plugin.Spec.Helm.Repository)
+	if err != nil {
+		return fmt.Errorf("adding repository: %w", err)
+	}
+
+	err = e.updateRepositories()
+	if err != nil {
+		return fmt.Errorf("updating repositories: %w", err)
+	}
+
 	args, err := generateInstallArgs(generateInstallArgsOpts{
 		KubeConfigPath: e.kubeConfigPath,
 		Fs:             e.fs,
