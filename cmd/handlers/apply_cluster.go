@@ -91,7 +91,7 @@ func handleCluster(opts handleClusterOpts) error {
 
 	spin.Stop()
 
-	fmt.Fprintf(opts.out, "\n\nReconciliation complete")
+	fmt.Fprintf(opts.out, "\n\nReconciliation complete\n")
 
 	return err
 }
