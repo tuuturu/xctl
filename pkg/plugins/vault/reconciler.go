@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/deifyed/xctl/pkg/clients/vault"
+
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/deifyed/xctl/pkg/config"
@@ -45,11 +47,14 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 
 		err = installVault(clients)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
+			switch {
+			case errors.Is(err, helm.ErrUnreachable):
 				return reconciliation.Result{Requeue: true}, nil
+			case errors.Is(err, vault.ErrConnectionRefused):
+				return reconciliation.Result{Requeue: true}, nil
+			default:
+				return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
 			}
-
-			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
