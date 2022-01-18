@@ -62,14 +62,11 @@ type generateInstallArgsOpts struct {
 }
 
 func generateInstallArgs(opts generateInstallArgsOpts) ([]string, error) {
-	args := []string{
-		fmt.Sprintf("--namespace=%s", opts.Plugin.Metadata.Namespace),
-		fmt.Sprintf("--kubeconfig=%s", opts.KubeConfigPath),
-		"install",
-		"--atomic",
-		"--wait",
-		opts.Plugin.Metadata.Name,
-		opts.Plugin.Spec.Helm.Chart,
+	argsMap := map[string]string{
+		"namespace":  opts.Plugin.Metadata.Namespace,
+		"kubeconfig": opts.KubeConfigPath,
+		"atomic":     "true",
+		"wait":       "true",
 	}
 
 	if opts.Plugin.Spec.Helm.Values != "" {
@@ -82,12 +79,32 @@ func generateInstallArgs(opts generateInstallArgsOpts) ([]string, error) {
 			return []string{}, fmt.Errorf("generating temporary values file: %w", err)
 		}
 
-		args = append(args, fmt.Sprintf("--values=%s", valuesPath))
+		argsMap["values"] = valuesPath
 	}
 
 	if opts.Plugin.Spec.Helm.Version != "" {
-		args = append(args, "--version=%s", opts.Plugin.Spec.Helm.Version)
+		argsMap["version"] = opts.Plugin.Spec.Helm.Version
 	}
 
+	chartWithRepository := fmt.Sprintf("%s/%s",
+		opts.Plugin.Spec.Helm.Repository.Name,
+		opts.Plugin.Spec.Helm.Chart,
+	)
+
+	args := append(mapAsArgs(argsMap), "install", opts.Plugin.Metadata.Name, chartWithRepository)
+
 	return args, nil
+}
+
+func mapAsArgs(m map[string]string) []string {
+	result := make([]string, len(m))
+	index := 0
+
+	for key, value := range m {
+		result[index] = fmt.Sprintf("--%s=%s", key, value)
+
+		index++
+	}
+
+	return result
 }
