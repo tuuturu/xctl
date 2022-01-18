@@ -9,8 +9,13 @@ func newCertbotPlugin() v1alpha1.Plugin {
 
 	plugin.Metadata.Name = certbotPluginName
 	plugin.Metadata.Namespace = "kube-system"
-	plugin.Spec.Helm.Chart = "jetstack/cert-manager"
+
+	plugin.Spec.Helm.Chart = "cert-manager"
+	plugin.Spec.Helm.Version = "1.6.1"
 	plugin.Spec.Helm.Values = valuesTemplate
+
+	plugin.Spec.Helm.Repository.Name = "jetstack"
+	plugin.Spec.Helm.Repository.URL = "https://charts.jetstack.io"
 
 	return plugin
 }

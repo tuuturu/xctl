@@ -9,8 +9,12 @@ func NewNginxIngressControllerPlugin() v1alpha1.Plugin {
 
 	plugin.Metadata.Name = nginxIngressControllerPluginName
 	plugin.Metadata.Namespace = "kube-system"
-	plugin.Spec.Helm.Chart = "ingress-nginx/ingress-nginx"
-	plugin.Spec.Helm.Version = "4.0.15"
+
+	plugin.Spec.Helm.Chart = "ingress-nginx"
+	plugin.Spec.Helm.Version = "4.0.13"
+
+	plugin.Spec.Helm.Repository.Name = "ingress-nginx"
+	plugin.Spec.Helm.Repository.URL = "https://kubernetes.github.io/ingress-nginx"
 
 	return plugin
 }
