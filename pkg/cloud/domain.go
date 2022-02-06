@@ -9,14 +9,14 @@ type Domain struct {
 }
 
 type SubdomainServiceCRUDer interface {
-	CreateSubdomain(ctx context.Context, fqdn string) (Domain, error)
-	DeleteSubdomain(ctx context.Context, fqdn string) error
-	GetSubdomain(ctx context.Context, fqdn string) (Domain, error)
-	HasSubdomain(ctx context.Context, fqdn string) (bool, error)
+	CreateSubdomain(ctx context.Context, domain Domain, target string) (Domain, error)
+	DeleteSubdomain(ctx context.Context, domain Domain) error
+	GetSubdomain(ctx context.Context, domain Domain) (Domain, error)
+	HasSubdomain(ctx context.Context, domain Domain) (bool, error)
 }
 
 type PrimaryDomainCRUDer interface {
-	HasPrimaryDomain(ctx context.Context, fqdn string) (bool, error)
+	HasPrimaryDomain(ctx context.Context, domain Domain) (bool, error)
 }
 
 type DomainService interface {

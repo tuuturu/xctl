@@ -11,9 +11,7 @@ import (
 	"github.com/deifyed/xctl/pkg/cloud"
 )
 
-func (p *provider) CreateSubdomain(ctx context.Context, fqdn string) (cloud.Domain, error) {
-	domain := cloud.Domain{Host: fqdn}
-
+func (p *provider) CreateSubdomain(ctx context.Context, domain cloud.Domain, target string) (cloud.Domain, error) {
 	primaryDomain, err := p.getLinodeDomain(ctx, domain.PrimaryDomain())
 	if err != nil {
 		if errors.Is(err, config.ErrNotFound) {
@@ -29,19 +27,17 @@ func (p *provider) CreateSubdomain(ctx context.Context, fqdn string) (cloud.Doma
 	_, err = p.client.CreateDomainRecord(ctx, primaryDomain.ID, linodego.DomainRecordCreateOptions{
 		Type:   linodego.RecordTypeA,
 		Name:   domain.Subdomain(),
-		Target: "",
+		Target: target,
 		TTLSec: config.DefaultSubdomainTTLSeconds,
 	})
 	if err != nil {
 		return cloud.Domain{}, fmt.Errorf("creating record: %w", err)
 	}
 
-	return cloud.Domain{Host: fqdn}, nil
+	return domain, nil
 }
 
-func (p *provider) DeleteSubdomain(ctx context.Context, fqdn string) error {
-	domain := cloud.Domain{Host: fqdn}
-
+func (p *provider) DeleteSubdomain(ctx context.Context, domain cloud.Domain) error {
 	primaryDomain, err := p.getLinodeDomain(ctx, domain.PrimaryDomain())
 	if err != nil {
 		if errors.Is(err, config.ErrNotFound) {
@@ -67,9 +63,7 @@ func (p *provider) DeleteSubdomain(ctx context.Context, fqdn string) error {
 	return nil
 }
 
-func (p *provider) GetSubdomain(ctx context.Context, fqdn string) (cloud.Domain, error) {
-	domain := cloud.Domain{Host: fqdn}
-
+func (p *provider) GetSubdomain(ctx context.Context, domain cloud.Domain) (cloud.Domain, error) {
 	linodeDomain, err := p.getLinodeDomain(ctx, domain.PrimaryDomain())
 	if err != nil {
 		return cloud.Domain{}, fmt.Errorf("getting primary domain: %w", err)
@@ -80,11 +74,11 @@ func (p *provider) GetSubdomain(ctx context.Context, fqdn string) (cloud.Domain,
 		return cloud.Domain{}, fmt.Errorf("getting record: %w", err)
 	}
 
-	return cloud.Domain{Host: fqdn}, nil
+	return domain, nil
 }
 
-func (p *provider) HasSubdomain(ctx context.Context, fqdn string) (bool, error) {
-	_, err := p.GetSubdomain(ctx, fqdn)
+func (p *provider) HasSubdomain(ctx context.Context, domain cloud.Domain) (bool, error) {
+	_, err := p.GetSubdomain(ctx, domain)
 	if err != nil {
 		if errors.Is(err, config.ErrNotFound) {
 			return false, nil

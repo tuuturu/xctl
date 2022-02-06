@@ -9,9 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (p *provider) HasPrimaryDomain(ctx context.Context, fqdn string) (bool, error) {
-	domain := cloud.Domain{Host: fqdn}
-
+func (p *provider) HasPrimaryDomain(ctx context.Context, domain cloud.Domain) (bool, error) {
 	err := domain.Validate()
 	if err != nil {
 		return false, fmt.Errorf("validating domain: %w", err)
