@@ -94,7 +94,7 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 		return reconciliation.Result{Requeue: false}, nil
 	}
 
-	return reconciliation.Result{}, reconciliation.ErrIndecisive
+	return reconciliation.NoopWaitIndecisiveHandler(action)
 }
 
 func ensureDependencies(helmClient helm.Client) (bool, error) {

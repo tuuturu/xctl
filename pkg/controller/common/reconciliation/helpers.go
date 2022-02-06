@@ -15,6 +15,18 @@ func DetermineUserIndication(metadata Context, componentFlag bool) Action {
 	return ActionCreate
 }
 
+// NoopWaitIndecisiveHandler handles NOOP, Wait and indecisiveness in a streamlined way
+func NoopWaitIndecisiveHandler(action Action) (Result, error) {
+	switch action {
+	case ActionWait:
+		return Result{Requeue: true}, nil
+	case ActionNoop:
+		return Result{Requeue: false}, nil
+	default:
+		return Result{}, ErrIndecisive
+	}
+}
+
 // DefaultDelayFunction defines a sane default reconciliation loop delay function
 func DefaultDelayFunction() {
 	time.Sleep(config.DefaultReconciliationLoopDelayDuration)

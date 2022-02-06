@@ -73,13 +73,9 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
-	case reconciliation.ActionWait:
-		return reconciliation.Result{Requeue: true}, nil
-	case reconciliation.ActionNoop:
-		return reconciliation.Result{Requeue: false}, nil
 	}
 
-	return reconciliation.Result{Requeue: false}, reconciliation.ErrIndecisive
+	return reconciliation.NoopWaitIndecisiveHandler(action)
 }
 
 func (n nginxIngressController) determineAction(opts determineActionOpts) (reconciliation.Action, error) {

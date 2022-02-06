@@ -37,7 +37,7 @@ func (d *domainReconciler) Reconcile(ctx reconciliation.Context) (reconciliation
 		return reconciliation.Result{Requeue: false}, err
 	}
 
-	return reconciliation.Result{}, reconciliation.ErrIndecisive
+	return reconciliation.NoopWaitIndecisiveHandler(action)
 }
 
 func (d *domainReconciler) determineAction(ctx reconciliation.Context, cluster cloud.Cluster) (reconciliation.Action, error) { //nolint:lll
