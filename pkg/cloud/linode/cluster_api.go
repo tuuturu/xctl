@@ -22,6 +22,7 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 					Min:     cloud.DefaultAutoscalerMinimumNodes,
 					Max:     cloud.DefaultAutoscalerMaximumNodes,
 				},
+				Tags: defaultLabels(manifest),
 			},
 		},
 		Label:      componentNamer(manifest, componentTypeCluster, ""),
