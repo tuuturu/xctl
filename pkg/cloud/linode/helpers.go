@@ -9,7 +9,7 @@ import (
 
 func defaultLabels(cluster v1alpha1.Cluster, extraLabels ...string) []string {
 	result := []string{
-		cluster.Metadata.Name,
+		componentNamer(cluster, "", ""),
 	}
 
 	result = append(result, extraLabels...)
@@ -20,7 +20,7 @@ func defaultLabels(cluster v1alpha1.Cluster, extraLabels ...string) []string {
 func componentNamer(cluster v1alpha1.Cluster, componentType string, id string) string {
 	componentName := strings.Join([]string{config.ApplicationName, cluster.Metadata.Name, componentType, id}, "-")
 	componentName = strings.ToLower(componentName)
-	componentName = strings.TrimSuffix(componentName, "-")
+	componentName = strings.TrimRight(componentName, "-")
 
 	return componentName
 }

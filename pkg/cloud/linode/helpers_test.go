@@ -37,6 +37,13 @@ func TestComponentNamer(t *testing.T) {
 			withComponentID:   "",
 			expectName:        "xctl-superprod-cluster",
 		},
+		{
+			name:              "Works with only cluster",
+			withClusterName:   "megaprod",
+			withComponentType: "",
+			withComponentID:   "",
+			expectName:        "xctl-megaprod",
+		},
 	}
 
 	for _, tc := range testCases {
