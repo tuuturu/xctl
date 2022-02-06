@@ -82,12 +82,11 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 
 	cluster, err := v.cloudProvider.GetCluster(opts.rctx.Ctx, opts.rctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {
-		switch {
-		case errors.Is(err, config.ErrNotFound):
-			clusterExists = false
-		default:
-			return reconciliation.ActionNoop, fmt.Errorf("checking cluster existence: %w", err)
+		if !errors.Is(err, config.ErrNotFound) {
+			return "", fmt.Errorf("checking cluster existence: %w", err)
 		}
+
+		clusterExists = false
 	}
 
 	if clusterExists && cluster.Ready {
