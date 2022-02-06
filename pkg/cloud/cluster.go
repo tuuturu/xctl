@@ -13,11 +13,20 @@ const (
 	DefaultAutoscalerMaximumNodes = 10
 )
 
+type ClusterNode struct {
+	Name string
+	IPv4 string
+}
+
 type Cluster struct {
 	// Name represents a way to identify a Cluster
 	Name string
 	// Ready represents whether the cluster is ready to be operated
 	Ready bool
+	// PublicIPv6 represents the IP of which the cluster is available for public requests
+	PublicIPv6 string
+	// Nodes contains details about the cluster's nodes
+	Nodes []ClusterNode
 }
 
 type ClusterService interface {

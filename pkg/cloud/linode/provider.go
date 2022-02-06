@@ -3,7 +3,11 @@ package linode
 import (
 	"context"
 	"fmt"
+	"net"
+	"strings"
 	"time"
+
+	"github.com/deifyed/xctl/pkg/cloud"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
@@ -25,6 +29,54 @@ func (p *provider) getCluster(ctx context.Context, clusterName string) (linodego
 	}
 
 	return linodego.LKECluster{}, config.ErrNotFound
+}
+
+func (p *provider) getClusterNodes(ctx context.Context, clusterID int) ([]cloud.ClusterNode, error) {
+	pools, err := p.client.ListLKEClusterPools(ctx, clusterID, &linodego.ListOptions{})
+	if err != nil {
+		return []cloud.ClusterNode{}, err
+	}
+
+	nodes := make([]cloud.ClusterNode, 0)
+	instances := make([]*linodego.Instance, 0)
+
+	for _, pool := range pools {
+		newInstances, err := p.getInstancesFromPool(ctx, pool)
+		if err != nil {
+			return nil, fmt.Errorf("retrieving instances from pool: %w", err)
+		}
+
+		instances = append(instances, newInstances...)
+	}
+
+	for _, instance := range instances {
+		localIP, err := getLocalIP(instance.IPv4)
+		if err != nil {
+			return nil, fmt.Errorf("acquiring local IP for instance: %w", err)
+		}
+
+		nodes = append(nodes, cloud.ClusterNode{
+			Name: instance.Label,
+			IPv4: localIP,
+		})
+	}
+
+	return nodes, nil
+}
+
+func (p *provider) getInstancesFromPool(ctx context.Context, pool linodego.LKEClusterPool) ([]*linodego.Instance, error) { //nolint:lll
+	instances := make([]*linodego.Instance, len(pool.Linodes))
+
+	for index, node := range pool.Linodes {
+		instance, err := p.client.GetInstance(ctx, node.InstanceID)
+		if err != nil {
+			return nil, fmt.Errorf("getting instance: %w", err)
+		}
+
+		instances[index] = instance
+	}
+
+	return instances, nil
 }
 
 func (p *provider) await(test pollTestFn) (err error) {
@@ -98,4 +150,14 @@ func nodePoolCheck(ctx context.Context, client linodego.Client, clusterID int) (
 	}
 
 	return true, nil
+}
+
+func getLocalIP(ips []*net.IP) (string, error) {
+	for _, ip := range ips {
+		if strings.HasPrefix(ip.String(), "192.168.") {
+			return ip.String(), nil
+		}
+	}
+
+	return "", cloud.ErrNotFound
 }
