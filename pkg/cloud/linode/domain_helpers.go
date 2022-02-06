@@ -28,6 +28,10 @@ func (p *provider) getLinodeDomainRecord(
 	domainID int,
 	subdomainName string,
 ) (linodego.DomainRecord, error) {
+	if subdomainName == "" {
+		subdomainName = "*"
+	}
+
 	records, err := p.client.ListDomainRecords(ctx, domainID, &linodego.ListOptions{})
 	if err != nil {
 		return linodego.DomainRecord{}, fmt.Errorf("listing domain records for ID %d: %w", domainID, err)
