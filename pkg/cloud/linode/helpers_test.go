@@ -1,7 +1,9 @@
-package v1alpha1
+package linode
 
 import (
 	"testing"
+
+	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -41,10 +43,10 @@ func TestComponentNamer(t *testing.T) {
 		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
-			manifest := NewDefaultCluster()
+			manifest := v1alpha1.NewDefaultCluster()
 			manifest.Metadata.Name = tc.withClusterName
 
-			name := manifest.ComponentName(tc.withComponentType, tc.withComponentID)
+			name := componentNamer(manifest, tc.withComponentType, tc.withComponentID)
 
 			assert.Equal(t, tc.expectName, name)
 		})

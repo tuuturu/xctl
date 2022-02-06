@@ -1,11 +1,5 @@
 package v1alpha1
 
-import (
-	"strings"
-
-	"github.com/deifyed/xctl/pkg/config"
-)
-
 const ClusterKind = "Cluster"
 
 type ClusterSpecPlugins struct {
@@ -40,12 +34,4 @@ func NewDefaultCluster() Cluster {
 			},
 		},
 	}
-}
-
-func (c Cluster) ComponentName(componentType string, id string) string {
-	componentName := strings.Join([]string{config.ApplicationName, c.Metadata.Name, componentType, id}, "-")
-	componentName = strings.ToLower(componentName)
-	componentName = strings.TrimSuffix(componentName, "-")
-
-	return componentName
 }

@@ -11,6 +11,9 @@ const (
 	linodeType4GB = "g6-standard-2" // GET https://api.linode.com/v4/linode/types
 	// regionFrankfurt defines a region in central Europe
 	regionFrankfurt = "eu-central" // GET https://api.linode.com/v4/regions
+
+	// componentTypeCluster defines the component type name of a cluster resource
+	componentTypeCluster = "cluster"
 )
 
 type provider struct {

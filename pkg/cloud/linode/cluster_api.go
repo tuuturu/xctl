@@ -24,7 +24,7 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 				},
 			},
 		},
-		Label:      manifest.ComponentName("cluster", ""),
+		Label:      componentNamer(manifest, componentTypeCluster, ""),
 		Region:     defaultRegion,
 		K8sVersion: defaultKubernetesVersion,
 		Tags:       defaultLabels(manifest),
