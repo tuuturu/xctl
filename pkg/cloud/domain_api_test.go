@@ -42,7 +42,7 @@ func TestSubdomain_Subdomain(t *testing.T) {
 		expectSubdomain string
 	}{
 		{
-			name:            "Should work",
+			name:            "Should returns the subdomain when it exists",
 			withFullDomain:  "test.tuuturu.org",
 			expectSubdomain: "test",
 		},
