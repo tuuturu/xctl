@@ -2,7 +2,6 @@ package binary
 
 import (
 	"fmt"
-	"regexp"
 
 	"github.com/deifyed/xctl/pkg/tools/binaries"
 
@@ -48,10 +47,4 @@ func (k kubectlBinaryClient) envAsArray() []string {
 	}
 
 	return env
-}
-
-var connectionRefusedRe = regexp.MustCompile(`.*connection refused.*`)
-
-func isConnectionRefused(s string) bool {
-	return connectionRefusedRe.MatchString(s)
 }
