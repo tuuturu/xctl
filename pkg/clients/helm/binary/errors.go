@@ -13,3 +13,9 @@ var reTimedOutErr = regexp.MustCompile(`.*connection timed out.*`)
 func isConnectionTimedOut(err error) bool {
 	return reTimedOutErr.MatchString(err.Error())
 }
+
+var reAlreadyExistsErr = regexp.MustCompile(`INSTALLATION FAILED: cannot re-use a name that is still in use\s`)
+
+func isAlreadyExists(err error) bool {
+	return reAlreadyExistsErr.MatchString(err.Error())
+}
