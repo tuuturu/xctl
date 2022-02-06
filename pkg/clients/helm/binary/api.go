@@ -45,7 +45,7 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 
 	err = cmd.Run()
 	if err != nil {
-		log.Debug("executing command", commandLogFields{
+		log.Debugf("executing command: %+v", commandLogFields{
 			Stdout: stdout.String(),
 			Stderr: stderr.String(),
 		})
