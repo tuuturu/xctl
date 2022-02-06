@@ -6,6 +6,13 @@ import (
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
 
+const (
+	// DefaultAutoscalerMinimumNodes defines the minimum amount of nodes that should be available
+	DefaultAutoscalerMinimumNodes = 2
+	// DefaultAutoscalerMaximumNodes defines the maximum amount of nodes that should be available
+	DefaultAutoscalerMaximumNodes = 10
+)
+
 type Cluster struct {
 	// Name represents a way to identify a Cluster
 	Name string

@@ -17,6 +17,11 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 			{
 				Count: config.DefaultClusterNodeAmount,
 				Type:  linodeType4GB,
+				Autoscaler: &linodego.LKEClusterPoolAutoscaler{
+					Enabled: true,
+					Min:     cloud.DefaultAutoscalerMinimumNodes,
+					Max:     cloud.DefaultAutoscalerMaximumNodes,
+				},
 			},
 		},
 		Label:      manifest.Metadata.Name,
