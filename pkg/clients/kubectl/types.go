@@ -40,6 +40,8 @@ type Poder interface {
 	PodExec(PodExecOpts, ...string) error
 	// PortForward opens a port forwarding connection and returns a function to close that connection
 	PortForward(PortForwardOpts) (StopFn, error)
+	// PodReady returns a boolean indicating if the pod is ready or not
+	PodReady(Pod) (bool, error)
 }
 
 type Client interface {

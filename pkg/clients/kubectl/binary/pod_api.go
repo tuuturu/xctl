@@ -2,6 +2,7 @@ package binary
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os/exec"
@@ -91,4 +92,51 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 
 		return cmd.Process.Kill()
 	}, nil
+}
+
+func (k kubectlBinaryClient) PodReady(pod kubectl.Pod) (bool, error) {
+	log := logging.GetLogger(logFeature, "podReady")
+
+	args := []string{
+		"--namespace", pod.Namespace,
+		"get", "pod",
+		pod.Name,
+		"--output=json",
+	}
+
+	cmd := exec.Command(k.kubectlPath, args...) //nolint:gosec
+
+	stderr := bytes.Buffer{}
+	stdout := bytes.Buffer{}
+
+	cmd.Env = k.envAsArray()
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	if err != nil {
+		log.Debug("executing command", commandLogFields{
+			Stdout: stdout.String(),
+			Stderr: stderr.String(),
+		})
+
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return false, fmt.Errorf("running command: %w", err)
+	}
+
+	var result getPodResult
+
+	err = json.Unmarshal(stdout.Bytes(), &result)
+	if err != nil {
+		return false, fmt.Errorf("unmarshalling response: %w", err)
+	}
+
+	for _, containerStatus := range result.Status.ContainerStatuses {
+		if !containerStatus.Ready {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }
