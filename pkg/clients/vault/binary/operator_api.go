@@ -26,6 +26,8 @@ func (c *client) Initialize() (vault.InitializationResponse, error) {
 			"stderr": stderr.String(),
 		}).Debug("executing command")
 
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
 		if isConnectionRefused(err) {
 			return vault.InitializationResponse{}, vault.ErrConnectionRefused
 		}
