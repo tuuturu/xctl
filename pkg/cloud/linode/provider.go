@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
+
 	"github.com/deifyed/xctl/pkg/cloud"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -16,11 +18,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (p *provider) getCluster(ctx context.Context, clusterName string) (linodego.LKECluster, error) {
+func (p *provider) getCluster(ctx context.Context, manifest v1alpha1.Cluster) (linodego.LKECluster, error) {
 	clusters, err := p.client.ListLKEClusters(ctx, &linodego.ListOptions{})
 	if err != nil {
 		return linodego.LKECluster{}, fmt.Errorf("retrieving existing LKE clusters: %w", err)
 	}
+
+	clusterName := componentNamer(manifest, componentTypeCluster, "")
 
 	for _, cluster := range clusters {
 		if cluster.Label == clusterName {
@@ -120,9 +124,9 @@ func (p *provider) awaitCreation(ctx context.Context, clusterID int) error {
 	})
 }
 
-func (p *provider) awaitDeletion(ctx context.Context, clusterName string) error {
+func (p *provider) awaitDeletion(ctx context.Context, manifest v1alpha1.Cluster) error {
 	return p.await(func() (bool, error) {
-		_, err := p.getCluster(ctx, clusterName)
+		_, err := p.getCluster(ctx, manifest)
 		if err != nil {
 			if errors.Is(err, config.ErrNotFound) {
 				return true, nil

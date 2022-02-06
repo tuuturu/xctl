@@ -61,10 +61,10 @@ var (
 			}
 
 			kubeConfigPath, err := ensureKubeConfig(ensureKubeConfigOpts{
-				fs:          venvCmdOpts.fs,
-				ctx:         ctx,
-				provider:    provider,
-				clusterName: venvCmdOpts.clusterManifest.Metadata.Name,
+				fs:              venvCmdOpts.fs,
+				ctx:             ctx,
+				provider:        provider,
+				clusterManifest: venvCmdOpts.clusterManifest,
 			})
 			if err != nil {
 				return fmt.Errorf("setting up kubeconfig: %w", err)
@@ -141,13 +141,13 @@ type ensureKubeConfigOpts struct {
 	fs  *afero.Afero
 	ctx context.Context
 
-	provider    cloud.ClusterService
-	clusterName string
+	provider        cloud.ClusterService
+	clusterManifest v1alpha1.Cluster
 }
 
 // ensureKubeConfig fetches a kubeconfig from provider and stores it b64 decoded in workdir as config.yaml
 func ensureKubeConfig(opts ensureKubeConfigOpts) (string, error) {
-	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(opts.clusterName)
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(opts.clusterManifest.Metadata.Name)
 	if err != nil {
 		return "", fmt.Errorf("acquiring KubeConfig path: %w", err)
 	}
@@ -156,7 +156,7 @@ func ensureKubeConfig(opts ensureKubeConfigOpts) (string, error) {
 		return kubeConfigPath, nil
 	}
 
-	kubeConfig, err := opts.provider.GetKubeConfig(opts.ctx, opts.clusterName)
+	kubeConfig, err := opts.provider.GetKubeConfig(opts.ctx, opts.clusterManifest)
 	if err != nil {
 		return "", fmt.Errorf("acquiring kubeconfig: %w", err)
 	}

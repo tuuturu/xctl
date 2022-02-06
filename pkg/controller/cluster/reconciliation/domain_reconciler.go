@@ -8,7 +8,7 @@ import (
 )
 
 func (d *domainReconciler) Reconcile(ctx reconciliation.Context) (reconciliation.Result, error) {
-	cluster, err := d.clusterService.GetCluster(ctx.Ctx, ctx.ClusterDeclaration.Metadata.Name)
+	cluster, err := d.clusterService.GetCluster(ctx.Ctx, ctx.ClusterDeclaration)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("retrieving cluster: %w", err)
 	}

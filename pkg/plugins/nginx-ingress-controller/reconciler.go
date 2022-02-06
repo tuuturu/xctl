@@ -86,7 +86,7 @@ func (n nginxIngressController) determineAction(opts determineActionOpts) (recon
 		opts.Ctx.ClusterDeclaration.Spec.Plugins.NginxIngressController,
 	)
 
-	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.ClusterDeclaration.Metadata.Name)
+	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.ClusterDeclaration)
 	if err != nil {
 		return reconciliation.ActionNoop, fmt.Errorf("checking cluster existence: %w", err)
 	}

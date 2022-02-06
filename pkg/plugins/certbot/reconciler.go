@@ -86,7 +86,7 @@ func (n certbotReconciler) determineAction(opts determineActionOpts) (reconcilia
 	log := opts.Logger
 	indication := reconciliation.DetermineUserIndication(opts.Ctx, opts.Ctx.ClusterDeclaration.Spec.Plugins.CertBot)
 
-	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.ClusterDeclaration.Metadata.Name)
+	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.ClusterDeclaration)
 	if err != nil {
 		return reconciliation.ActionNoop, fmt.Errorf("checking cluster existence: %w", err)
 	}

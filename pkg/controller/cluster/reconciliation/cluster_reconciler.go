@@ -7,6 +7,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
+
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/deifyed/xctl/pkg/clients/helm"
@@ -28,7 +30,7 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 	log := logging.GetLogger("cluster", "reconciliation")
 	action := reconciliation.DetermineUserIndication(rctx, true)
 
-	clusterExists, err := c.clusterService.HasCluster(rctx.Ctx, rctx.ClusterDeclaration.Metadata.Name)
+	clusterExists, err := c.clusterService.HasCluster(rctx.Ctx, rctx.ClusterDeclaration)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("checking cluster existence: %w", err)
 	}
@@ -44,7 +46,7 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 			}
 		}
 
-		err = generateKubeconfig(rctx.Ctx, rctx.Filesystem, c.clusterService, rctx.ClusterDeclaration.Metadata.Name)
+		err = generateKubeconfig(rctx.Ctx, rctx.Filesystem, c.clusterService, rctx.ClusterDeclaration)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("generating kubeconfig: %w", err)
 		}
@@ -76,7 +78,7 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 			return reconciliation.Result{Requeue: true}, nil
 		}
 
-		err = c.clusterService.DeleteCluster(rctx.Ctx, rctx.ClusterDeclaration.Metadata.Name)
+		err = c.clusterService.DeleteCluster(rctx.Ctx, rctx.ClusterDeclaration)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("deleting cluster: %w", err)
 		}
@@ -110,8 +112,8 @@ func ensureDependencies(helmClient helm.Client) (bool, error) {
 	return true, nil
 }
 
-func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.ClusterService, clusterName string) error {
-	rawConfig, err := provider.GetKubeConfig(ctx, clusterName)
+func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.ClusterService, manifest v1alpha1.Cluster) error {
+	rawConfig, err := provider.GetKubeConfig(ctx, manifest)
 	if err != nil {
 		return fmt.Errorf("getting kubeconfig: %w", err)
 	}
@@ -121,7 +123,7 @@ func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.Clu
 		return fmt.Errorf("decoding kubeconfig: %w", err)
 	}
 
-	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(clusterName)
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(manifest.Metadata.Name)
 	if err != nil {
 		return fmt.Errorf("acquiring KubeConfigPath: %w", err)
 	}

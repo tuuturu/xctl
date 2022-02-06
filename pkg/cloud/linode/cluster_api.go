@@ -45,8 +45,8 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 	return nil
 }
 
-func (p *provider) DeleteCluster(ctx context.Context, clusterName string) error {
-	cluster, err := p.getCluster(ctx, clusterName)
+func (p *provider) DeleteCluster(ctx context.Context, manifest v1alpha1.Cluster) error {
+	cluster, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		switch {
 		case errors.Is(err, config.ErrNotFound):
@@ -63,7 +63,7 @@ func (p *provider) DeleteCluster(ctx context.Context, clusterName string) error 
 		return fmt.Errorf("deleting cluster: %w", err)
 	}
 
-	err = p.awaitDeletion(ctx, clusterName)
+	err = p.awaitDeletion(ctx, manifest)
 	if err != nil {
 		return fmt.Errorf("awaiting deletion of cluster: %w", err)
 	}
@@ -71,8 +71,8 @@ func (p *provider) DeleteCluster(ctx context.Context, clusterName string) error 
 	return nil
 }
 
-func (p *provider) GetCluster(ctx context.Context, clusterName string) (cloud.Cluster, error) {
-	lkeCluster, err := p.getCluster(ctx, clusterName)
+func (p *provider) GetCluster(ctx context.Context, manifest v1alpha1.Cluster) (cloud.Cluster, error) {
+	lkeCluster, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		if errorIsNotAuthenticated(err) {
 			return cloud.Cluster{}, config.ErrNotAuthenticated
@@ -105,8 +105,8 @@ func (p *provider) GetCluster(ctx context.Context, clusterName string) (cloud.Cl
 	}, nil
 }
 
-func (p *provider) HasCluster(ctx context.Context, clusterName string) (bool, error) {
-	_, err := p.getCluster(ctx, clusterName)
+func (p *provider) HasCluster(ctx context.Context, manifest v1alpha1.Cluster) (bool, error) {
+	_, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		switch {
 		case errors.Is(err, config.ErrNotFound):
@@ -121,11 +121,11 @@ func (p *provider) HasCluster(ctx context.Context, clusterName string) (bool, er
 	return true, nil
 }
 
-func (p *provider) GetKubeConfig(ctx context.Context, clusterName string) ([]byte, error) {
-	cluster, err := p.getCluster(ctx, clusterName)
+func (p *provider) GetKubeConfig(ctx context.Context, manifest v1alpha1.Cluster) ([]byte, error) {
+	cluster, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		if errors.Is(err, config.ErrNotFound) {
-			return []byte{}, fmt.Errorf("could not find cluster with name %s", clusterName)
+			return []byte{}, fmt.Errorf("could not find cluster with name %s", manifest.Metadata.Name)
 		}
 
 		return []byte{}, fmt.Errorf("querying clusters: %w", err)
