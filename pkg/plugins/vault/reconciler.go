@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/deifyed/xctl/pkg/clients/kubectl"
+
 	"github.com/deifyed/xctl/pkg/clients/vault"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -35,6 +37,7 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 	action, err := v.determineAction(determineActionOpts{
 		rctx:       rctx,
 		helmClient: clients.helm,
+		kubectl:    clients.kubectl,
 		plugin:     plugin,
 	})
 	if err != nil {
@@ -76,8 +79,9 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 	indication := reconciliation.DetermineUserIndication(opts.rctx, opts.rctx.ClusterDeclaration.Spec.Plugins.Vault)
 
 	var (
-		clusterExists = true
-		vaultExists   = true
+		clusterExists    = true
+		vaultExists      = true
+		vaultInitialized = true
 	)
 
 	cluster, err := v.cloudProvider.GetCluster(opts.rctx.Ctx, opts.rctx.ClusterDeclaration)
@@ -98,6 +102,14 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 
 			return reconciliation.ActionNoop, fmt.Errorf("checking vault existence: %w", err)
 		}
+
+		vaultInitialized, err = opts.kubectl.PodReady(kubectl.Pod{
+			Name:      "vault-0",
+			Namespace: opts.plugin.Metadata.Namespace,
+		})
+		if err != nil {
+			return "", fmt.Errorf("checking pod ready status: %w", err)
+		}
 	}
 
 	switch indication {
@@ -106,7 +118,7 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 			return reconciliation.ActionWait, nil
 		}
 
-		if vaultExists {
+		if vaultExists && vaultInitialized {
 			return reconciliation.ActionNoop, nil
 		}
 

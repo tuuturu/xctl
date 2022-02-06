@@ -19,6 +19,7 @@ type determineActionOpts struct {
 	rctx       reconciliation.Context
 	helmClient helm.Client
 	plugin     v1alpha1.Plugin
+	kubectl    kubectl.Client
 }
 
 type clientContainer struct {
