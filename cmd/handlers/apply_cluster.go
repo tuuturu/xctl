@@ -6,13 +6,12 @@ import (
 	"io"
 	"time"
 
-	"github.com/deifyed/xctl/pkg/tools/logging"
-
 	"github.com/deifyed/xctl/pkg/plugins/certbot"
+	"github.com/deifyed/xctl/pkg/plugins/vault"
 
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
-	"github.com/deifyed/xctl/pkg/plugins/vault"
+	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/spf13/afero"
 
@@ -82,6 +81,7 @@ func handleCluster(opts handleClusterOpts) error {
 		clusterrec.NewClusterReconciler(provider),
 		vault.NewVaultReconciler(provider),
 		ingress.NewNginxIngressControllerReconciler(provider),
+		clusterrec.NewDomainReconciler(provider),
 		certbot.NewCertbotReconciler(provider),
 	)
 
