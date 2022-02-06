@@ -26,9 +26,15 @@ func (d Domain) PrimaryDomain() string {
 
 // Subdomain knows how to extract the lowest level of domain i.e. dev in dev.tuuturu.org
 func (d Domain) Subdomain() string {
-	parts := strings.Split(d.Host, ".")
+	cleaned := strings.TrimSuffix(d.Host, ".")
 
-	return parts[0]
+	parts := strings.Split(cleaned, ".")
+
+	if len(parts) >= requiredPartsForSubdomain {
+		return parts[0]
+	}
+
+	return ""
 }
 
 // FQDN ensures the Host provided satisfies the fully qualified domain name format
@@ -44,3 +50,5 @@ func (d Domain) FQDN() string {
 func (d Domain) String() string {
 	return strings.TrimRight(d.FQDN(), ".")
 }
+
+const requiredPartsForSubdomain = 3

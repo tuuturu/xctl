@@ -46,6 +46,11 @@ func TestSubdomain_Subdomain(t *testing.T) {
 			withFullDomain:  "test.tuuturu.org",
 			expectSubdomain: "test",
 		},
+		{
+			name:            "Should return empty string with no subdomain",
+			withFullDomain:  "klokkinn.no",
+			expectSubdomain: "",
+		},
 	}
 
 	for _, tc := range testCases {
