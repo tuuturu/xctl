@@ -97,6 +97,10 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 	if clusterExists && cluster.Ready {
 		vaultExists, err = opts.helmClient.Exists(opts.plugin)
 		if err != nil {
+			if errors.Is(err, helm.ErrUnreachable) {
+				return reconciliation.ActionWait, nil
+			}
+
 			return reconciliation.ActionNoop, fmt.Errorf("checking vault existence: %w", err)
 		}
 	}
