@@ -50,6 +50,8 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 			Stderr: stderr.String(),
 		})
 
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
 		switch {
 		case isUnreachable(err):
 			return helm.ErrUnreachable
