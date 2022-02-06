@@ -81,9 +81,27 @@ func (p *provider) GetCluster(ctx context.Context, clusterName string) (cloud.Cl
 		return cloud.Cluster{}, fmt.Errorf("querying clusters: %w", err)
 	}
 
+	nodes, err := p.getClusterNodes(ctx, lkeCluster.ID)
+	if err != nil {
+		return cloud.Cluster{}, fmt.Errorf("retrieving cluster nodes for cluster: %w", err)
+	}
+
+	publicIPv6 := ""
+
+	loadbalancer, err := p.getClusterNodebalancer(ctx, nodes)
+	if err != nil {
+		if !errors.Is(err, cloud.ErrNotFound) {
+			return cloud.Cluster{}, fmt.Errorf("acquiring cluster node balancer: %w", err)
+		}
+	} else {
+		publicIPv6 = *loadbalancer.IPv6
+	}
+
 	return cloud.Cluster{
-		Name:  lkeCluster.Label,
-		Ready: lkeCluster.Status == linodego.LKEClusterReady,
+		Name:       lkeCluster.Label,
+		Ready:      lkeCluster.Status == linodego.LKEClusterReady,
+		Nodes:      nodes,
+		PublicIPv6: publicIPv6,
 	}, nil
 }
 
