@@ -79,10 +79,10 @@ func handleCluster(opts handleClusterOpts) error {
 
 	scheduler := reconciliation.NewScheduler(schedulerOpts,
 		clusterrec.NewClusterReconciler(provider),
-		vault.NewVaultReconciler(provider),
 		ingress.NewNginxIngressControllerReconciler(provider),
 		clusterrec.NewDomainReconciler(provider),
 		certbot.NewCertbotReconciler(provider),
+		vault.NewVaultReconciler(provider),
 	)
 
 	spin.Start()
