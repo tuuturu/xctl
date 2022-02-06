@@ -27,6 +27,7 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 		Label:      manifest.Metadata.Name,
 		Region:     defaultRegion,
 		K8sVersion: defaultKubernetesVersion,
+		Tags:       defaultLabels(manifest),
 	})
 	if err != nil {
 		if errorIsNotAuthenticated(err) {
