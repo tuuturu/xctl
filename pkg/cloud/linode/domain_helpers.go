@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/deifyed/xctl/pkg/config"
+	"github.com/deifyed/xctl/pkg/cloud"
+
 	"github.com/linode/linodego"
 )
 
@@ -20,7 +21,7 @@ func (p *provider) getLinodeDomain(ctx context.Context, domainName string) (lino
 		}
 	}
 
-	return linodego.Domain{}, config.ErrNotFound
+	return linodego.Domain{}, cloud.ErrNotFound
 }
 
 func (p *provider) getLinodeDomainRecord(
@@ -43,5 +44,5 @@ func (p *provider) getLinodeDomainRecord(
 		}
 	}
 
-	return linodego.DomainRecord{}, config.ErrNotFound
+	return linodego.DomainRecord{}, cloud.ErrNotFound
 }

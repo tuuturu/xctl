@@ -14,7 +14,7 @@ import (
 func (p *provider) CreateSubdomain(ctx context.Context, domain cloud.Domain, target string) (cloud.Domain, error) {
 	primaryDomain, err := p.getLinodeDomain(ctx, domain.PrimaryDomain())
 	if err != nil {
-		if errors.Is(err, config.ErrNotFound) {
+		if errors.Is(err, cloud.ErrNotFound) {
 			return cloud.Domain{}, fmt.Errorf("finding parent domain %s. Please register this domain with Linode: %w",
 				domain.PrimaryDomain(),
 				err,
@@ -40,7 +40,7 @@ func (p *provider) CreateSubdomain(ctx context.Context, domain cloud.Domain, tar
 func (p *provider) DeleteSubdomain(ctx context.Context, domain cloud.Domain) error {
 	primaryDomain, err := p.getLinodeDomain(ctx, domain.PrimaryDomain())
 	if err != nil {
-		if errors.Is(err, config.ErrNotFound) {
+		if errors.Is(err, cloud.ErrNotFound) {
 			return fmt.Errorf("finding parent domain %s. Please register this domain with Linode: %w",
 				domain.PrimaryDomain(),
 				err,
@@ -80,7 +80,7 @@ func (p *provider) GetSubdomain(ctx context.Context, domain cloud.Domain) (cloud
 func (p *provider) HasSubdomain(ctx context.Context, domain cloud.Domain) (bool, error) {
 	_, err := p.GetSubdomain(ctx, domain)
 	if err != nil {
-		if errors.Is(err, config.ErrNotFound) {
+		if errors.Is(err, cloud.ErrNotFound) {
 			return false, nil
 		}
 

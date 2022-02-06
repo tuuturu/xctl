@@ -13,6 +13,10 @@ var (
 )
 
 func Translate(key string) string {
+	if len(translations) == 0 {
+		initializeTranslations()
+	}
+
 	hit, ok := translations[key]
 	if !ok {
 		return "!translation not available!"
@@ -25,7 +29,7 @@ func T(key string) string {
 	return Translate(key)
 }
 
-func init() {
+func initializeTranslations() {
 	err := yaml.Unmarshal(rawErrors, &translations)
 	if err != nil {
 		panic("reading error translations")

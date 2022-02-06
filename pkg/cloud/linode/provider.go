@@ -32,7 +32,7 @@ func (p *provider) getCluster(ctx context.Context, manifest v1alpha1.Cluster) (l
 		}
 	}
 
-	return linodego.LKECluster{}, config.ErrNotFound
+	return linodego.LKECluster{}, cloud.ErrNotFound
 }
 
 func (p *provider) getClusterNodes(ctx context.Context, clusterID int) ([]cloud.ClusterNode, error) {
@@ -128,7 +128,7 @@ func (p *provider) awaitDeletion(ctx context.Context, manifest v1alpha1.Cluster)
 	return p.await(func() (bool, error) {
 		_, err := p.getCluster(ctx, manifest)
 		if err != nil {
-			if errors.Is(err, config.ErrNotFound) {
+			if errors.Is(err, cloud.ErrNotFound) {
 				return true, nil
 			}
 

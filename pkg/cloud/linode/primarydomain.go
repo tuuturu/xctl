@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/deifyed/xctl/pkg/cloud"
-	"github.com/deifyed/xctl/pkg/config"
 	"github.com/pkg/errors"
 )
 
@@ -17,7 +16,7 @@ func (p *provider) HasPrimaryDomain(ctx context.Context, domain cloud.Domain) (b
 
 	_, err = p.getLinodeDomain(ctx, domain.PrimaryDomain())
 	if err != nil {
-		if errors.Is(err, config.ErrNotFound) {
+		if errors.Is(err, cloud.ErrNotFound) {
 			return false, nil
 		}
 

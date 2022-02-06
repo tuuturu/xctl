@@ -2,5 +2,9 @@ package cloud
 
 import "github.com/pkg/errors"
 
-// ErrNotFound indicates something is missing
-var ErrNotFound = errors.New("not found")
+var (
+	// ErrNotFound indicates something is missing
+	ErrNotFound = errors.New("not found")
+	// ErrNotAuthenticated indicates invalid or missing authentication
+	ErrNotAuthenticated = errors.New("not authenticated")
+)

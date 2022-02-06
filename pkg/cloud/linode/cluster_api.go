@@ -32,7 +32,7 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 	})
 	if err != nil {
 		if errorIsNotAuthenticated(err) {
-			return config.ErrNotAuthenticated
+			return cloud.ErrNotAuthenticated
 		}
 
 		return fmt.Errorf("creating cluster: %w", err)
@@ -50,10 +50,10 @@ func (p *provider) DeleteCluster(ctx context.Context, manifest v1alpha1.Cluster)
 	cluster, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		switch {
-		case errors.Is(err, config.ErrNotFound):
+		case errors.Is(err, cloud.ErrNotFound):
 			return nil
 		case errorIsNotAuthenticated(err):
-			return config.ErrNotAuthenticated
+			return cloud.ErrNotAuthenticated
 		default:
 			return fmt.Errorf("querying clusters: %w", err)
 		}
@@ -76,7 +76,7 @@ func (p *provider) GetCluster(ctx context.Context, manifest v1alpha1.Cluster) (c
 	lkeCluster, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		if errorIsNotAuthenticated(err) {
-			return cloud.Cluster{}, config.ErrNotAuthenticated
+			return cloud.Cluster{}, cloud.ErrNotAuthenticated
 		}
 
 		return cloud.Cluster{}, fmt.Errorf("querying clusters: %w", err)
@@ -110,10 +110,10 @@ func (p *provider) HasCluster(ctx context.Context, manifest v1alpha1.Cluster) (b
 	_, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		switch {
-		case errors.Is(err, config.ErrNotFound):
+		case errors.Is(err, cloud.ErrNotFound):
 			return false, nil
 		case errorIsNotAuthenticated(err):
-			return false, config.ErrNotAuthenticated
+			return false, cloud.ErrNotAuthenticated
 		default:
 			return false, fmt.Errorf("querying clusters: %w", err)
 		}
@@ -125,7 +125,7 @@ func (p *provider) HasCluster(ctx context.Context, manifest v1alpha1.Cluster) (b
 func (p *provider) GetKubeConfig(ctx context.Context, manifest v1alpha1.Cluster) ([]byte, error) {
 	cluster, err := p.getCluster(ctx, manifest)
 	if err != nil {
-		if errors.Is(err, config.ErrNotFound) {
+		if errors.Is(err, cloud.ErrNotFound) {
 			return []byte{}, fmt.Errorf("could not find cluster with name %s", manifest.Metadata.Name)
 		}
 
