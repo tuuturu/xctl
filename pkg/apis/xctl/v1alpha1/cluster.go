@@ -43,5 +43,9 @@ func NewDefaultCluster() Cluster {
 }
 
 func (c Cluster) ComponentName(componentType string, id string) string {
-	return strings.ToLower(strings.Join([]string{config.ApplicationName, c.Metadata.Name, componentType, id}, "-"))
+	componentName := strings.Join([]string{config.ApplicationName, c.Metadata.Name, componentType, id}, "-")
+	componentName = strings.ToLower(componentName)
+	componentName = strings.TrimSuffix(componentName, "-")
+
+	return componentName
 }

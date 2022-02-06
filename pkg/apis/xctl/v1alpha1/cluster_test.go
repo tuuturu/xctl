@@ -28,6 +28,13 @@ func TestComponentNamer(t *testing.T) {
 			withComponentID:   "TUUTURUORG",
 			expectName:        "xctl-test2-domain-tuuturuorg",
 		},
+		{
+			name:              "Works without ID",
+			withClusterName:   "superprod",
+			withComponentType: "cluster",
+			withComponentID:   "",
+			expectName:        "xctl-superprod-cluster",
+		},
 	}
 
 	for _, tc := range testCases {
