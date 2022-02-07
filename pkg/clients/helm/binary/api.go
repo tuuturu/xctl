@@ -90,7 +90,16 @@ func (e externalBinaryHelm) Delete(plugin v1alpha1.Plugin) error {
 			Stderr: stderr.String(),
 		})
 
-		return fmt.Errorf("running Helm uninstall on %s: %w", plugin.Metadata.Name, err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		switch {
+		case isUnreachable(err):
+			return helm.ErrUnreachable
+		case isConnectionTimedOut(err):
+			return helm.ErrTimeout
+		default:
+			return fmt.Errorf("running Helm uninstall on %s: %w", plugin.Metadata.Name, err)
+		}
 	}
 
 	return nil
@@ -121,7 +130,16 @@ func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
 			Stderr: stderr.String(),
 		})
 
-		return false, fmt.Errorf("running Helm get: %s", stderr.String())
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		switch {
+		case isUnreachable(err):
+			return false, helm.ErrUnreachable
+		case isConnectionTimedOut(err):
+			return false, helm.ErrTimeout
+		default:
+			return false, fmt.Errorf("running Helm exists on %s: %w", plugin.Metadata.Name, err)
+		}
 	}
 
 	return true, nil

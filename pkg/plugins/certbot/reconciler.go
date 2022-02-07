@@ -2,6 +2,8 @@ package certbot
 
 import (
 	"fmt"
+	"github.com/deifyed/xctl/pkg/clients/helm"
+	"github.com/pkg/errors"
 
 	"github.com/deifyed/xctl/pkg/clients/kubectl"
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
@@ -46,6 +48,12 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 		Logger: log,
 	})
 	if err != nil {
+		if errors.Is(err, helm.ErrUnreachable) {
+			log.Debug("requeuing due to helm: cluster unreachable")
+
+			return reconciliation.Result{Requeue: true}, nil
+		}
+
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
 
@@ -96,6 +104,10 @@ func (n certbotReconciler) determineAction(opts determineActionOpts) (reconcilia
 	if clusterExists {
 		componentExists, err = opts.Helm.Exists(opts.Plugin)
 		if err != nil {
+			if errors.Is(err, helm.ErrUnreachable) {
+				return "", fmt.Errorf("checking component existence: %w", err)
+			}
+
 			return reconciliation.ActionNoop, fmt.Errorf("checking component existence: %w", err)
 		}
 	}
