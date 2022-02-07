@@ -122,6 +122,10 @@ func (k kubectlBinaryClient) PodReady(pod kubectl.Pod) (bool, error) {
 
 		err = fmt.Errorf("%s: %w", stderr.String(), err)
 
+		if isErrNotFound(err) {
+			return false, kubectl.ErrNotFound
+		}
+
 		return false, fmt.Errorf("running command: %w", err)
 	}
 

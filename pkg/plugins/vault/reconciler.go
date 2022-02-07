@@ -108,7 +108,11 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 			Namespace: opts.plugin.Metadata.Namespace,
 		})
 		if err != nil {
-			return "", fmt.Errorf("checking pod ready status: %w", err)
+			if !errors.Is(err, kubectl.ErrNotFound) {
+				return "", fmt.Errorf("checking pod ready status: %w", err)
+			}
+
+			vaultInitialized = false
 		}
 	}
 

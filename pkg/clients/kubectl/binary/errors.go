@@ -2,7 +2,7 @@ package binary
 
 import "regexp"
 
-var reErrNotFound = regexp.MustCompile(`Error from server (NotFound): pods .+ not found\s`)
+var reErrNotFound = regexp.MustCompile(`Error from server \(NotFound\): pods ".+" not found\s`)
 
 func isErrNotFound(err error) bool {
 	return reErrNotFound.MatchString(err.Error())
