@@ -156,7 +156,7 @@ func (n certbotReconciler) String() string {
 	return "Certbot"
 }
 
-func NewCertbotReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {
+func NewReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {
 	return &certbotReconciler{
 		cloudProvider: cloudProvider,
 	}

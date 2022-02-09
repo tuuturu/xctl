@@ -132,7 +132,7 @@ func (n nginxIngressController) String() string {
 	return "Nginx Ingress Controller"
 }
 
-func NewNginxIngressControllerReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {
+func NewReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {
 	return &nginxIngressController{
 		cloudProvider: cloudProvider,
 	}

@@ -81,10 +81,10 @@ func handleCluster(opts handleClusterOpts) error {
 
 	scheduler := reconciliation.NewScheduler(schedulerOpts,
 		clusterrec.NewClusterReconciler(provider),
-		ingress.NewNginxIngressControllerReconciler(provider),
+		ingress.NewReconciler(provider),
 		clusterrec.NewDomainReconciler(provider),
-		certbot.NewCertbotReconciler(provider),
-		vault.NewVaultReconciler(provider),
+		certbot.NewReconciler(provider),
+		vault.NewReconciler(provider),
 		prometheus.NewReconciler(provider),
 	)
 

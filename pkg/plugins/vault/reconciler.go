@@ -142,7 +142,7 @@ func (v vaultReconciler) String() string {
 	return "Vault"
 }
 
-func NewVaultReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {
+func NewReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {
 	return &vaultReconciler{
 		cloudProvider: cloudProvider,
 	}
