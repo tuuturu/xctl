@@ -6,6 +6,7 @@ type ClusterSpecPlugins struct {
 	CertBot                bool `json:"certBot"`
 	NginxIngressController bool `json:"nginxIngressController"`
 	Vault                  bool `json:"vault"`
+	Prometheus             bool `json:"prometheus"`
 }
 
 type ClusterSpec struct {

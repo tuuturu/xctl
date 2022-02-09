@@ -6,6 +6,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/plugins/prometheus"
+
 	"github.com/deifyed/xctl/pkg/plugins/certbot"
 	"github.com/deifyed/xctl/pkg/plugins/vault"
 
@@ -83,6 +85,7 @@ func handleCluster(opts handleClusterOpts) error {
 		clusterrec.NewDomainReconciler(provider),
 		certbot.NewCertbotReconciler(provider),
 		vault.NewVaultReconciler(provider),
+		prometheus.NewReconciler(provider),
 	)
 
 	spin.Start()
