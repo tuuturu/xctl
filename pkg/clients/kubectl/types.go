@@ -46,16 +46,22 @@ type PodExecOpts struct {
 	Stdout io.Writer
 }
 
-// PortForwardOpts defines required data for forwarding a port from a pod
+// PortForwardOpts defines required data for forwarding a port from a service
 type PortForwardOpts struct {
-	Pod Pod
+	Service Service
 
-	PortFrom int
-	PortTo   int
+	ServicePort int
+	LocalPort   int
 }
 
 // Pod defines required data for identifying a pod
 type Pod struct {
+	Name      string
+	Namespace string
+}
+
+// Service defines required data for identifying a service
+type Service struct {
 	Name      string
 	Namespace string
 }

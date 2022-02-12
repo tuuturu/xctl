@@ -59,9 +59,9 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 	log := logging.GetLogger(logFeature, "portforward")
 
 	cmd := exec.Command(k.kubectlPath, "port-forward", //nolint:gosec
-		"--namespace", opts.Pod.Namespace,
-		opts.Pod.Name,
-		fmt.Sprintf("%s:%s", strconv.Itoa(opts.PortFrom), strconv.Itoa(opts.PortTo)),
+		"--namespace", opts.Service.Namespace,
+		fmt.Sprintf("service/%s", opts.Service.Name),
+		fmt.Sprintf("%s:%s", strconv.Itoa(opts.LocalPort), strconv.Itoa(opts.ServicePort)),
 	)
 
 	stderr := bytes.Buffer{}

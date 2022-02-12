@@ -30,14 +30,15 @@ func installVault(clients clientContainer) error {
 		return fmt.Errorf("installing Helm chart: %w", err)
 	}
 
-	podSelector := kubectl.Pod{Name: "vault-0", Namespace: "kube-system"}
-
 	log.Debug("port forwarding vault container")
 
 	stopFn, err := clients.kubectl.PortForward(kubectl.PortForwardOpts{
-		Pod:      podSelector,
-		PortFrom: vault.DefaultPort,
-		PortTo:   vault.DefaultPort,
+		Service: kubectl.Service{
+			Name:      plugin.Metadata.Name,
+			Namespace: plugin.Metadata.Namespace,
+		},
+		ServicePort: vault.DefaultPort,
+		LocalPort:   vault.DefaultPort,
 	})
 	if err != nil {
 		return fmt.Errorf("forwarding vault port: %w", err)
@@ -56,7 +57,10 @@ func installVault(clients clientContainer) error {
 
 	log.Debug("activating Kubernetes engine")
 
-	err = activateKubernetesEngine(clients.vault, clients.kubectl, podSelector)
+	err = activateKubernetesEngine(clients.vault, clients.kubectl, kubectl.Pod{
+		Name:      "vault-0",
+		Namespace: plugin.Metadata.Namespace,
+	})
 	if err != nil {
 		return fmt.Errorf("activating Kubernetes engine: %w", err)
 	}
