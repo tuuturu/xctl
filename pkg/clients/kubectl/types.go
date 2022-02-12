@@ -11,26 +11,7 @@ var DefaultKubernetesIssuer = url.URL{ //nolint:gochecknoglobals
 	Host:   "kubernetes.default.svc.cluster.local",
 }
 
-type PodExecOpts struct {
-	Pod    Pod
-	Stdout io.Writer
-}
-
-type PortForwardOpts struct {
-	Pod Pod
-
-	PortFrom int
-	PortTo   int
-}
-
-type Pod struct {
-	Name      string
-	Namespace string
-}
-
-// StopFn knows how to stop things
-type StopFn func() error
-
+// Poder defines operations done on pods
 type Poder interface {
 	// PodExec executes a script within a specified pod
 	PodExec(PodExecOpts, ...string) error
@@ -40,8 +21,32 @@ type Poder interface {
 	PodReady(Pod) (bool, error)
 }
 
+// Client defines operations done on a Kubernetes cluster
 type Client interface {
 	Poder
 	// Apply applies a manifest to the contextual cluster
 	Apply(manifest io.Reader) error
 }
+
+// PodExecOpts defines required data for executing commands on a pod
+type PodExecOpts struct {
+	Pod    Pod
+	Stdout io.Writer
+}
+
+// PortForwardOpts defines required data for forwarding a port from a pod
+type PortForwardOpts struct {
+	Pod Pod
+
+	PortFrom int
+	PortTo   int
+}
+
+// Pod defines required data for identifying a pod
+type Pod struct {
+	Name      string
+	Namespace string
+}
+
+// StopFn knows how to stop things
+type StopFn func() error
