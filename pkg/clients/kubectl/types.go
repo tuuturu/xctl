@@ -21,12 +21,23 @@ type Poder interface {
 	PodReady(Pod) (bool, error)
 }
 
+type Resourcer interface {
+	// Apply applies a manifest to the contextual cluster
+	Apply(manifest io.Reader) error
+	// Get retrieves a named resource of a certain type from a specific namespace
+	Get(namespace string, resourceType string, name string) (io.Reader, error)
+}
+
+type Operator interface {
+	// GetUserToken retrieves the authenticated user's token
+	GetUserToken() (io.Reader, error)
+}
+
 // Client defines operations done on a Kubernetes cluster
 type Client interface {
 	Poder
-	// Apply applies a manifest to the contextual cluster
-	Apply(manifest io.Reader) error
-	Get(namespace string, resourceType string, name string) (io.Reader, error)
+	Resourcer
+	Operator
 }
 
 // PodExecOpts defines required data for executing commands on a pod
