@@ -17,12 +17,12 @@ type ConfigureKubernetesAuthenticationOpts struct {
 }
 
 type Secreter interface {
-	EnableKv2() error
 	Put(string, map[string]string) error
-	Get(string) (map[string]string, error)
+	Get(string, string) (string, error)
 }
 
 type Operator interface {
+	EnableKv2() error
 	Initialize() (InitializationResponse, error)
 	Unseal(key string) error
 }
