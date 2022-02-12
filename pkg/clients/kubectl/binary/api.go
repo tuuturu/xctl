@@ -3,9 +3,8 @@ package binary
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os/exec"
-
-	"sigs.k8s.io/yaml"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
@@ -14,13 +13,8 @@ import (
 	"github.com/deifyed/xctl/pkg/clients/kubectl"
 )
 
-func (k kubectlBinaryClient) Apply(opts kubectl.ApplyOpts) error {
+func (k kubectlBinaryClient) Apply(manifest io.Reader) error {
 	log := logging.GetLogger(logFeature, "apply")
-
-	raw, err := yaml.Marshal(opts.Manifest)
-	if err != nil {
-		return fmt.Errorf("marshalling manifest: %w", err)
-	}
 
 	cmd := exec.Command(k.kubectlPath, "apply", "-f", "-") //nolint:gosec
 
@@ -30,9 +24,9 @@ func (k kubectlBinaryClient) Apply(opts kubectl.ApplyOpts) error {
 	cmd.Env = k.envAsArray()
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
-	cmd.Stdin = bytes.NewReader(raw)
+	cmd.Stdin = manifest
 
-	err = cmd.Run()
+	err := cmd.Run()
 	if err != nil {
 		log.Debug("executing command", commandLogFields{
 			Stdout: stdout.String(),

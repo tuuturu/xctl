@@ -3,10 +3,11 @@ package certbot
 import (
 	"fmt"
 
+	"github.com/deifyed/xctl/pkg/tools/manifests"
+
 	"github.com/deifyed/xctl/pkg/clients/helm"
 	"github.com/pkg/errors"
 
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
 	"github.com/deifyed/xctl/pkg/clients/kubectl/binary"
@@ -69,9 +70,12 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 
 		log.Debug("configuring cluster issuer")
 
-		err = kubectlClient.Apply(kubectl.ApplyOpts{
-			Manifest: newLetsEncryptClusterIssuer(rctx.ClusterDeclaration.Spec.AdminEmail),
-		})
+		manifest, err := manifests.ResourceAsReader(newLetsEncryptClusterIssuer(rctx.ClusterDeclaration.Spec.AdminEmail))
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("creating cluster issuer: %w", err)
+		}
+
+		err = kubectlClient.Apply(manifest)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("creating cluster issuer: %w", err)
 		}

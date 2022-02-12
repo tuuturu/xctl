@@ -23,10 +23,6 @@ type PortForwardOpts struct {
 	PortTo   int
 }
 
-type ApplyOpts struct {
-	Manifest interface{}
-}
-
 type Pod struct {
 	Name      string
 	Namespace string
@@ -47,5 +43,5 @@ type Poder interface {
 type Client interface {
 	Poder
 	// Apply applies a manifest to the contextual cluster
-	Apply(ApplyOpts) error
+	Apply(manifest io.Reader) error
 }
