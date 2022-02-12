@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/deifyed/xctl/pkg/secrets"
+	"github.com/deifyed/xctl/pkg/secrets/kubernetes"
+
 	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
 	kubectlBinary "github.com/deifyed/xctl/pkg/clients/kubectl/binary"
 	vaultBinary "github.com/deifyed/xctl/pkg/clients/vault/binary"
@@ -20,7 +23,9 @@ func installVault(clients clientContainer) error {
 
 	log.Debug("installing Helm chart")
 
-	err := clients.helm.Install(NewVaultPlugin())
+	plugin := NewVaultPlugin()
+
+	err := clients.helm.Install(plugin)
 	if err != nil {
 		return fmt.Errorf("installing Helm chart: %w", err)
 	}
@@ -44,7 +49,7 @@ func installVault(clients clientContainer) error {
 
 	log.Debug("initializing Vault")
 
-	err = initializeVault(clients.vault)
+	err = initializeVault(clients.vault, kubernetes.New(clients.kubectl, plugin.Metadata.Namespace))
 	if err != nil {
 		return fmt.Errorf("initializing vault: %w", err)
 	}
@@ -66,7 +71,7 @@ func installVault(clients clientContainer) error {
 	return nil
 }
 
-func initializeVault(vaultClient vault.Client) error {
+func initializeVault(vaultClient vault.Client, secretClient secrets.Client) error {
 	initResponse, err := vaultClient.Initialize()
 	if err != nil {
 		return fmt.Errorf("running init: %w", err)
@@ -79,6 +84,17 @@ func initializeVault(vaultClient vault.Client) error {
 		if err != nil {
 			return fmt.Errorf("unsealing: %w", err)
 		}
+	}
+
+	secretPairs := map[string]string{"rootToken": initResponse.RootToken}
+
+	for index, key := range initResponse.UnsealKeysB64 {
+		secretPairs[fmt.Sprintf("unsealKey%d", index+1)] = key
+	}
+
+	err = secretClient.Put("vault", secretPairs)
+	if err != nil {
+		return fmt.Errorf("storing secret: %w", err)
 	}
 
 	return nil
