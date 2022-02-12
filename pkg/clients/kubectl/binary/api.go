@@ -39,6 +39,36 @@ func (k kubectlBinaryClient) Apply(manifest io.Reader) error {
 	return nil
 }
 
+func (k kubectlBinaryClient) Get(namespace string, resourceType string, name string) (io.Reader, error) {
+	log := logging.GetLogger(logFeature, "get")
+
+	cmd := exec.Command(k.kubectlPath,
+		"get",
+		"--namespace", namespace,
+		"--output", "yaml",
+		resourceType, name,
+	)
+
+	stderr := bytes.Buffer{}
+	stdout := bytes.Buffer{}
+
+	cmd.Env = k.envAsArray()
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	if err != nil {
+		log.Debug("executing command", commandLogFields{
+			Stdout: stdout.String(),
+			Stderr: stderr.String(),
+		})
+
+		return nil, fmt.Errorf("executing pod command: %s", err)
+	}
+
+	return &stdout, nil
+}
+
 func New(fs *afero.Afero, kubeConfigPath string) (kubectl.Client, error) {
 	kubectlPath, err := getKubectlPath(fs)
 	if err != nil {

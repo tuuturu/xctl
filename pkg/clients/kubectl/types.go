@@ -26,6 +26,7 @@ type Client interface {
 	Poder
 	// Apply applies a manifest to the contextual cluster
 	Apply(manifest io.Reader) error
+	Get(namespace string, resourceType string, name string) (io.Reader, error)
 }
 
 // PodExecOpts defines required data for executing commands on a pod
