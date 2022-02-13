@@ -9,6 +9,8 @@ import (
 )
 
 func TestComponentNamer(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name              string
 		withClusterName   string

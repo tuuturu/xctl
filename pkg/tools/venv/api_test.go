@@ -7,6 +7,8 @@ import (
 )
 
 func TestSliceAsMap(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 
@@ -49,6 +51,8 @@ func TestSliceAsMap(t *testing.T) {
 }
 
 func TestMapAsSlice(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 
@@ -88,7 +92,10 @@ func TestMapAsSlice(t *testing.T) {
 	}
 }
 
+//nolint:funlen
 func TestMergeVariables(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 

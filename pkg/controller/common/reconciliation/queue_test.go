@@ -9,6 +9,8 @@ import (
 )
 
 func TestBasicQueueFunctionality(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 		with []Reconciler
@@ -49,6 +51,8 @@ func TestBasicQueueFunctionality(t *testing.T) {
 }
 
 func TestErrorUponMaximumRequeues(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name         string
 		withRequeues int

@@ -7,6 +7,8 @@ import (
 )
 
 func TestIsConnectionRefused(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 

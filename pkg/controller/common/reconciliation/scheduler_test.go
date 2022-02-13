@@ -23,6 +23,8 @@ func (r requeueReconciler) Reconcile(_ Context) (Result, error) {
 
 //nolint:funlen
 func TestRequeueing(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 
@@ -102,6 +104,8 @@ func (n noopReconciler) Reconcile(_ Context) (Result, error) {
 func (n noopReconciler) String() string { return "" }
 
 func TestQueueingPops(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 
@@ -142,6 +146,8 @@ func TestQueueingPops(t *testing.T) {
 }
 
 func TestQueueingPush(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 
@@ -182,6 +188,8 @@ func TestQueueingPush(t *testing.T) {
 }
 
 func TestNoMutation(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 
@@ -232,6 +240,8 @@ func (d deadlockReconciler) Reconcile(_ Context) (Result, error) {
 }
 
 func TestPreflightDeadlock(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name            string
 		withReconcilers []Reconciler

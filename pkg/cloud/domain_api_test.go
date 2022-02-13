@@ -7,6 +7,8 @@ import (
 )
 
 func TestSubdomain_PrimaryDomain(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name               string
 		withURL            string
@@ -36,6 +38,8 @@ func TestSubdomain_PrimaryDomain(t *testing.T) {
 }
 
 func TestSubdomain_Subdomain(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name            string
 		withFullDomain  string
@@ -65,6 +69,8 @@ func TestSubdomain_Subdomain(t *testing.T) {
 }
 
 func TestDomain_FQDN(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name       string
 		withDomain Domain
@@ -97,6 +103,8 @@ func TestDomain_FQDN(t *testing.T) {
 }
 
 func TestDomain_String(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name         string
 		withDomain   Domain
@@ -134,6 +142,8 @@ func TestDomain_String(t *testing.T) {
 }
 
 func TestDomain_Validate(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name       string
 		withDomain Domain

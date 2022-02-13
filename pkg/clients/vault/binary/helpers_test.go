@@ -9,6 +9,8 @@ import (
 )
 
 func TestParsing(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name       string
 		withOutput string
