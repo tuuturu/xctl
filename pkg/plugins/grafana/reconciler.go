@@ -5,10 +5,9 @@ import (
 	"fmt"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/clients/helm"
-	"github.com/deifyed/xctl/pkg/clients/helm/binary"
-	"github.com/deifyed/xctl/pkg/config"
+	"github.com/google/uuid"
 
+	"github.com/deifyed/xctl/pkg/clients/helm"
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/deifyed/xctl/pkg/cloud"
@@ -19,22 +18,21 @@ import (
 func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
-	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
+	clients, err := prepareClients(rctx.Filesystem, rctx.ClusterDeclaration)
 	if err != nil {
-		return reconciliation.Result{}, fmt.Errorf("acquiring kube config path: %w", err)
+		return reconciliation.Result{}, fmt.Errorf("preparing clients: %w", err)
 	}
 
-	helmClient, err := binary.New(rctx.Filesystem, kubeConfigPath)
+	stopFn, err := openVaultConnection(clients.kubectl)
 	if err != nil {
-		return reconciliation.Result{}, fmt.Errorf("acquiring Helm client: %w", err)
+		return reconciliation.Result{}, fmt.Errorf("opening vault connection: %w", err)
 	}
 
-	plugin, err := NewPlugin(rctx.ClusterDeclaration)
-	if err != nil {
-		return reconciliation.Result{}, fmt.Errorf("creating plugin: %w", err)
-	}
+	defer func() {
+		_ = stopFn()
+	}()
 
-	action, err := r.determineAction(rctx, helmClient, plugin)
+	action, err := r.determineAction(rctx, clients.helm)
 	if err != nil {
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
@@ -43,26 +41,26 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 	case reconciliation.ActionCreate:
 		log.Debug("installing")
 
-		err = helmClient.Install(plugin)
+		err = r.install(clients, rctx.ClusterDeclaration)
 		if err != nil {
 			if errors.Is(err, helm.ErrUnreachable) {
 				return reconciliation.Result{Requeue: true}, nil
 			}
 
-			return reconciliation.Result{}, fmt.Errorf("running helm install: %w", err)
+			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
 		log.Debug("deleting")
 
-		err = helmClient.Delete(plugin)
+		err = r.uninstall(clients)
 		if err != nil {
 			if errors.Is(err, helm.ErrUnreachable) {
 				return reconciliation.Result{Requeue: true}, nil
 			}
 
-			return reconciliation.Result{}, fmt.Errorf("running helm delete: %w", err)
+			return reconciliation.Result{}, fmt.Errorf("uninstalling: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
@@ -71,7 +69,52 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 	return reconciliation.NoopWaitIndecisiveHandler(action)
 }
 
-func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client, plugin v1alpha1.Plugin) (reconciliation.Action, error) { //nolint:lll
+func (r reconciler) install(clients clientContainer, cluster v1alpha1.Cluster) error {
+	username := uuid.New().String()
+	password := uuid.New().String()
+
+	err := clients.secrets.Put("grafana", map[string]string{
+		"adminUsername": username,
+		"adminPassword": password,
+	}) //nolint:godox    // TODO: Injecting into template is not ok
+	if err != nil {
+		return fmt.Errorf("creating secrets: %w", err)
+	}
+
+	grafanaPlugin, err := NewPlugin(NewPluginOpts{
+		Host:          fmt.Sprintf("grafana.%s", cluster.Spec.RootDomain),
+		AdminUsername: username,
+		AdminPassword: password,
+	})
+	if err != nil {
+		return fmt.Errorf("creating plugin: %w", err)
+	}
+
+	err = clients.helm.Install(grafanaPlugin)
+	if err != nil {
+		return fmt.Errorf("running helm install: %w", err)
+	}
+
+	return nil
+}
+
+func (r reconciler) uninstall(clients clientContainer) error {
+	grafanaPlugin, err := NewPlugin(NewPluginOpts{})
+	if err != nil {
+		return fmt.Errorf("creating plugin: %w", err)
+	}
+
+	// err = secretsClient.Delete("grafana")
+
+	err = clients.helm.Delete(grafanaPlugin)
+	if err != nil {
+		return fmt.Errorf("running helm delete: %w", err)
+	}
+
+	return nil
+}
+
+func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client) (reconciliation.Action, error) { //nolint:lll
 	indication := reconciliation.DetermineUserIndication(rctx, rctx.ClusterDeclaration.Spec.Plugins.Grafana)
 
 	var (
@@ -86,6 +129,11 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 		}
 
 		clusterExists = false
+	}
+
+	plugin, err := NewPlugin(NewPluginOpts{})
+	if err != nil {
+		return "", fmt.Errorf("preparing plugin: %w", err)
 	}
 
 	if clusterExists {
@@ -104,8 +152,6 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 		if componentExists {
 			return reconciliation.ActionNoop, nil
 		}
-
-		// depends on ServiceMonitor crd
 
 		return reconciliation.ActionCreate, nil
 	case reconciliation.ActionDelete:

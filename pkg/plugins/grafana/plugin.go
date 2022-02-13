@@ -11,7 +11,7 @@ import (
 
 const pluginName = "grafana"
 
-func NewPlugin(cluster v1alpha1.Cluster) (v1alpha1.Plugin, error) {
+func NewPlugin(opts NewPluginOpts) (v1alpha1.Plugin, error) {
 	plugin := v1alpha1.NewPlugin(pluginName)
 
 	plugin.Metadata.Name = pluginName
@@ -23,7 +23,7 @@ func NewPlugin(cluster v1alpha1.Cluster) (v1alpha1.Plugin, error) {
 	plugin.Spec.Helm.Repository.Name = "grafana"
 	plugin.Spec.Helm.Repository.URL = "https://grafana.github.io/helm-charts"
 
-	values, err := generateValues(cluster.Spec.RootDomain)
+	values, err := generateValues(opts)
 	if err != nil {
 		return v1alpha1.Plugin{}, fmt.Errorf("generating values: %w", err)
 	}
@@ -33,7 +33,7 @@ func NewPlugin(cluster v1alpha1.Cluster) (v1alpha1.Plugin, error) {
 	return plugin, nil
 }
 
-func generateValues(host string) (string, error) {
+func generateValues(opts NewPluginOpts) (string, error) {
 	t, err := template.New("values").Parse(rawValues)
 	if err != nil {
 		return "", fmt.Errorf("parsing raw values: %w", err)
@@ -41,11 +41,7 @@ func generateValues(host string) (string, error) {
 
 	buf := bytes.Buffer{}
 
-	err = t.Execute(&buf, struct {
-		Host string
-	}{
-		Host: host,
-	})
+	err = t.Execute(&buf, opts)
 	if err != nil {
 		return "", fmt.Errorf("injecting variables: %w", err)
 	}

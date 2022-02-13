@@ -6,6 +6,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/plugins/grafana"
+
 	"github.com/deifyed/xctl/pkg/plugins/prometheus"
 
 	"github.com/deifyed/xctl/pkg/plugins/certbot"
@@ -86,6 +88,7 @@ func handleCluster(opts handleClusterOpts) error {
 		certbot.NewReconciler(provider),
 		vault.NewReconciler(provider),
 		prometheus.NewReconciler(provider),
+		grafana.NewReconciler(provider),
 	)
 
 	spin.Start()

@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/briandowns/spinner v1.16.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/google/uuid v1.1.2
 	github.com/linode/linodego v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.2.0
