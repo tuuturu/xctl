@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"net/url"
 
+	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
+	"github.com/deifyed/xctl/pkg/tools/clients/vault"
+	vaultBinary "github.com/deifyed/xctl/pkg/tools/clients/vault/binary"
+
 	"github.com/deifyed/xctl/pkg/secrets"
 	"github.com/deifyed/xctl/pkg/secrets/kubernetes"
 
-	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
-	kubectlBinary "github.com/deifyed/xctl/pkg/clients/kubectl/binary"
-	vaultBinary "github.com/deifyed/xctl/pkg/clients/vault/binary"
 	"github.com/deifyed/xctl/pkg/tools/logging"
 	"github.com/spf13/afero"
-
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
-	"github.com/deifyed/xctl/pkg/clients/vault"
 )
 
 func installVault(clients clientContainer) error {

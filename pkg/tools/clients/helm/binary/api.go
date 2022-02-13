@@ -7,8 +7,9 @@ import (
 	"os/exec"
 	"strings"
 
+	helm2 "github.com/deifyed/xctl/pkg/tools/clients/helm"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/clients/helm"
 	"github.com/deifyed/xctl/pkg/tools/logging"
 	"github.com/spf13/afero"
 )
@@ -56,9 +57,9 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 		case isAlreadyExists(err):
 			break
 		case isUnreachable(err):
-			return helm.ErrUnreachable
+			return helm2.ErrUnreachable
 		case isConnectionTimedOut(err):
-			return helm.ErrTimeout
+			return helm2.ErrTimeout
 		default:
 			return fmt.Errorf("running Helm install on %s: %w", plugin.Metadata.Name, err)
 		}
@@ -94,9 +95,9 @@ func (e externalBinaryHelm) Delete(plugin v1alpha1.Plugin) error {
 
 		switch {
 		case isUnreachable(err):
-			return helm.ErrUnreachable
+			return helm2.ErrUnreachable
 		case isConnectionTimedOut(err):
-			return helm.ErrTimeout
+			return helm2.ErrTimeout
 		default:
 			return fmt.Errorf("running Helm uninstall on %s: %w", plugin.Metadata.Name, err)
 		}
@@ -134,9 +135,9 @@ func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
 
 		switch {
 		case isUnreachable(err):
-			return false, helm.ErrUnreachable
+			return false, helm2.ErrUnreachable
 		case isConnectionTimedOut(err):
-			return false, helm.ErrTimeout
+			return false, helm2.ErrTimeout
 		default:
 			return false, fmt.Errorf("running Helm exists on %s: %w", plugin.Metadata.Name, err)
 		}
@@ -145,7 +146,7 @@ func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
 	return true, nil
 }
 
-func New(fs *afero.Afero, kubeConfigPath string) (helm.Client, error) {
+func New(fs *afero.Afero, kubeConfigPath string) (helm2.Client, error) {
 	binaryPath, err := getHelmPath(fs)
 	if err != nil {
 		return nil, fmt.Errorf("acquiring Helm path: %w", err)

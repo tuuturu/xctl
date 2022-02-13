@@ -7,14 +7,15 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
+	vaultClient "github.com/deifyed/xctl/pkg/tools/clients/vault"
+
 	"github.com/deifyed/xctl/pkg/plugins/vault"
 
 	"github.com/deifyed/xctl/cmd/preruns"
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
-	kubectlBinary "github.com/deifyed/xctl/pkg/clients/kubectl/binary"
-	vaultClient "github.com/deifyed/xctl/pkg/clients/vault"
 	"github.com/deifyed/xctl/pkg/cloud/linode"
 	"github.com/deifyed/xctl/pkg/plugins/grafana"
 	"github.com/spf13/afero"

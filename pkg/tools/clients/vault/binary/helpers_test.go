@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/deifyed/xctl/pkg/clients/vault"
+	"github.com/deifyed/xctl/pkg/tools/clients/vault"
+
 	"github.com/stretchr/testify/assert"
 )
 

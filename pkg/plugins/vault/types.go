@@ -2,11 +2,11 @@ package vault
 
 import (
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/clients/helm"
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
-	"github.com/deifyed/xctl/pkg/clients/vault"
 	"github.com/deifyed/xctl/pkg/cloud"
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	"github.com/deifyed/xctl/pkg/tools/clients/vault"
 )
 
 const logFeature = "plugin/vault"

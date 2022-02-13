@@ -6,13 +6,14 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
+	"github.com/deifyed/xctl/pkg/tools/clients/vault"
+	vaultBinary "github.com/deifyed/xctl/pkg/tools/clients/vault/binary"
+
 	"github.com/deifyed/xctl/cmd/preruns"
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
-	kubectlBinary "github.com/deifyed/xctl/pkg/clients/kubectl/binary"
-	"github.com/deifyed/xctl/pkg/clients/vault"
-	vaultBinary "github.com/deifyed/xctl/pkg/clients/vault/binary"
 	"github.com/deifyed/xctl/pkg/cloud/linode"
 	vaultPlugin "github.com/deifyed/xctl/pkg/plugins/vault"
 	"github.com/deifyed/xctl/pkg/secrets"

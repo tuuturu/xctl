@@ -3,7 +3,8 @@ package binary
 import (
 	"fmt"
 
-	"github.com/deifyed/xctl/pkg/clients/vault"
+	"github.com/deifyed/xctl/pkg/tools/clients/vault"
+
 	"github.com/spf13/afero"
 )
 

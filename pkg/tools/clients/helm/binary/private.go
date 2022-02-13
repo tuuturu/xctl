@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 
-	"github.com/deifyed/xctl/pkg/clients/helm"
 	"github.com/deifyed/xctl/pkg/tools/logging"
 )
 

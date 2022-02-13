@@ -3,12 +3,13 @@ package grafana
 import (
 	"fmt"
 
+	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
+	vaultClient "github.com/deifyed/xctl/pkg/tools/clients/vault"
+	vaultBinary "github.com/deifyed/xctl/pkg/tools/clients/vault/binary"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
-	kubectlBinary "github.com/deifyed/xctl/pkg/clients/kubectl/binary"
-	vaultClient "github.com/deifyed/xctl/pkg/clients/vault"
-	vaultBinary "github.com/deifyed/xctl/pkg/clients/vault/binary"
 	"github.com/deifyed/xctl/pkg/config"
 	"github.com/deifyed/xctl/pkg/plugins/vault"
 	"github.com/spf13/afero"

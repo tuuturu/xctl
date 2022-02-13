@@ -4,9 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/deifyed/xctl/pkg/clients/helm"
-
-	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
+	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 

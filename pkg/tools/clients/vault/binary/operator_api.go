@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/deifyed/xctl/pkg/clients/vault"
+	vault2 "github.com/deifyed/xctl/pkg/tools/clients/vault"
+
 	"github.com/sirupsen/logrus"
 )
 
-func (c *client) Initialize() (vault.InitializationResponse, error) {
+func (c *client) Initialize() (vault2.InitializationResponse, error) {
 	cmd := exec.Command(c.vaultPath, "operator", "init", "-format=json")
 
 	stderr := bytes.Buffer{}
@@ -29,15 +30,15 @@ func (c *client) Initialize() (vault.InitializationResponse, error) {
 		err = fmt.Errorf("%s: %w", stderr.String(), err)
 
 		if isConnectionRefused(err) {
-			return vault.InitializationResponse{}, vault.ErrConnectionRefused
+			return vault2.InitializationResponse{}, vault2.ErrConnectionRefused
 		}
 
-		return vault.InitializationResponse{}, fmt.Errorf("executing command: %w", err)
+		return vault2.InitializationResponse{}, fmt.Errorf("executing command: %w", err)
 	}
 
 	response, err := parseInitializationResponse(&stdout)
 	if err != nil {
-		return vault.InitializationResponse{}, fmt.Errorf("parsing initialization response: %w", err)
+		return vault2.InitializationResponse{}, fmt.Errorf("parsing initialization response: %w", err)
 	}
 
 	return response, nil

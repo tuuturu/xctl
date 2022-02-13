@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/deifyed/xctl/pkg/clients/vault"
+	"github.com/deifyed/xctl/pkg/tools/clients/vault"
 
 	"github.com/sirupsen/logrus"
 )

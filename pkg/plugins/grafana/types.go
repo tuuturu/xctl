@@ -1,10 +1,10 @@
 package grafana
 
 import (
-	"github.com/deifyed/xctl/pkg/clients/helm"
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
 	"github.com/deifyed/xctl/pkg/cloud"
 	"github.com/deifyed/xctl/pkg/secrets"
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 )
 
 const logFeature = "plugin/grafana"

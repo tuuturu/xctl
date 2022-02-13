@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 
+	helm2 "github.com/deifyed/xctl/pkg/tools/clients/helm"
+	"github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/clients/helm"
-	"github.com/deifyed/xctl/pkg/clients/helm/binary"
 	"github.com/deifyed/xctl/pkg/config"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -42,7 +43,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		err = helmClient.Install(plugin)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
+			if errors.Is(err, helm2.ErrUnreachable) {
 				return reconciliation.Result{Requeue: true}, nil
 			}
 
@@ -55,7 +56,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		err = helmClient.Delete(plugin)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
+			if errors.Is(err, helm2.ErrUnreachable) {
 				return reconciliation.Result{Requeue: true}, nil
 			}
 
@@ -68,7 +69,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 	return reconciliation.NoopWaitIndecisiveHandler(action)
 }
 
-func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client, plugin v1alpha1.Plugin) (reconciliation.Action, error) { //nolint:lll
+func (r reconciler) determineAction(rctx reconciliation.Context, helm helm2.Client, plugin v1alpha1.Plugin) (reconciliation.Action, error) { //nolint:lll
 	indication := reconciliation.DetermineUserIndication(rctx, rctx.ClusterDeclaration.Spec.Plugins.Prometheus)
 
 	var (

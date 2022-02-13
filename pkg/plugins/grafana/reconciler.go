@@ -4,10 +4,11 @@ import (
 	"errors"
 	"fmt"
 
+	helm2 "github.com/deifyed/xctl/pkg/tools/clients/helm"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/google/uuid"
 
-	"github.com/deifyed/xctl/pkg/clients/helm"
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/deifyed/xctl/pkg/cloud"
@@ -43,7 +44,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		err = r.install(clients, rctx.ClusterDeclaration)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
+			if errors.Is(err, helm2.ErrUnreachable) {
 				return reconciliation.Result{Requeue: true}, nil
 			}
 
@@ -56,7 +57,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		err = r.uninstall(clients)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
+			if errors.Is(err, helm2.ErrUnreachable) {
 				return reconciliation.Result{Requeue: true}, nil
 			}
 
@@ -114,7 +115,7 @@ func (r reconciler) uninstall(clients clientContainer) error {
 	return nil
 }
 
-func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client) (reconciliation.Action, error) { //nolint:lll
+func (r reconciler) determineAction(rctx reconciliation.Context, helm helm2.Client) (reconciliation.Action, error) { //nolint:lll
 	indication := reconciliation.DetermineUserIndication(rctx, rctx.ClusterDeclaration.Spec.Plugins.Grafana)
 
 	var (

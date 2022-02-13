@@ -9,11 +9,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
+	kubectl2 "github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+
 	"github.com/deifyed/xctl/pkg/tools/logging"
 )
 
-func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) error {
+func (k kubectlBinaryClient) PodExec(opts kubectl2.PodExecOpts, args ...string) error {
 	log := logging.GetLogger(logFeature, "podexec")
 
 	staticArgs := []string{
@@ -55,7 +56,7 @@ func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) e
 	return nil
 }
 
-func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.StopFn, error) {
+func (k kubectlBinaryClient) PortForward(opts kubectl2.PortForwardOpts) (kubectl2.StopFn, error) {
 	log := logging.GetLogger(logFeature, "portforward")
 
 	cmd := exec.Command(k.kubectlPath, "port-forward", //nolint:gosec
@@ -79,7 +80,7 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 		})
 
 		if isConnectionRefused(stderr.String()) {
-			return nil, kubectl.ErrConnectionRefused
+			return nil, kubectl2.ErrConnectionRefused
 		}
 
 		return nil, fmt.Errorf("executing pod command: %s", err)
@@ -94,7 +95,7 @@ func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.
 	}, nil
 }
 
-func (k kubectlBinaryClient) PodReady(pod kubectl.Pod) (bool, error) {
+func (k kubectlBinaryClient) PodReady(pod kubectl2.Pod) (bool, error) {
 	log := logging.GetLogger(logFeature, "podReady")
 
 	args := []string{
@@ -123,7 +124,7 @@ func (k kubectlBinaryClient) PodReady(pod kubectl.Pod) (bool, error) {
 		err = fmt.Errorf("%s: %w", stderr.String(), err)
 
 		if isErrNotFound(err) {
-			return false, kubectl.ErrNotFound
+			return false, kubectl2.ErrNotFound
 		}
 
 		return false, fmt.Errorf("running command: %w", err)

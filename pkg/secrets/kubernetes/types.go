@@ -1,6 +1,8 @@
 package kubernetes
 
-import "github.com/deifyed/xctl/pkg/clients/kubectl"
+import (
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+)
 
 const secretKind = "Secret"
 

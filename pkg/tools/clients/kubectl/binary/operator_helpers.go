@@ -1,7 +1,7 @@
 package binary
 
 import (
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 )
 
 func getCurrentContext(cfg kubeConfig, name string) (kubeConfigContextContext, error) {

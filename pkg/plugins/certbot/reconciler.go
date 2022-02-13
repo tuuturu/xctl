@@ -3,16 +3,15 @@ package certbot
 import (
 	"fmt"
 
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
+	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
+
 	"github.com/deifyed/xctl/pkg/tools/manifests"
 
-	"github.com/deifyed/xctl/pkg/clients/helm"
 	"github.com/pkg/errors"
 
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
-
-	"github.com/deifyed/xctl/pkg/clients/kubectl/binary"
-
-	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
-
-	"github.com/deifyed/xctl/pkg/clients/vault"
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
+	kubectl2 "github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	"github.com/deifyed/xctl/pkg/tools/clients/vault"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
@@ -15,8 +15,6 @@ import (
 	"github.com/deifyed/xctl/pkg/cloud"
 
 	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
-
-	"github.com/deifyed/xctl/pkg/clients/helm"
 )
 
 func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
@@ -103,12 +101,12 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 			return reconciliation.ActionNoop, fmt.Errorf("checking vault existence: %w", err)
 		}
 
-		vaultInitialized, err = opts.kubectl.PodReady(kubectl.Pod{
+		vaultInitialized, err = opts.kubectl.PodReady(kubectl2.Pod{
 			Name:      "vault-0",
 			Namespace: opts.plugin.Metadata.Namespace,
 		})
 		if err != nil {
-			if !errors.Is(err, kubectl.ErrNotFound) {
+			if !errors.Is(err, kubectl2.ErrNotFound) {
 				return "", fmt.Errorf("checking pod ready status: %w", err)
 			}
 

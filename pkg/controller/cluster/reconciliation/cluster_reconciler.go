@@ -7,13 +7,13 @@ import (
 	"os"
 	"path"
 
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
+	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
-	"github.com/deifyed/xctl/pkg/clients/helm"
-
-	helmBinary "github.com/deifyed/xctl/pkg/clients/helm/binary"
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
 	"github.com/deifyed/xctl/pkg/cloud"

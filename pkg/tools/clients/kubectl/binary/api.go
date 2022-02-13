@@ -6,11 +6,11 @@ import (
 	"io"
 	"os/exec"
 
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/spf13/afero"
-
-	"github.com/deifyed/xctl/pkg/clients/kubectl"
 )
 
 func (k kubectlBinaryClient) Apply(manifest io.Reader) error {
