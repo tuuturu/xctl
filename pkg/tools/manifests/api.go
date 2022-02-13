@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
+
 	"sigs.k8s.io/yaml"
 )
 
@@ -16,4 +18,21 @@ func ResourceAsReader(manifest interface{}) (io.Reader, error) {
 	}
 
 	return bytes.NewReader(result), nil
+}
+
+// ExtractEnvironmentManifest knows how to produce an environment manifest from a reader source
+func ExtractEnvironmentManifest(source io.Reader) (v1alpha1.Cluster, error) {
+	manifest := v1alpha1.NewDefaultCluster()
+
+	rawManifest, err := io.ReadAll(source)
+	if err != nil {
+		return v1alpha1.Cluster{}, fmt.Errorf("reading: %w", err)
+	}
+
+	err = yaml.Unmarshal(rawManifest, &manifest)
+	if err != nil {
+		return v1alpha1.Cluster{}, fmt.Errorf("unmarshalling: %w", err)
+	}
+
+	return manifest, nil
 }

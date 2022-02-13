@@ -1,0 +1,29 @@
+# Help texts for cmd/ package
+
+## Common flags
+cmdFlagContextName: context
+cmdFlagContextUsage: cluster declaration representing context of the operation
+
+## Root command
+cmdRootShortDecsription: xctl provisions a known and complete production environment
+
+## Apply
+cmdApplyShortDescription: Apply a manifest
+
+## Delete
+cmdDeleteShortDescription: Delete a resource
+
+## Forward
+cmdForwardShortDescription: Set up a connection to a service
+
+## Get
+cmdGetShortDescription: Query data from the environment
+
+### Get credentials
+cmdGetCredentialsShortDescription: Retrieve credentials
+
+### Scaffold
+cmdScaffoldShortDescription: Scaffold resource templates
+
+## Venv
+cmdVenvShortDescription: Activate a virtual environment

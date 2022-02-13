@@ -1,9 +1,11 @@
-package preruns
+package hooks
 
 import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/deifyed/xctl/pkg/tools/manifests"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 
@@ -14,7 +16,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type ClusterManifestIniterOpts struct {
+// ClusterManifestInitializerOpts defines required data for loading a cluster manifest
+type ClusterManifestInitializerOpts struct {
 	Io xctl.IOStreams
 	Fs *afero.Afero
 
@@ -23,8 +26,8 @@ type ClusterManifestIniterOpts struct {
 	SourcePath *string
 }
 
-// ClusterManifestIniter initializes a cluster manifest struct based on a filepath or stdin
-func ClusterManifestIniter(opts ClusterManifestIniterOpts) func(cmd *cobra.Command, args []string) error { //nolint:lll
+// ClusterManifestInitializer initializes a cluster manifest struct based on a filepath or stdin
+func ClusterManifestInitializer(opts ClusterManifestInitializerOpts) func(cmd *cobra.Command, args []string) error { //nolint:lll
 	return func(cmd *cobra.Command, args []string) error {
 		var (
 			source io.Reader
@@ -43,6 +46,21 @@ func ClusterManifestIniter(opts ClusterManifestIniterOpts) func(cmd *cobra.Comma
 		rawManifest, err := io.ReadAll(source)
 		if err != nil {
 			return fmt.Errorf("reading cluster manifest: %w", err)
+		}
+
+		defaultSource, err := manifests.ResourceAsReader(v1alpha1.NewDefaultCluster())
+		if err != nil {
+			return fmt.Errorf("converting manifest to stream: %w", err)
+		}
+
+		rawDefaultSource, err := io.ReadAll(defaultSource)
+		if err != nil {
+			return fmt.Errorf("buffering default source: %w", err)
+		}
+
+		err = yaml.Unmarshal(rawDefaultSource, opts.ClusterManifest)
+		if err != nil {
+			return fmt.Errorf("unmarshalling default manifest: %w", err)
 		}
 
 		err = yaml.Unmarshal(rawManifest, opts.ClusterManifest)

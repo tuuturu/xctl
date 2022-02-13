@@ -3,15 +3,18 @@ kind: Cluster
 
 metadata:
   # Name of the cluster
-  name: TestCluster
+  name: tuuturu-prod
   # Associate following email with the cluster
-  email: mail@klokkinn.no
+  email: mail@tuuturu.org
 
 spec:
   # Associate following domain with the cluster
-  rootDomain: klokkinn.no
+  rootDomain: tuuturu.org
 
   #plugins:
   #  certBot: true
+  #  grafana: true
   #  nginxIngressController: true
+  #  prometheus: true
   #  vault: true
+  #

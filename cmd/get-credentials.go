@@ -6,27 +6,23 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/deifyed/xctl/pkg/tools/i18n"
+
+	"github.com/deifyed/xctl/pkg/tools/secrets"
+
+	"github.com/deifyed/xctl/cmd/hooks"
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
 	"github.com/deifyed/xctl/pkg/tools/clients/vault"
 	vaultBinary "github.com/deifyed/xctl/pkg/tools/clients/vault/binary"
 
-	"github.com/deifyed/xctl/cmd/preruns"
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud/linode"
 	vaultPlugin "github.com/deifyed/xctl/pkg/plugins/vault"
-	"github.com/deifyed/xctl/pkg/secrets"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
-
-type getCredentialsOpts struct {
-	io                  xctl.IOStreams
-	fs                  *afero.Afero
-	clusterManifestPath string
-	ClusterManifest     v1alpha1.Cluster
-}
 
 var (
 	getCredentialsCmdOpts = getCredentialsOpts{ //nolint:gochecknoglobals
@@ -39,9 +35,9 @@ var (
 	}
 	getCredentialsCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "credentials",
-		Short: "retrieves credentials",
+		Short: i18n.T("cmdGetCredentialsShortDescription"),
 		Args:  cobra.ExactArgs(1),
-		PreRunE: preruns.ClusterManifestIniter(preruns.ClusterManifestIniterOpts{
+		PreRunE: hooks.ClusterManifestInitializer(hooks.ClusterManifestInitializerOpts{
 			Io:              getCredentialsCmdOpts.io,
 			Fs:              getCredentialsCmdOpts.fs,
 			ClusterManifest: &getCredentialsCmdOpts.ClusterManifest,
@@ -156,11 +152,18 @@ func init() {
 
 	flags.StringVarP(
 		&getCredentialsCmdOpts.clusterManifestPath,
-		"context",
+		i18n.T("cmdFlagContextName"),
 		"c",
 		"-",
-		"cluster manifest representing context of the virtual environment",
+		i18n.T("cmdFlagContextUsage"),
 	)
 
 	getCmd.AddCommand(getCredentialsCmd)
+}
+
+type getCredentialsOpts struct {
+	io                  xctl.IOStreams
+	fs                  *afero.Afero
+	clusterManifestPath string
+	ClusterManifest     v1alpha1.Cluster
 }

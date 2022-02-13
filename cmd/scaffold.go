@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/tools/i18n"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/tools/scaffolding"
 	"github.com/spf13/cobra"
@@ -12,7 +14,7 @@ import (
 
 var scaffoldCmd = &cobra.Command{ //nolint:gochecknoglobals
 	Use:   "scaffold",
-	Short: "Scaffolds resource templates",
+	Short: i18n.T("cmdScaffoldShortDescription"),
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		resource := strings.ToLower(args[0])

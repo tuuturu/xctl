@@ -33,6 +33,8 @@ func NewDefaultCluster() Cluster {
 				CertBot:                true,
 				NginxIngressController: true,
 				Vault:                  true,
+				Prometheus:             true,
+				Grafana:                true,
 			},
 		},
 	}

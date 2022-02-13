@@ -3,10 +3,13 @@ package cmd
 import (
 	"os"
 
-	"github.com/deifyed/xctl/pkg/config"
+	"github.com/deifyed/xctl/pkg/tools/i18n"
 
 	"github.com/deifyed/xctl/cmd/handlers"
 	"github.com/deifyed/xctl/pkg/apis/xctl"
+
+	"github.com/deifyed/xctl/pkg/config"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -14,9 +17,9 @@ import (
 var (
 	applyCmdOpts = handlers.ApplyRunEOpts{ //nolint:gochecknoglobals
 		Io: xctl.IOStreams{
-			In:  os.Stdin,
 			Out: os.Stdout,
 			Err: os.Stderr,
+			In:  os.Stdin,
 		},
 		Filesystem: &afero.Afero{Fs: afero.NewOsFs()},
 		Purge:      false,
@@ -24,7 +27,7 @@ var (
 	}
 	applyCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "apply",
-		Short: "applies a manifest",
+		Short: i18n.T("cmdApplyShortDescription"),
 		RunE:  handlers.ApplyRunE(&applyCmdOpts),
 	}
 )

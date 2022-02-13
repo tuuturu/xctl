@@ -8,7 +8,9 @@ import (
 
 var (
 	//go:embed translations/nb_NO/errors.yaml
-	rawErrors    []byte            //nolint:gochecknoglobals
+	rawErrors []byte //nolint:gochecknoglobals
+	//go:embed translations/nb_NO/cmd.yaml
+	rawCmd       []byte            //nolint:gochecknoglobals
 	translations map[string]string //nolint:gochecknoglobals
 )
 
@@ -30,8 +32,35 @@ func T(key string) string {
 }
 
 func initializeTranslations() {
-	err := yaml.Unmarshal(rawErrors, &translations)
-	if err != nil {
-		panic("reading error translations")
+	rawTranslations := [][]byte{
+		rawErrors,
+		rawCmd,
 	}
+
+	marshalledTranslations := make([]map[string]string, 0)
+
+	for _, rawTranslation := range rawTranslations {
+		currentTranslations := make(map[string]string)
+
+		err := yaml.Unmarshal(rawTranslation, &currentTranslations)
+		if err != nil {
+			panic("reading error translations")
+		}
+
+		marshalledTranslations = append(marshalledTranslations, currentTranslations)
+	}
+
+	translations = mergeTranslations(marshalledTranslations...)
+}
+
+func mergeTranslations(args ...map[string]string) map[string]string {
+	result := make(map[string]string)
+
+	for _, translation := range args {
+		for key, value := range translation {
+			result[key] = value
+		}
+	}
+
+	return result
 }

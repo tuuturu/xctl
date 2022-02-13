@@ -3,9 +3,9 @@ package certbot
 import (
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud"
-	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
 	"github.com/deifyed/xctl/pkg/tools/clients/helm"
 	"github.com/deifyed/xctl/pkg/tools/logging"
+	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 )
 
 const logFeature = "plugin/certbot"

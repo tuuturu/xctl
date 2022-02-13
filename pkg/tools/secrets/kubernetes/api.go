@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/deifyed/xctl/pkg/tools/secrets"
+
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 
-	"github.com/deifyed/xctl/pkg/secrets"
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"

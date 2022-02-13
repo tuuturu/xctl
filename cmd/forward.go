@@ -7,13 +7,15 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/tools/i18n"
+
+	"github.com/deifyed/xctl/cmd/hooks"
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
 	vaultClient "github.com/deifyed/xctl/pkg/tools/clients/vault"
 
 	"github.com/deifyed/xctl/pkg/plugins/vault"
 
-	"github.com/deifyed/xctl/cmd/preruns"
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud/linode"
@@ -40,9 +42,9 @@ var (
 	}
 	forwardCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "forward",
-		Short: "Sets up a connection to a service",
+		Short: i18n.T("cmdForwardShortDescription"),
 		Args:  cobra.ExactArgs(1),
-		PreRunE: preruns.ClusterManifestIniter(preruns.ClusterManifestIniterOpts{
+		PreRunE: hooks.ClusterManifestInitializer(hooks.ClusterManifestInitializerOpts{
 			Io:              forwardCmdOpts.io,
 			Fs:              forwardCmdOpts.fs,
 			ClusterManifest: &forwardCmdOpts.ClusterManifest,
@@ -154,15 +156,16 @@ func getVaultForwardOpts() kubectl.PortForwardOpts {
 	}
 }
 
+//nolint:gochecknoinits
 func init() {
 	flags := forwardCmd.Flags()
 
 	flags.StringVarP(
 		&forwardCmdOpts.clusterManifestPath,
-		"cluster-declaration",
+		i18n.T("cmdFlagContextName"),
 		"c",
 		"-",
-		"cluster declaration representing context of the virtual environment",
+		i18n.T("cmdFlagContextUsage"),
 	)
 
 	rootCmd.AddCommand(forwardCmd)

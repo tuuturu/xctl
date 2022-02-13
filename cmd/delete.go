@@ -3,6 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/deifyed/xctl/pkg/tools/i18n"
+
 	"github.com/deifyed/xctl/pkg/config"
 
 	"github.com/deifyed/xctl/cmd/handlers"
@@ -24,7 +26,7 @@ var (
 	}
 	deleteCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "delete",
-		Short: "deletes a resource",
+		Short: i18n.T("cmdDeleteShortDescription"),
 		RunE:  handlers.ApplyRunE(&deleteCmdOpts),
 	}
 )

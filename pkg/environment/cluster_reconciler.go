@@ -1,4 +1,4 @@
-package reconciliation
+package environment
 
 import (
 	"context"
@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"path"
+
+	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 
 	"github.com/deifyed/xctl/pkg/tools/clients/helm"
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
@@ -18,14 +20,10 @@ import (
 
 	"github.com/deifyed/xctl/pkg/cloud"
 	"github.com/deifyed/xctl/pkg/config"
-	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
 	"github.com/spf13/afero"
 )
 
-type clusterReconciler struct {
-	clusterService cloud.ClusterService
-}
-
+//nolint:funlen
 func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger("cluster", "reconciliation")
 	action := reconciliation.DetermineUserIndication(rctx, true)
@@ -112,7 +110,7 @@ func ensureDependencies(helmClient helm.Client) (bool, error) {
 	return true, nil
 }
 
-func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.ClusterService, manifest v1alpha1.Cluster) error {
+func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.ClusterService, manifest v1alpha1.Cluster) error { //nolint:lll
 	rawConfig, err := provider.GetKubeConfig(ctx, manifest)
 	if err != nil {
 		return fmt.Errorf("getting kubeconfig: %w", err)
@@ -147,4 +145,8 @@ func (c *clusterReconciler) String() string {
 
 func NewClusterReconciler(clusterService cloud.ClusterService) reconciliation.Reconciler {
 	return &clusterReconciler{clusterService: clusterService}
+}
+
+type clusterReconciler struct {
+	clusterService cloud.ClusterService
 }

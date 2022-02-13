@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	reconciliation2 "github.com/deifyed/xctl/pkg/tools/reconciliation"
+
 	helm2 "github.com/deifyed/xctl/pkg/tools/clients/helm"
 	"github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 
@@ -13,64 +15,62 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/deifyed/xctl/pkg/cloud"
-
-	"github.com/deifyed/xctl/pkg/controller/common/reconciliation"
 )
 
-func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
+func (r reconciler) Reconcile(rctx reconciliation2.Context) (reconciliation2.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
 	if err != nil {
-		return reconciliation.Result{}, fmt.Errorf("acquiring kube config path: %w", err)
+		return reconciliation2.Result{}, fmt.Errorf("acquiring kube config path: %w", err)
 	}
 
 	helmClient, err := binary.New(rctx.Filesystem, kubeConfigPath)
 	if err != nil {
-		return reconciliation.Result{}, fmt.Errorf("acquiring Helm client: %w", err)
+		return reconciliation2.Result{}, fmt.Errorf("acquiring Helm client: %w", err)
 	}
 
 	plugin := NewPlugin()
 
 	action, err := r.determineAction(rctx, helmClient, plugin)
 	if err != nil {
-		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
+		return reconciliation2.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
 
 	switch action {
-	case reconciliation.ActionCreate:
+	case reconciliation2.ActionCreate:
 		log.Debug("installing")
 
 		err = helmClient.Install(plugin)
 		if err != nil {
 			if errors.Is(err, helm2.ErrUnreachable) {
-				return reconciliation.Result{Requeue: true}, nil
+				return reconciliation2.Result{Requeue: true}, nil
 			}
 
-			return reconciliation.Result{}, fmt.Errorf("running helm install: %w", err)
+			return reconciliation2.Result{}, fmt.Errorf("running helm install: %w", err)
 		}
 
-		return reconciliation.Result{Requeue: false}, nil
-	case reconciliation.ActionDelete:
+		return reconciliation2.Result{Requeue: false}, nil
+	case reconciliation2.ActionDelete:
 		log.Debug("deleting")
 
 		err = helmClient.Delete(plugin)
 		if err != nil {
 			if errors.Is(err, helm2.ErrUnreachable) {
-				return reconciliation.Result{Requeue: true}, nil
+				return reconciliation2.Result{Requeue: true}, nil
 			}
 
-			return reconciliation.Result{}, fmt.Errorf("running helm delete: %w", err)
+			return reconciliation2.Result{}, fmt.Errorf("running helm delete: %w", err)
 		}
 
-		return reconciliation.Result{Requeue: false}, nil
+		return reconciliation2.Result{Requeue: false}, nil
 	}
 
-	return reconciliation.NoopWaitIndecisiveHandler(action)
+	return reconciliation2.NoopWaitIndecisiveHandler(action)
 }
 
-func (r reconciler) determineAction(rctx reconciliation.Context, helm helm2.Client, plugin v1alpha1.Plugin) (reconciliation.Action, error) { //nolint:lll
-	indication := reconciliation.DetermineUserIndication(rctx, rctx.ClusterDeclaration.Spec.Plugins.Prometheus)
+func (r reconciler) determineAction(rctx reconciliation2.Context, helm helm2.Client, plugin v1alpha1.Plugin) (reconciliation2.Action, error) { //nolint:lll
+	indication := reconciliation2.DetermineUserIndication(rctx, rctx.ClusterDeclaration.Spec.Plugins.Prometheus)
 
 	var (
 		clusterExists   = true
@@ -94,36 +94,36 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm2.Clie
 	}
 
 	switch indication {
-	case reconciliation.ActionCreate:
+	case reconciliation2.ActionCreate:
 		if !clusterExists {
-			return reconciliation.ActionWait, nil
+			return reconciliation2.ActionWait, nil
 		}
 
 		if componentExists {
-			return reconciliation.ActionNoop, nil
+			return reconciliation2.ActionNoop, nil
 		}
 
-		return reconciliation.ActionCreate, nil
-	case reconciliation.ActionDelete:
+		return reconciliation2.ActionCreate, nil
+	case reconciliation2.ActionDelete:
 		if !clusterExists {
-			return reconciliation.ActionNoop, nil
+			return reconciliation2.ActionNoop, nil
 		}
 
 		if !componentExists {
-			return reconciliation.ActionNoop, nil
+			return reconciliation2.ActionNoop, nil
 		}
 
-		return reconciliation.ActionDelete, nil
+		return reconciliation2.ActionDelete, nil
 	}
 
-	return reconciliation.ActionNoop, reconciliation.ErrIndecisive
+	return reconciliation2.ActionNoop, reconciliation2.ErrIndecisive
 }
 
 func (r reconciler) String() string {
 	return "Prometheus"
 }
 
-func NewReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {
+func NewReconciler(cloudProvider cloud.Provider) reconciliation2.Reconciler {
 	return &reconciler{
 		cloudProvider: cloudProvider,
 	}

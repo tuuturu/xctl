@@ -8,13 +8,15 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/tools/i18n"
+
+	"github.com/deifyed/xctl/cmd/hooks"
 	"github.com/deifyed/xctl/pkg/config"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 
 	"github.com/deifyed/xctl/pkg/cloud/linode"
 
-	"github.com/deifyed/xctl/cmd/preruns"
 	"github.com/deifyed/xctl/pkg/cloud"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -43,8 +45,8 @@ var (
 	}
 	venvCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "venv",
-		Short: "activates a virtual environment enabling manipulation of the production environment",
-		PreRunE: preruns.ClusterManifestIniter(preruns.ClusterManifestIniterOpts{
+		Short: i18n.T("cmdVenvShortDescription"),
+		PreRunE: hooks.ClusterManifestInitializer(hooks.ClusterManifestInitializerOpts{
 			Io:              venvCmdOpts.io,
 			Fs:              venvCmdOpts.fs,
 			ClusterManifest: &venvCmdOpts.clusterManifest,
@@ -104,10 +106,10 @@ func init() {
 
 	flags.StringVarP(
 		&venvCmdOpts.clusterDeclarationPath,
-		"cluster-declaration",
+		i18n.T("cmdFlagContextName"),
 		"c",
 		"-",
-		"cluster declaration representing context of the virtual environment",
+		i18n.T("cmdFlagContextUsage"),
 	)
 
 	rootCmd.AddCommand(venvCmd)

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/deifyed/xctl/pkg/tools/i18n"
+
 	"github.com/deifyed/xctl/cmd/helpers"
 
 	"github.com/spf13/cobra"
@@ -11,7 +13,7 @@ import (
 
 var rootCmd = &cobra.Command{ //nolint:gochecknoglobals
 	Use:   "xctl",
-	Short: "xctl provisions a known and complete production environment",
+	Short: i18n.T("cmdRootShortDecsription"),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return nil
 	},
