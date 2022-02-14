@@ -48,7 +48,7 @@ func Reconcile(opts ReconcileOpts) error {
 		Out:                             opts.Out,
 		PurgeFlag:                       opts.Purge,
 		ClusterDeclaration:              manifest,
-		ReconciliationLoopDelayFunction: func() { time.Sleep(config.DefaultReconciliationLoopDelayDuration) },
+		ReconciliationLoopDelayFunction: reconciliation.DefaultDelayFunction,
 		QueueStepFunc: func(identifier string) {
 			log.Debug(fmt.Sprintf("reconciling %s", identifier))
 
