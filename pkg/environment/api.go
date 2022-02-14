@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/deifyed/xctl/pkg/tools/manifests"
 
@@ -21,7 +20,6 @@ import (
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
-	"github.com/deifyed/xctl/pkg/config"
 	"github.com/deifyed/xctl/pkg/tools/spinner"
 )
 
