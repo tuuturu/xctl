@@ -17,6 +17,6 @@ lint: $(GOLANGCILINT)
 	@golangci-lint run
 
 test: $(RICHGO)
-	@go test ./... | tee >($(RICHGO) testfilter)
+	@$(RICHGO) test ./...
 
 check: fmt lint test
