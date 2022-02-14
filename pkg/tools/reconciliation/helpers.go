@@ -1,7 +1,12 @@
 package reconciliation
 
 import (
+	"errors"
 	"time"
+
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	"github.com/deifyed/xctl/pkg/tools/clients/vault"
 
 	"github.com/deifyed/xctl/pkg/config"
 )
@@ -30,4 +35,20 @@ func NoopWaitIndecisiveHandler(action Action) (Result, error) {
 // DefaultDelayFunction defines a sane default reconciliation loop delay function
 func DefaultDelayFunction() {
 	time.Sleep(config.DefaultReconciliationLoopDelayDuration)
+}
+
+func isQueueableError(err error) bool {
+	queueableErrors := []error{
+		helm.ErrUnreachable, helm.ErrTimeout,
+		kubectl.ErrConnectionRefused,
+		vault.ErrConnectionRefused,
+	}
+
+	for _, potentialQueueableError := range queueableErrors {
+		if errors.Is(err, potentialQueueableError) {
+			return true
+		}
+	}
+
+	return false
 }

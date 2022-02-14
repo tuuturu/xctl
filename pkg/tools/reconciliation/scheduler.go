@@ -22,7 +22,11 @@ func (c *Scheduler) Run(ctx context.Context) (Result, error) {
 
 		result, err := reconciler.Reconcile(reconciliationContext)
 		if err != nil {
-			return Result{}, fmt.Errorf("reconciling %s: %w", reconciler.String(), err)
+			if !isQueueableError(err) {
+				return Result{}, fmt.Errorf("reconciling %s: %w", reconciler.String(), err)
+			}
+
+			result.Requeue = true
 		}
 
 		if result.Requeue {
