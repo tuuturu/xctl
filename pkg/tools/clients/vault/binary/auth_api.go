@@ -11,7 +11,7 @@ import (
 )
 
 func (c *client) EnableKubernetesAuthentication() error {
-	cmd := exec.Command(c.vaultPath, "auth", "enable", "kubernetes")
+	cmd := exec.Command(c.vaultPath, "auth", "enable", "kubernetes") //nolint:gosec
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
@@ -27,7 +27,9 @@ func (c *client) EnableKubernetesAuthentication() error {
 			"stderr": stderr.String(),
 		}).Debug("executing command")
 
-		return fmt.Errorf("executing command: %w", err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return errorHandler(err, fmt.Errorf("executing command: %w", err))
 	}
 
 	return nil
@@ -43,7 +45,7 @@ func (c *client) ConfigureKubernetesAuthentication(opts vault.ConfigureKubernete
 		fmt.Sprintf("issuer=%s", opts.Issuer.String()),
 	}
 
-	cmd := exec.Command(c.vaultPath, args...)
+	cmd := exec.Command(c.vaultPath, args...) //nolint:gosec
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
@@ -59,7 +61,9 @@ func (c *client) ConfigureKubernetesAuthentication(opts vault.ConfigureKubernete
 			"stderr": stderr.String(),
 		}).Debug("executing command")
 
-		return fmt.Errorf("executing command: %w", err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return errorHandler(err, fmt.Errorf("executing command: %w", err))
 	}
 
 	return nil

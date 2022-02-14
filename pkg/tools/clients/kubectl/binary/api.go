@@ -33,7 +33,9 @@ func (k kubectlBinaryClient) Apply(manifest io.Reader) error {
 			Stderr: stderr.String(),
 		})
 
-		return fmt.Errorf("executing pod command: %s", err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return errorHandler(err, fmt.Errorf("executing pod command: %s", err))
 	}
 
 	return nil
@@ -63,7 +65,9 @@ func (k kubectlBinaryClient) Get(namespace string, resourceType string, name str
 			Stderr: stderr.String(),
 		})
 
-		return nil, fmt.Errorf("executing pod command: %s", err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return nil, errorHandler(err, fmt.Errorf("executing pod command: %s", err))
 	}
 
 	return &stdout, nil

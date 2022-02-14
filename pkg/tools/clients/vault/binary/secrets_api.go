@@ -31,7 +31,9 @@ func (c *client) Put(name string, secretAttributes map[string]string) error {
 			"stderr": stderr.String(),
 		}).Debug("executing command")
 
-		return fmt.Errorf("executing command: %w", err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return errorHandler(err, fmt.Errorf("executing command: %w", err))
 	}
 
 	return nil
@@ -59,7 +61,9 @@ func (c *client) Get(name string, key string) (string, error) {
 			"stderr": stderr.String(),
 		}).Debug("executing command")
 
-		return "", fmt.Errorf("executing command: %w", err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return "", errorHandler(err, fmt.Errorf("executing command: %w", err))
 	}
 
 	return stdout.String(), nil
@@ -87,7 +91,9 @@ func (c *client) Delete(name string) error {
 			"stderr": stderr.String(),
 		}).Debug("executing command")
 
-		return fmt.Errorf("executing command: %w", err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return errorHandler(err, fmt.Errorf("executing command: %w", err))
 	}
 
 	return nil

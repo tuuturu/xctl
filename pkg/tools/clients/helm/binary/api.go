@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	helm2 "github.com/deifyed/xctl/pkg/tools/clients/helm"
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -46,6 +46,10 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 
 	err = cmd.Run()
 	if err != nil {
+		if isAlreadyExists(err) {
+			return nil
+		}
+
 		log.Debugf("executing command: %+v", commandLogFields{
 			Stdout: stdout.String(),
 			Stderr: stderr.String(),
@@ -53,16 +57,7 @@ func (e externalBinaryHelm) Install(plugin v1alpha1.Plugin) error {
 
 		err = fmt.Errorf("%s: %w", stderr.String(), err)
 
-		switch {
-		case isAlreadyExists(err):
-			break
-		case isUnreachable(err):
-			return helm2.ErrUnreachable
-		case isConnectionTimedOut(err):
-			return helm2.ErrTimeout
-		default:
-			return fmt.Errorf("running Helm install on %s: %w", plugin.Metadata.Name, err)
-		}
+		return errorHelper(err, fmt.Errorf("running Helm install on %s: %w", plugin.Metadata.Name, err))
 	}
 
 	return nil
@@ -93,14 +88,7 @@ func (e externalBinaryHelm) Delete(plugin v1alpha1.Plugin) error {
 
 		err = fmt.Errorf("%s: %w", stderr.String(), err)
 
-		switch {
-		case isUnreachable(err):
-			return helm2.ErrUnreachable
-		case isConnectionTimedOut(err):
-			return helm2.ErrTimeout
-		default:
-			return fmt.Errorf("running Helm uninstall on %s: %w", plugin.Metadata.Name, err)
-		}
+		return errorHelper(err, fmt.Errorf("running Helm uninstall on %s: %w", plugin.Metadata.Name, err))
 	}
 
 	return nil
@@ -133,20 +121,13 @@ func (e externalBinaryHelm) Exists(plugin v1alpha1.Plugin) (bool, error) {
 
 		err = fmt.Errorf("%s: %w", stderr.String(), err)
 
-		switch {
-		case isUnreachable(err):
-			return false, helm2.ErrUnreachable
-		case isConnectionTimedOut(err):
-			return false, helm2.ErrTimeout
-		default:
-			return false, fmt.Errorf("running Helm exists on %s: %w", plugin.Metadata.Name, err)
-		}
+		return false, errorHelper(err, fmt.Errorf("running Helm exists on %s: %w", plugin.Metadata.Name, err))
 	}
 
 	return true, nil
 }
 
-func New(fs *afero.Afero, kubeConfigPath string) (helm2.Client, error) {
+func New(fs *afero.Afero, kubeConfigPath string) (helm.Client, error) {
 	binaryPath, err := getHelmPath(fs)
 	if err != nil {
 		return nil, fmt.Errorf("acquiring Helm path: %w", err)

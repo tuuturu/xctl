@@ -1,6 +1,7 @@
 package binary
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,7 +34,7 @@ func TestIsConnectionRefused(t *testing.T) {
 		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.expectResult, isConnectionRefused(tc.withMessage))
+			assert.Equal(t, tc.expectResult, isConnectionRefused(errors.New(tc.withMessage)))
 		})
 	}
 }

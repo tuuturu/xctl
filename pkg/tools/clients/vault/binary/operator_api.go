@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"os/exec"
 
-	vault2 "github.com/deifyed/xctl/pkg/tools/clients/vault"
+	"github.com/deifyed/xctl/pkg/tools/clients/vault"
 
 	"github.com/sirupsen/logrus"
 )
 
-func (c *client) Initialize() (vault2.InitializationResponse, error) {
-	cmd := exec.Command(c.vaultPath, "operator", "init", "-format=json")
+func (c *client) Initialize() (vault.InitializationResponse, error) {
+	cmd := exec.Command(c.vaultPath, "operator", "init", "-format=json") //nolint:gosec
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
@@ -29,23 +29,19 @@ func (c *client) Initialize() (vault2.InitializationResponse, error) {
 
 		err = fmt.Errorf("%s: %w", stderr.String(), err)
 
-		if isConnectionRefused(err) {
-			return vault2.InitializationResponse{}, vault2.ErrConnectionRefused
-		}
-
-		return vault2.InitializationResponse{}, fmt.Errorf("executing command: %w", err)
+		return vault.InitializationResponse{}, errorHandler(err, fmt.Errorf("executing command: %w", err))
 	}
 
 	response, err := parseInitializationResponse(&stdout)
 	if err != nil {
-		return vault2.InitializationResponse{}, fmt.Errorf("parsing initialization response: %w", err)
+		return vault.InitializationResponse{}, fmt.Errorf("parsing initialization response: %w", err)
 	}
 
 	return response, nil
 }
 
 func (c *client) Unseal(key string) error {
-	cmd := exec.Command(c.vaultPath, "operator", "unseal", key)
+	cmd := exec.Command(c.vaultPath, "operator", "unseal", key) //nolint:gosec
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
@@ -61,14 +57,16 @@ func (c *client) Unseal(key string) error {
 			"stderr": stderr.String(),
 		}).Debug("executing command")
 
-		return fmt.Errorf("executing command: %w", err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return errorHandler(err, fmt.Errorf("executing command: %w", err))
 	}
 
 	return nil
 }
 
 func (c *client) EnableKv2() error {
-	cmd := exec.Command(c.vaultPath, "secrets", "enable", "kv-v2")
+	cmd := exec.Command(c.vaultPath, "secrets", "enable", "kv-v2") //nolint:gosec
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
@@ -84,7 +82,9 @@ func (c *client) EnableKv2() error {
 			"stderr": stderr.String(),
 		}).Debug("executing command")
 
-		return fmt.Errorf("executing command: %w", err)
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return errorHandler(err, fmt.Errorf("executing command: %w", err))
 	}
 
 	return nil

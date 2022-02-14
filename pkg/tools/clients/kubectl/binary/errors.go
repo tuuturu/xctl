@@ -1,6 +1,21 @@
 package binary
 
-import "regexp"
+import (
+	"regexp"
+
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+)
+
+func errorHandler(err error, defaultError error) error {
+	switch {
+	case isConnectionRefused(err):
+		return kubectl.ErrConnectionRefused
+	case isErrNotFound(err):
+		return kubectl.ErrNotFound
+	default:
+		return defaultError
+	}
+}
 
 var reErrNotFound = regexp.MustCompile(`Error from server \(NotFound\): pods ".+" not found\s`)
 
@@ -10,6 +25,6 @@ func isErrNotFound(err error) bool {
 
 var connectionRefusedRe = regexp.MustCompile(`.*connection refused.*`)
 
-func isConnectionRefused(s string) bool {
-	return connectionRefusedRe.MatchString(s)
+func isConnectionRefused(err error) bool {
+	return connectionRefusedRe.MatchString(err.Error())
 }

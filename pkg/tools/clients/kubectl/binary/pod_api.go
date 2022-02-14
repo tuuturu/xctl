@@ -9,12 +9,12 @@ import (
 	"strconv"
 	"time"
 
-	kubectl2 "github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 )
 
-func (k kubectlBinaryClient) PodExec(opts kubectl2.PodExecOpts, args ...string) error {
+func (k kubectlBinaryClient) PodExec(opts kubectl.PodExecOpts, args ...string) error {
 	log := logging.GetLogger(logFeature, "podexec")
 
 	staticArgs := []string{
@@ -41,7 +41,9 @@ func (k kubectlBinaryClient) PodExec(opts kubectl2.PodExecOpts, args ...string) 
 			Stderr: stderr.String(),
 		})
 
-		return fmt.Errorf("executing pod command: %s", stderr.String())
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return errorHandler(err, fmt.Errorf("executing pod command: %s", stderr.String()))
 	}
 
 	if opts.Stdout == nil {
@@ -56,7 +58,7 @@ func (k kubectlBinaryClient) PodExec(opts kubectl2.PodExecOpts, args ...string) 
 	return nil
 }
 
-func (k kubectlBinaryClient) PortForward(opts kubectl2.PortForwardOpts) (kubectl2.StopFn, error) {
+func (k kubectlBinaryClient) PortForward(opts kubectl.PortForwardOpts) (kubectl.StopFn, error) {
 	log := logging.GetLogger(logFeature, "portforward")
 
 	cmd := exec.Command(k.kubectlPath, "port-forward", //nolint:gosec
@@ -79,11 +81,9 @@ func (k kubectlBinaryClient) PortForward(opts kubectl2.PortForwardOpts) (kubectl
 			Stderr: stderr.String(),
 		})
 
-		if isConnectionRefused(stderr.String()) {
-			return nil, kubectl2.ErrConnectionRefused
-		}
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
 
-		return nil, fmt.Errorf("executing pod command: %s", err)
+		return nil, errorHandler(err, fmt.Errorf("executing pod command: %s", err))
 	}
 
 	time.Sleep(portForwardWaitSeconds * time.Second)
@@ -95,7 +95,7 @@ func (k kubectlBinaryClient) PortForward(opts kubectl2.PortForwardOpts) (kubectl
 	}, nil
 }
 
-func (k kubectlBinaryClient) PodReady(pod kubectl2.Pod) (bool, error) {
+func (k kubectlBinaryClient) PodReady(pod kubectl.Pod) (bool, error) {
 	log := logging.GetLogger(logFeature, "podReady")
 
 	args := []string{
@@ -123,11 +123,7 @@ func (k kubectlBinaryClient) PodReady(pod kubectl2.Pod) (bool, error) {
 
 		err = fmt.Errorf("%s: %w", stderr.String(), err)
 
-		if isErrNotFound(err) {
-			return false, kubectl2.ErrNotFound
-		}
-
-		return false, fmt.Errorf("running command: %w", err)
+		return false, errorHandler(err, fmt.Errorf("running command: %w", err))
 	}
 
 	var result getPodResult

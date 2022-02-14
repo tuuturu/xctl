@@ -1,6 +1,21 @@
 package binary
 
-import "regexp"
+import (
+	"regexp"
+
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
+)
+
+func errorHelper(err error, defaultErr error) error {
+	switch {
+	case isUnreachable(err):
+		return helm.ErrUnreachable
+	case isConnectionTimedOut(err):
+		return helm.ErrTimeout
+	default:
+		return defaultErr
+	}
+}
 
 var reUnreachableErr = regexp.MustCompile(`.*EOF: Kubernetes cluster unreachable.*`)
 
