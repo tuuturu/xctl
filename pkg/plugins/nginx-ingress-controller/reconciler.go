@@ -1,12 +1,10 @@
 package ingress
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 
-	"github.com/deifyed/xctl/pkg/tools/clients/helm"
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -48,18 +46,7 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 
 		err = helmClient.Install(plugin)
 		if err != nil {
-			switch {
-			case errors.Is(err, helm.ErrTimeout):
-				log.Info("Requeuing due to timeout")
-
-				return reconciliation.Result{Requeue: true}, nil
-			case errors.Is(err, helm.ErrUnreachable):
-				log.Info("Requeuing due to cluster being unreachable")
-
-				return reconciliation.Result{Requeue: true}, nil
-			default:
-				return reconciliation.Result{Requeue: false}, fmt.Errorf("installing helm chart: %w", err)
-			}
+			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing helm chart: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil

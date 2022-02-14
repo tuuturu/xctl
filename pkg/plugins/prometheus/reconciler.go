@@ -43,10 +43,6 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		err = helmClient.Install(plugin)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
-				return reconciliation.Result{Requeue: true}, nil
-			}
-
 			return reconciliation.Result{}, fmt.Errorf("running helm install: %w", err)
 		}
 
@@ -56,10 +52,6 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		err = helmClient.Delete(plugin)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
-				return reconciliation.Result{Requeue: true}, nil
-			}
-
 			return reconciliation.Result{}, fmt.Errorf("running helm delete: %w", err)
 		}
 

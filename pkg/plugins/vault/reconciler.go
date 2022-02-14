@@ -6,10 +6,7 @@ import (
 
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 
-	"github.com/deifyed/xctl/pkg/tools/clients/helm"
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
-	"github.com/deifyed/xctl/pkg/tools/clients/vault"
-
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/deifyed/xctl/pkg/config"
@@ -48,14 +45,7 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 
 		err = installVault(clients)
 		if err != nil {
-			switch {
-			case errors.Is(err, helm.ErrUnreachable):
-				return reconciliation.Result{Requeue: true}, nil
-			case errors.Is(err, vault.ErrConnectionRefused):
-				return reconciliation.Result{Requeue: true}, nil
-			default:
-				return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
-			}
+			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
@@ -94,11 +84,7 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 	if clusterExists && cluster.Ready {
 		vaultExists, err = opts.helmClient.Exists(opts.plugin)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
-				return reconciliation.ActionWait, nil
-			}
-
-			return reconciliation.ActionNoop, fmt.Errorf("checking vault existence: %w", err)
+			return "", fmt.Errorf("checking vault existence: %w", err)
 		}
 
 		vaultInitialized, err = opts.kubectl.PodReady(kubectl.Pod{

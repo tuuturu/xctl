@@ -44,10 +44,6 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		err = r.install(clients, rctx.ClusterDeclaration)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
-				return reconciliation.Result{Requeue: true}, nil
-			}
-
 			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
 		}
 
@@ -57,10 +53,6 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		err = r.uninstall(clients)
 		if err != nil {
-			if errors.Is(err, helm.ErrUnreachable) {
-				return reconciliation.Result{Requeue: true}, nil
-			}
-
 			return reconciliation.Result{}, fmt.Errorf("uninstalling: %w", err)
 		}
 
