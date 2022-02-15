@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"os"
 	"path"
 
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
@@ -127,7 +126,7 @@ func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.Clu
 		return fmt.Errorf("acquiring KubeConfigPath: %w", err)
 	}
 
-	err = os.MkdirAll(path.Dir(kubeConfigPath), 0o700)
+	err = fs.MkdirAll(path.Dir(kubeConfigPath), 0o700)
 	if err != nil {
 		return fmt.Errorf("preparing folder structure: %w", err)
 	}
