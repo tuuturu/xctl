@@ -13,7 +13,6 @@ import (
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
-	"github.com/deifyed/xctl/pkg/config"
 	"github.com/linode/linodego"
 	"github.com/pkg/errors"
 )
@@ -93,7 +92,7 @@ func (p *provider) await(test pollTestFn) (err error) {
 		delayFunction()
 
 		if time.Now().After(timeout) {
-			return config.ErrTimeout
+			return cloud.ErrTimeout
 		}
 
 		ready, err = test()
