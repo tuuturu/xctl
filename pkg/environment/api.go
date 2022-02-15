@@ -23,6 +23,7 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/spinner"
 )
 
+// Reconcile knows how to ensure reality for an environment is as declared in an environment manifest
 func Reconcile(opts ReconcileOpts) error {
 	log := logging.GetLogger("cmd", "cluster")
 

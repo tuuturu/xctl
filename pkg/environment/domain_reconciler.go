@@ -10,6 +10,7 @@ import (
 	"github.com/deifyed/xctl/pkg/cloud"
 )
 
+// Reconcile knows how to ensure reality for a domain is as declared in an environment manifest
 func (d *domainReconciler) Reconcile(ctx reconciliation.Context) (reconciliation.Result, error) {
 	cluster, err := d.clusterService.GetCluster(ctx.Ctx, ctx.ClusterDeclaration)
 	if err != nil {
@@ -88,10 +89,12 @@ func (d *domainReconciler) determineAction(ctx reconciliation.Context, cluster c
 	return reconciliation.ActionNoop, reconciliation.ErrIndecisive
 }
 
+// String returns a string representing the reconciler
 func (d *domainReconciler) String() string {
 	return domainReconcilerName
 }
 
+// NewDomainReconciler returns an initialized domain reconciler
 func NewDomainReconciler(provider cloud.Provider) reconciliation.Reconciler {
 	return &domainReconciler{
 		domainService:  provider,

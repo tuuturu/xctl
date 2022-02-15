@@ -24,6 +24,7 @@ import (
 )
 
 //nolint:funlen
+// Reconcile knows how to ensure reality for a cluster is as declared in an environment manifest
 func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger("cluster", "reconciliation")
 	action := reconciliation.DetermineUserIndication(rctx, true)
@@ -139,10 +140,12 @@ func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.Clu
 	return nil
 }
 
+// String returns a string representing the reconciler
 func (c *clusterReconciler) String() string {
 	return "Kubernetes Cluster"
 }
 
+// NewClusterReconciler returns an initialized cluster reconciler
 func NewClusterReconciler(clusterService cloud.ClusterService) reconciliation.Reconciler {
 	return &clusterReconciler{clusterService: clusterService}
 }

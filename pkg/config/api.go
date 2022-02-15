@@ -6,6 +6,7 @@ import (
 	"path"
 )
 
+// GetAbsoluteXCTLDir returns the main xctl configuration directory, usually lives in the users home directory
 func GetAbsoluteXCTLDir() (string, error) {
 	userDir, err := os.UserHomeDir()
 	if err != nil {
@@ -35,6 +36,7 @@ func GetAbsoluteKubeconfigPath(clusterName string) (string, error) {
 	return path.Join(clusterDir, DefaultKubeconfigFilename), nil
 }
 
+// GetAbsoluteBinariesDir returns the absolute path of the directory containing downloaded binaries
 func GetAbsoluteBinariesDir() (string, error) {
 	xctlDir, err := GetAbsoluteXCTLDir()
 	if err != nil {
@@ -44,6 +46,7 @@ func GetAbsoluteBinariesDir() (string, error) {
 	return path.Join(xctlDir, DefaultBinariesDir), nil
 }
 
+// IsDebugMode returns a boolean representing if xctl is running is debug mode or not
 func IsDebugMode() bool {
 	debugMode := os.Getenv("XCTL_DEBUG")
 

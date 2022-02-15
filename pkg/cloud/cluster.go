@@ -13,8 +13,11 @@ const (
 	DefaultAutoscalerMaximumNodes = 10
 )
 
+// ClusterNode represents a node in the cluster
 type ClusterNode struct {
+	// Name defines the name of a node
 	Name string
+	// IPv4 defines the IPv4 address the node is available at
 	IPv4 string
 }
 
