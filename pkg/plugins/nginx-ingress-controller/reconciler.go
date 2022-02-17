@@ -18,7 +18,7 @@ import (
 func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
-	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("acquiring KubeConfig path: %w", err)
 	}
@@ -69,10 +69,10 @@ func (n nginxIngressController) determineAction(opts determineActionOpts) (recon
 
 	indication := reconciliation.DetermineUserIndication(
 		opts.Ctx,
-		opts.Ctx.ClusterDeclaration.Spec.Plugins.NginxIngressController,
+		opts.Ctx.EnvironmentManifest.Spec.Plugins.NginxIngressController,
 	)
 
-	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.ClusterDeclaration)
+	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.EnvironmentManifest)
 	if err != nil {
 		return reconciliation.ActionNoop, fmt.Errorf("checking cluster existence: %w", err)
 	}

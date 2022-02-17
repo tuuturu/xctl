@@ -42,7 +42,7 @@ type Context struct {
 	Filesystem *afero.Afero
 	Out        io.Writer
 
-	ClusterDeclaration     v1alpha1.Cluster
+	EnvironmentManifest    v1alpha1.Environment
 	ApplicationDeclaration v1alpha1.Application
 
 	Purge bool

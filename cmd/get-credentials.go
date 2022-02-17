@@ -37,11 +37,11 @@ var (
 		Use:   "credentials",
 		Short: i18n.T("cmdGetCredentialsShortDescription"),
 		Args:  cobra.ExactArgs(1),
-		PreRunE: hooks.ClusterManifestInitializer(hooks.ClusterManifestInitializerOpts{
-			Io:              getCredentialsCmdOpts.io,
-			Fs:              getCredentialsCmdOpts.fs,
-			ClusterManifest: &getCredentialsCmdOpts.ClusterManifest,
-			SourcePath:      &getCredentialsCmdOpts.clusterManifestPath,
+		PreRunE: hooks.EnvironmentManifestInitializer(hooks.EnvironmentManifestInitializerOpts{
+			Io:                  getCredentialsCmdOpts.io,
+			Fs:                  getCredentialsCmdOpts.fs,
+			EnvironmentManifest: &getCredentialsCmdOpts.environmentManifest,
+			SourcePath:          &getCredentialsCmdOpts.environmentManifestPath,
 		}),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			target := args[0]
@@ -60,10 +60,10 @@ var (
 			ctx := context.Background()
 
 			kubeConfigPath, err := ensureKubeConfig(ensureKubeConfigOpts{
-				fs:              getCredentialsCmdOpts.fs,
-				ctx:             ctx,
-				provider:        provider,
-				clusterManifest: getCredentialsCmdOpts.ClusterManifest,
+				fs:                  getCredentialsCmdOpts.fs,
+				ctx:                 ctx,
+				provider:            provider,
+				environmentManifest: getCredentialsCmdOpts.environmentManifest,
 			})
 			if err != nil {
 				return fmt.Errorf("setting up kubeconfig: %w", err)
@@ -151,7 +151,7 @@ func init() {
 	flags := getCredentialsCmd.Flags()
 
 	flags.StringVarP(
-		&getCredentialsCmdOpts.clusterManifestPath,
+		&getCredentialsCmdOpts.environmentManifestPath,
 		i18n.T("cmdFlagContextName"),
 		"c",
 		"-",
@@ -162,8 +162,8 @@ func init() {
 }
 
 type getCredentialsOpts struct {
-	io                  xctl.IOStreams
-	fs                  *afero.Afero
-	clusterManifestPath string
-	ClusterManifest     v1alpha1.Cluster
+	io                      xctl.IOStreams
+	fs                      *afero.Afero
+	environmentManifestPath string
+	environmentManifest     v1alpha1.Environment
 }

@@ -12,7 +12,7 @@ import (
 
 // Reconcile knows how to ensure reality for a domain is as declared in an environment manifest
 func (d *domainReconciler) Reconcile(ctx reconciliation.Context) (reconciliation.Result, error) {
-	cluster, err := d.clusterService.GetCluster(ctx.Ctx, ctx.ClusterDeclaration)
+	cluster, err := d.clusterService.GetCluster(ctx.Ctx, ctx.EnvironmentManifest)
 	if err != nil {
 		if !errors.Is(err, cloud.ErrNotFound) {
 			return reconciliation.Result{}, fmt.Errorf("retrieving cluster: %w", err)
@@ -24,7 +24,7 @@ func (d *domainReconciler) Reconcile(ctx reconciliation.Context) (reconciliation
 		return reconciliation.Result{}, fmt.Errorf("determining action: %w", err)
 	}
 
-	domain := cloud.Domain{Host: fmt.Sprintf("*.%s", ctx.ClusterDeclaration.Spec.Domain)}
+	domain := cloud.Domain{Host: fmt.Sprintf("*.%s", ctx.EnvironmentManifest.Spec.Domain)}
 
 	switch action {
 	case reconciliation.ActionCreate:
@@ -48,7 +48,7 @@ func (d *domainReconciler) Reconcile(ctx reconciliation.Context) (reconciliation
 
 func (d *domainReconciler) determineAction(ctx reconciliation.Context, cluster cloud.Cluster) (reconciliation.Action, error) { //nolint:lll
 	userIndication := reconciliation.DetermineUserIndication(ctx, true)
-	domain := cloud.Domain{Host: ctx.ClusterDeclaration.Spec.Domain}
+	domain := cloud.Domain{Host: ctx.EnvironmentManifest.Spec.Domain}
 
 	hasPrimaryDomain, err := d.domainService.HasPrimaryDomain(ctx.Ctx, domain)
 	if err != nil {

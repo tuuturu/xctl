@@ -8,8 +8,6 @@ import (
 
 	_ "embed"
 
-	"github.com/deifyed/xctl/pkg/tools/manifests"
-
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 
 	"github.com/deifyed/xctl/pkg/plugins/grafana"
@@ -30,7 +28,7 @@ import (
 func Reconcile(opts ReconcileOpts) error {
 	log := logging.GetLogger("cmd", "cluster")
 
-	manifest, err := manifests.ExtractEnvironmentManifest(opts.Manifest)
+	manifest, err := extractEnvironmentManifest(opts.Manifest)
 	if err != nil {
 		return fmt.Errorf("extracting manifest: %w", err)
 	}
@@ -84,7 +82,7 @@ func Reconcile(opts ReconcileOpts) error {
 	return nil
 }
 
-//go:embed cluster-template.yaml
+//go:embed environment-template.yaml
 var clusterTemplate string //nolint:gochecknoglobals
 
 func Scaffold() io.Reader {

@@ -53,8 +53,8 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 		}
 
 		switch kind {
-		case v1alpha1.ClusterKind:
-			fmt.Fprintf(opts.Io.Out, "Applying cluster manifest, please wait\n\n")
+		case v1alpha1.EnvironmentKind:
+			fmt.Fprintf(opts.Io.Out, "Applying environment manifest, please wait\n\n")
 
 			return environment.Reconcile(environment.ReconcileOpts{
 				Out:        opts.Io.Out,

@@ -7,7 +7,7 @@ import (
 	"github.com/deifyed/xctl/pkg/config"
 )
 
-func defaultLabels(cluster v1alpha1.Cluster, extraLabels ...string) []string {
+func defaultLabels(cluster v1alpha1.Environment, extraLabels ...string) []string {
 	result := []string{
 		componentNamer(cluster, "", ""),
 	}
@@ -17,7 +17,7 @@ func defaultLabels(cluster v1alpha1.Cluster, extraLabels ...string) []string {
 	return result
 }
 
-func componentNamer(cluster v1alpha1.Cluster, componentType string, id string) string {
+func componentNamer(cluster v1alpha1.Environment, componentType string, id string) string {
 	componentName := strings.Join([]string{config.ApplicationName, cluster.Metadata.Name, componentType, id}, "-")
 	componentName = strings.ToLower(componentName)
 	componentName = strings.TrimRight(componentName, "-")

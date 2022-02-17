@@ -28,7 +28,7 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 	log := logging.GetLogger("cluster", "reconciliation")
 	action := reconciliation.DetermineUserIndication(rctx, true)
 
-	clusterExists, err := c.clusterService.HasCluster(rctx.Ctx, rctx.ClusterDeclaration)
+	clusterExists, err := c.clusterService.HasCluster(rctx.Ctx, rctx.EnvironmentManifest)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("checking cluster existence: %w", err)
 	}
@@ -38,13 +38,13 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 		log.Debug("creating")
 
 		if !clusterExists {
-			err = c.clusterService.CreateCluster(rctx.Ctx, rctx.ClusterDeclaration)
+			err = c.clusterService.CreateCluster(rctx.Ctx, rctx.EnvironmentManifest)
 			if err != nil {
 				return reconciliation.Result{}, fmt.Errorf("creating cluster: %w", err)
 			}
 		}
 
-		err = generateKubeconfig(rctx.Ctx, rctx.Filesystem, c.clusterService, rctx.ClusterDeclaration)
+		err = generateKubeconfig(rctx.Ctx, rctx.Filesystem, c.clusterService, rctx.EnvironmentManifest)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("generating kubeconfig: %w", err)
 		}
@@ -57,7 +57,7 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 			return reconciliation.Result{Requeue: false}, nil
 		}
 
-		kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
+		kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("acquiring KubeConfig path: %w", err)
 		}
@@ -76,12 +76,12 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 			return reconciliation.Result{Requeue: true}, nil
 		}
 
-		err = c.clusterService.DeleteCluster(rctx.Ctx, rctx.ClusterDeclaration)
+		err = c.clusterService.DeleteCluster(rctx.Ctx, rctx.EnvironmentManifest)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("deleting cluster: %w", err)
 		}
 
-		clusterDir, err := config.GetAbsoluteXCTLClusterDir(rctx.ClusterDeclaration.Metadata.Name)
+		clusterDir, err := config.GetAbsoluteXCTLClusterDir(rctx.EnvironmentManifest.Metadata.Name)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("acquiring cluster directory: %w", err)
 		}
@@ -110,7 +110,7 @@ func ensureDependencies(helmClient helm.Client) (bool, error) {
 	return true, nil
 }
 
-func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.ClusterService, manifest v1alpha1.Cluster) error { //nolint:lll
+func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.ClusterService, manifest v1alpha1.Environment) error { //nolint:lll
 	rawConfig, err := provider.GetKubeConfig(ctx, manifest)
 	if err != nil {
 		return fmt.Errorf("getting kubeconfig: %w", err)
@@ -141,7 +141,7 @@ func generateKubeconfig(ctx context.Context, fs *afero.Afero, provider cloud.Clu
 
 // String returns a string representing the reconciler
 func (c *clusterReconciler) String() string {
-	return "Kubernetes Cluster"
+	return "Kubernetes Environment"
 }
 
 // NewClusterReconciler returns an initialized cluster reconciler

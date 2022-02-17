@@ -11,7 +11,7 @@ import (
 	"github.com/linode/linodego"
 )
 
-func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster) error {
+func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Environment) error {
 	cluster, err := p.client.CreateLKECluster(ctx, linodego.LKEClusterCreateOptions{
 		NodePools: []linodego.LKEClusterPoolCreateOptions{
 			{
@@ -46,7 +46,7 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Cluster)
 	return nil
 }
 
-func (p *provider) DeleteCluster(ctx context.Context, manifest v1alpha1.Cluster) error {
+func (p *provider) DeleteCluster(ctx context.Context, manifest v1alpha1.Environment) error {
 	cluster, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		switch {
@@ -72,7 +72,7 @@ func (p *provider) DeleteCluster(ctx context.Context, manifest v1alpha1.Cluster)
 	return nil
 }
 
-func (p *provider) GetCluster(ctx context.Context, manifest v1alpha1.Cluster) (cloud.Cluster, error) {
+func (p *provider) GetCluster(ctx context.Context, manifest v1alpha1.Environment) (cloud.Cluster, error) {
 	lkeCluster, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		if errorIsNotAuthenticated(err) {
@@ -106,7 +106,7 @@ func (p *provider) GetCluster(ctx context.Context, manifest v1alpha1.Cluster) (c
 	}, nil
 }
 
-func (p *provider) HasCluster(ctx context.Context, manifest v1alpha1.Cluster) (bool, error) {
+func (p *provider) HasCluster(ctx context.Context, manifest v1alpha1.Environment) (bool, error) {
 	_, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		switch {
@@ -122,7 +122,7 @@ func (p *provider) HasCluster(ctx context.Context, manifest v1alpha1.Cluster) (b
 	return true, nil
 }
 
-func (p *provider) GetKubeConfig(ctx context.Context, manifest v1alpha1.Cluster) ([]byte, error) {
+func (p *provider) GetKubeConfig(ctx context.Context, manifest v1alpha1.Environment) ([]byte, error) {
 	cluster, err := p.getCluster(ctx, manifest)
 	if err != nil {
 		if errors.Is(err, cloud.ErrNotFound) {

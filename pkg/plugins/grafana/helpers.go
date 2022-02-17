@@ -33,7 +33,7 @@ func openVaultConnection(kubectlClient kubectl.Client) (kubectl.StopFn, error) {
 	return stopFn, nil
 }
 
-func prepareClients(fs *afero.Afero, cluster v1alpha1.Cluster) (clientContainer, error) {
+func prepareClients(fs *afero.Afero, cluster v1alpha1.Environment) (clientContainer, error) {
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(cluster.Metadata.Name)
 	if err != nil {
 		return clientContainer{}, fmt.Errorf("acquiring kube config path: %w", err)

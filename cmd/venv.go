@@ -28,10 +28,10 @@ import (
 )
 
 type venvOpts struct {
-	io                     xctl.IOStreams
-	fs                     *afero.Afero
-	clusterDeclarationPath string
-	clusterManifest        v1alpha1.Cluster
+	io                         xctl.IOStreams
+	fs                         *afero.Afero
+	environmentDeclarationPath string
+	environmentManifest        v1alpha1.Environment
 }
 
 var (
@@ -46,11 +46,11 @@ var (
 	venvCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "venv",
 		Short: i18n.T("cmdVenvShortDescription"),
-		PreRunE: hooks.ClusterManifestInitializer(hooks.ClusterManifestInitializerOpts{
-			Io:              venvCmdOpts.io,
-			Fs:              venvCmdOpts.fs,
-			ClusterManifest: &venvCmdOpts.clusterManifest,
-			SourcePath:      &venvCmdOpts.clusterDeclarationPath,
+		PreRunE: hooks.EnvironmentManifestInitializer(hooks.EnvironmentManifestInitializerOpts{
+			Io:                  venvCmdOpts.io,
+			Fs:                  venvCmdOpts.fs,
+			EnvironmentManifest: &venvCmdOpts.environmentManifest,
+			SourcePath:          &venvCmdOpts.environmentDeclarationPath,
 		}),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.Background()
@@ -63,10 +63,10 @@ var (
 			}
 
 			kubeConfigPath, err := ensureKubeConfig(ensureKubeConfigOpts{
-				fs:              venvCmdOpts.fs,
-				ctx:             ctx,
-				provider:        provider,
-				clusterManifest: venvCmdOpts.clusterManifest,
+				fs:                  venvCmdOpts.fs,
+				ctx:                 ctx,
+				provider:            provider,
+				environmentManifest: venvCmdOpts.environmentManifest,
 			})
 			if err != nil {
 				return fmt.Errorf("setting up kubeconfig: %w", err)
@@ -105,7 +105,7 @@ func init() {
 	flags := venvCmd.Flags()
 
 	flags.StringVarP(
-		&venvCmdOpts.clusterDeclarationPath,
+		&venvCmdOpts.environmentDeclarationPath,
 		i18n.T("cmdFlagContextName"),
 		"c",
 		"-",
@@ -143,13 +143,13 @@ type ensureKubeConfigOpts struct {
 	fs  *afero.Afero
 	ctx context.Context
 
-	provider        cloud.ClusterService
-	clusterManifest v1alpha1.Cluster
+	provider            cloud.ClusterService
+	environmentManifest v1alpha1.Environment
 }
 
 // ensureKubeConfig fetches a kubeconfig from provider and stores it b64 decoded in workdir as config.yaml
 func ensureKubeConfig(opts ensureKubeConfigOpts) (string, error) {
-	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(opts.clusterManifest.Metadata.Name)
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(opts.environmentManifest.Metadata.Name)
 	if err != nil {
 		return "", fmt.Errorf("acquiring KubeConfig path: %w", err)
 	}
@@ -158,7 +158,7 @@ func ensureKubeConfig(opts ensureKubeConfigOpts) (string, error) {
 		return kubeConfigPath, nil
 	}
 
-	kubeConfig, err := opts.provider.GetKubeConfig(opts.ctx, opts.clusterManifest)
+	kubeConfig, err := opts.provider.GetKubeConfig(opts.ctx, opts.environmentManifest)
 	if err != nil {
 		return "", fmt.Errorf("acquiring kubeconfig: %w", err)
 	}

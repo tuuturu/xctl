@@ -49,7 +49,7 @@ func (c *Scheduler) metadata(ctx context.Context) Context {
 		Ctx:                    ctx,
 		Filesystem:             c.fs,
 		Out:                    c.out,
-		ClusterDeclaration:     c.clusterDeclaration,
+		EnvironmentManifest:    c.clusterDeclaration,
 		ApplicationDeclaration: c.applicationDeclaration,
 		Purge:                  c.purgeFlag,
 	}
@@ -82,7 +82,7 @@ type SchedulerOpts struct {
 	PurgeFlag bool
 	// ReconciliationLoopDelayFunction introduces delay to the reconciliation process
 	ReconciliationLoopDelayFunction func()
-	ClusterDeclaration              v1alpha1.Cluster
+	ClusterDeclaration              v1alpha1.Environment
 	ApplicationDeclaration          v1alpha1.Application
 	QueueStepFunc                   func(identifier string)
 }
@@ -93,7 +93,7 @@ type Scheduler struct {
 	out io.Writer
 
 	purgeFlag              bool
-	clusterDeclaration     v1alpha1.Cluster
+	clusterDeclaration     v1alpha1.Environment
 	applicationDeclaration v1alpha1.Application
 
 	reconciliationLoopDelayFunction func()

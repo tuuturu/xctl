@@ -8,6 +8,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+//nolint:funlen
 func TestInferKindFromManifest(t *testing.T) {
 	t.Parallel()
 
@@ -21,9 +22,9 @@ func TestInferKindFromManifest(t *testing.T) {
 			name: "Should successfully identify cluster",
 
 			withManifest: func() []byte {
-				manifest := Cluster{
+				manifest := Environment{
 					TypeMeta: TypeMeta{
-						Kind:       ClusterKind,
+						Kind:       EnvironmentKind,
 						APIVersion: apiVersion,
 					},
 					Metadata: Metadata{
@@ -35,7 +36,7 @@ func TestInferKindFromManifest(t *testing.T) {
 
 				return data
 			}(),
-			expectKind: ClusterKind,
+			expectKind: EnvironmentKind,
 		},
 		{
 			name: "Should successfully identify application",

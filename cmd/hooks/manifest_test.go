@@ -11,18 +11,18 @@ import (
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
 
-func TestClusterManifestInitializer(t *testing.T) {
+func TestEnvironmentManifestInitializer(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
 		name           string
 		withInput      string
-		expectManifest v1alpha1.Cluster
+		expectManifest v1alpha1.Environment
 	}{
 		{
 			name:           "Should be equal to default when empty",
 			withInput:      "",
-			expectManifest: v1alpha1.NewDefaultCluster(),
+			expectManifest: v1alpha1.NewDefaultEnvironment(),
 		},
 	}
 
@@ -33,17 +33,17 @@ func TestClusterManifestInitializer(t *testing.T) {
 			stdin := bytes.NewReader([]byte(tc.withInput))
 
 			path := "-"
-			result := v1alpha1.Cluster{}
+			result := v1alpha1.Environment{}
 
-			err := ClusterManifestInitializer(ClusterManifestInitializerOpts{
+			err := EnvironmentManifestInitializer(EnvironmentManifestInitializerOpts{
 				Io: xctl.IOStreams{
 					In:  stdin,
 					Out: io.Discard,
 					Err: io.Discard,
 				},
-				Fs:              nil,
-				ClusterManifest: &result,
-				SourcePath:      &path,
+				Fs:                  nil,
+				EnvironmentManifest: &result,
+				SourcePath:          &path,
 			})(nil, nil)
 			assert.NoError(t, err)
 

@@ -16,18 +16,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ClusterManifestInitializerOpts defines required data for loading a cluster manifest
-type ClusterManifestInitializerOpts struct {
+// EnvironmentManifestInitializerOpts defines required data for loading a cluster manifest
+type EnvironmentManifestInitializerOpts struct {
 	Io xctl.IOStreams
 	Fs *afero.Afero
 
-	ClusterManifest *v1alpha1.Cluster
+	EnvironmentManifest *v1alpha1.Environment
 
 	SourcePath *string
 }
 
-// ClusterManifestInitializer initializes a cluster manifest struct based on a filepath or stdin
-func ClusterManifestInitializer(opts ClusterManifestInitializerOpts) func(cmd *cobra.Command, args []string) error { //nolint:lll
+// EnvironmentManifestInitializer initializes a cluster manifest struct based on a filepath or stdin
+func EnvironmentManifestInitializer(opts EnvironmentManifestInitializerOpts) func(cmd *cobra.Command, args []string) error { //nolint:lll
 	return func(cmd *cobra.Command, args []string) error {
 		var (
 			source io.Reader
@@ -48,7 +48,7 @@ func ClusterManifestInitializer(opts ClusterManifestInitializerOpts) func(cmd *c
 			return fmt.Errorf("reading cluster manifest: %w", err)
 		}
 
-		defaultSource, err := manifests.ResourceAsReader(v1alpha1.NewDefaultCluster())
+		defaultSource, err := manifests.ResourceAsReader(v1alpha1.NewDefaultEnvironment())
 		if err != nil {
 			return fmt.Errorf("converting manifest to stream: %w", err)
 		}
@@ -58,12 +58,12 @@ func ClusterManifestInitializer(opts ClusterManifestInitializerOpts) func(cmd *c
 			return fmt.Errorf("buffering default source: %w", err)
 		}
 
-		err = yaml.Unmarshal(rawDefaultSource, opts.ClusterManifest)
+		err = yaml.Unmarshal(rawDefaultSource, opts.EnvironmentManifest)
 		if err != nil {
 			return fmt.Errorf("unmarshalling default manifest: %w", err)
 		}
 
-		err = yaml.Unmarshal(rawManifest, opts.ClusterManifest)
+		err = yaml.Unmarshal(rawManifest, opts.EnvironmentManifest)
 		if err != nil {
 			return fmt.Errorf("unmarshalling cluster manifest: %w", err)
 		}

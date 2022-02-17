@@ -52,7 +52,7 @@ func TestComponentNamer(t *testing.T) {
 		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
-			manifest := v1alpha1.NewDefaultCluster()
+			manifest := v1alpha1.NewDefaultEnvironment()
 			manifest.Metadata.Name = tc.withClusterName
 
 			name := componentNamer(manifest, tc.withComponentType, tc.withComponentID)

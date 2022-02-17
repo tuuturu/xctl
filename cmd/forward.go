@@ -25,10 +25,10 @@ import (
 )
 
 type forwardOpts struct {
-	io                  xctl.IOStreams
-	fs                  *afero.Afero
-	clusterManifestPath string
-	ClusterManifest     v1alpha1.Cluster
+	io                      xctl.IOStreams
+	fs                      *afero.Afero
+	environmentManifestPath string
+	EnvironmentManifest     v1alpha1.Environment
 }
 
 var (
@@ -44,11 +44,11 @@ var (
 		Use:   "forward",
 		Short: i18n.T("cmdForwardShortDescription"),
 		Args:  cobra.ExactArgs(1),
-		PreRunE: hooks.ClusterManifestInitializer(hooks.ClusterManifestInitializerOpts{
-			Io:              forwardCmdOpts.io,
-			Fs:              forwardCmdOpts.fs,
-			ClusterManifest: &forwardCmdOpts.ClusterManifest,
-			SourcePath:      &forwardCmdOpts.clusterManifestPath,
+		PreRunE: hooks.EnvironmentManifestInitializer(hooks.EnvironmentManifestInitializerOpts{
+			Io:                  forwardCmdOpts.io,
+			Fs:                  forwardCmdOpts.fs,
+			EnvironmentManifest: &forwardCmdOpts.EnvironmentManifest,
+			SourcePath:          &forwardCmdOpts.environmentManifestPath,
 		}),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			target := args[0]
@@ -74,10 +74,10 @@ var (
 			ctx := context.Background()
 
 			kubeConfigPath, err := ensureKubeConfig(ensureKubeConfigOpts{
-				fs:              forwardCmdOpts.fs,
-				ctx:             ctx,
-				provider:        provider,
-				clusterManifest: forwardCmdOpts.ClusterManifest,
+				fs:                  forwardCmdOpts.fs,
+				ctx:                 ctx,
+				provider:            provider,
+				environmentManifest: forwardCmdOpts.EnvironmentManifest,
 			})
 			if err != nil {
 				return fmt.Errorf("setting up kubeconfig: %w", err)
@@ -161,7 +161,7 @@ func init() {
 	flags := forwardCmd.Flags()
 
 	flags.StringVarP(
-		&forwardCmdOpts.clusterManifestPath,
+		&forwardCmdOpts.environmentManifestPath,
 		i18n.T("cmdFlagContextName"),
 		"c",
 		"-",

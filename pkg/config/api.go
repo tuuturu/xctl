@@ -23,7 +23,7 @@ func GetAbsoluteXCTLClusterDir(clusterName string) (string, error) {
 		return "", err
 	}
 
-	return path.Join(xctlDir, DefaultClustersDir, clusterName), nil
+	return path.Join(xctlDir, DefaultEnvironmentsDir, clusterName), nil
 }
 
 // GetAbsoluteKubeconfigPath knows where the cluster Kubeconfig file is

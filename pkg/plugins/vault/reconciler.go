@@ -17,7 +17,7 @@ import (
 func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
-	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("acquiring KubeConfig path: %w", err)
 	}
@@ -64,7 +64,7 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 }
 
 func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
-	indication := reconciliation.DetermineUserIndication(opts.rctx, opts.rctx.ClusterDeclaration.Spec.Plugins.Vault)
+	indication := reconciliation.DetermineUserIndication(opts.rctx, opts.rctx.EnvironmentManifest.Spec.Plugins.Vault)
 
 	var (
 		clusterExists    = true
@@ -72,7 +72,7 @@ func (v vaultReconciler) determineAction(opts determineActionOpts) (reconciliati
 		vaultInitialized = true
 	)
 
-	cluster, err := v.cloudProvider.GetCluster(opts.rctx.Ctx, opts.rctx.ClusterDeclaration)
+	cluster, err := v.cloudProvider.GetCluster(opts.rctx.Ctx, opts.rctx.EnvironmentManifest)
 	if err != nil {
 		if !errors.Is(err, cloud.ErrNotFound) {
 			return "", fmt.Errorf("checking cluster existence: %w", err)

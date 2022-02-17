@@ -20,7 +20,7 @@ import (
 func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
-	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("acquiring kube config path: %w", err)
 	}
@@ -62,14 +62,14 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 }
 
 func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client, plugin v1alpha1.Plugin) (reconciliation.Action, error) { //nolint:lll
-	indication := reconciliation.DetermineUserIndication(rctx, rctx.ClusterDeclaration.Spec.Plugins.Prometheus)
+	indication := reconciliation.DetermineUserIndication(rctx, rctx.EnvironmentManifest.Spec.Plugins.Prometheus)
 
 	var (
 		clusterExists   = true
 		componentExists = true
 	)
 
-	_, err := r.cloudProvider.GetCluster(rctx.Ctx, rctx.ClusterDeclaration)
+	_, err := r.cloudProvider.GetCluster(rctx.Ctx, rctx.EnvironmentManifest)
 	if err != nil {
 		if !errors.Is(err, cloud.ErrNotFound) {
 			return "", fmt.Errorf("acquiring cluster: %w", err)

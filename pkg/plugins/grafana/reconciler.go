@@ -19,7 +19,7 @@ import (
 func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
-	clients, err := prepareClients(rctx.Filesystem, rctx.ClusterDeclaration)
+	clients, err := prepareClients(rctx.Filesystem, rctx.EnvironmentManifest)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("preparing clients: %w", err)
 	}
@@ -42,7 +42,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 	case reconciliation.ActionCreate:
 		log.Debug("installing")
 
-		err = r.install(clients, rctx.ClusterDeclaration)
+		err = r.install(clients, rctx.EnvironmentManifest)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
 		}
@@ -62,7 +62,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 	return reconciliation.NoopWaitIndecisiveHandler(action)
 }
 
-func (r reconciler) install(clients clientContainer, cluster v1alpha1.Cluster) error {
+func (r reconciler) install(clients clientContainer, cluster v1alpha1.Environment) error {
 	username := uuid.New().String()
 	password := uuid.New().String()
 
@@ -108,14 +108,14 @@ func (r reconciler) uninstall(clients clientContainer) error {
 }
 
 func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client) (reconciliation.Action, error) { //nolint:lll
-	indication := reconciliation.DetermineUserIndication(rctx, rctx.ClusterDeclaration.Spec.Plugins.Grafana)
+	indication := reconciliation.DetermineUserIndication(rctx, rctx.EnvironmentManifest.Spec.Plugins.Grafana)
 
 	var (
 		clusterExists   = true
 		componentExists = true
 	)
 
-	_, err := r.cloudProvider.GetCluster(rctx.Ctx, rctx.ClusterDeclaration)
+	_, err := r.cloudProvider.GetCluster(rctx.Ctx, rctx.EnvironmentManifest)
 	if err != nil {
 		if !errors.Is(err, cloud.ErrNotFound) {
 			return "", fmt.Errorf("acquiring cluster: %w", err)

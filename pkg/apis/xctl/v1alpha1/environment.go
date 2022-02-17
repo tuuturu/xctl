@@ -1,8 +1,8 @@
 package v1alpha1
 
-const ClusterKind = "Cluster"
+const EnvironmentKind = "Environment"
 
-type ClusterSpecPlugins struct {
+type EnvironmentSpecPlugins struct {
 	CertBot                bool `json:"certBot"`
 	NginxIngressController bool `json:"nginxIngressController"`
 	Vault                  bool `json:"vault"`
@@ -10,26 +10,26 @@ type ClusterSpecPlugins struct {
 	Grafana                bool `json:"grafana"`
 }
 
-type ClusterSpec struct {
-	Domain     string             `json:"domain"`
-	AdminEmail string             `json:"adminEmail"`
-	Plugins    ClusterSpecPlugins `json:"plugins"`
+type EnvironmentSpec struct {
+	Domain     string                 `json:"domain"`
+	AdminEmail string                 `json:"adminEmail"`
+	Plugins    EnvironmentSpecPlugins `json:"plugins"`
 }
 
-type Cluster struct {
+type Environment struct {
 	TypeMeta `json:",inline"`
-	Metadata Metadata    `json:"metadata"`
-	Spec     ClusterSpec `json:"spec"`
+	Metadata Metadata        `json:"metadata"`
+	Spec     EnvironmentSpec `json:"spec"`
 }
 
-func NewDefaultCluster() Cluster {
-	return Cluster{
+func NewDefaultEnvironment() Environment {
+	return Environment{
 		TypeMeta: TypeMeta{
-			Kind:       ClusterKind,
+			Kind:       EnvironmentKind,
 			APIVersion: apiVersion,
 		},
-		Spec: ClusterSpec{
-			Plugins: ClusterSpecPlugins{
+		Spec: EnvironmentSpec{
+			Plugins: EnvironmentSpecPlugins{
 				CertBot:                true,
 				NginxIngressController: true,
 				Vault:                  true,

@@ -23,7 +23,7 @@ import (
 func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
-	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.ClusterDeclaration.Metadata.Name)
+	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("acquiring KubeConfig path: %w", err)
 	}
@@ -61,7 +61,7 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 
 		log.Debug("configuring cluster issuer")
 
-		manifest, err := manifests.ResourceAsReader(newLetsEncryptClusterIssuer(rctx.ClusterDeclaration.Spec.AdminEmail))
+		manifest, err := manifests.ResourceAsReader(newLetsEncryptClusterIssuer(rctx.EnvironmentManifest.Spec.AdminEmail))
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("creating cluster issuer: %w", err)
 		}
@@ -88,9 +88,9 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 
 func (n certbotReconciler) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
 	log := opts.Logger
-	indication := reconciliation.DetermineUserIndication(opts.Ctx, opts.Ctx.ClusterDeclaration.Spec.Plugins.CertBot)
+	indication := reconciliation.DetermineUserIndication(opts.Ctx, opts.Ctx.EnvironmentManifest.Spec.Plugins.CertBot)
 
-	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.ClusterDeclaration)
+	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.EnvironmentManifest)
 	if err != nil {
 		return reconciliation.ActionNoop, fmt.Errorf("checking cluster existence: %w", err)
 	}

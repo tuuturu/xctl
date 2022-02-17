@@ -25,8 +25,8 @@ const ( // Domain
 )
 
 const ( // Internal filesystem directories
-	// DefaultClustersDir defines the folder containing cluster directories
-	DefaultClustersDir = "clusters"
+	// DefaultEnvironmentsDir defines the folder containing environment directories
+	DefaultEnvironmentsDir = "environments"
 	// DefaultKubeconfigFilename defines the name of the kubeconfig in the internal FS
 	DefaultKubeconfigFilename = "kubeconfig.yaml"
 	// DefaultBinariesDir defines the name of the directory containing binaries

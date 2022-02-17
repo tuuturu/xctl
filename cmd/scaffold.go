@@ -21,7 +21,7 @@ var scaffoldCmd = &cobra.Command{ //nolint:gochecknoglobals
 		resource := strings.ToLower(args[0])
 
 		switch resource {
-		case strings.ToLower(v1alpha1.ClusterKind):
+		case strings.ToLower(v1alpha1.EnvironmentKind):
 			_, err := io.Copy(cmd.OutOrStdout(), environment.Scaffold())
 			if err != nil {
 				return fmt.Errorf("scaffolding cluster template: %w", err)
@@ -29,7 +29,7 @@ var scaffoldCmd = &cobra.Command{ //nolint:gochecknoglobals
 		default:
 			return fmt.Errorf("unable to recognize resource type \"%s\". Valid resource types are: %+v",
 				resource,
-				[]string{strings.ToLower(v1alpha1.ClusterKind)},
+				[]string{strings.ToLower(v1alpha1.EnvironmentKind)},
 			)
 		}
 

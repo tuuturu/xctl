@@ -1,5 +1,5 @@
 apiVersion: v1alpha1
-kind: Cluster
+kind: Environment
 
 metadata:
   # Name of the environment
