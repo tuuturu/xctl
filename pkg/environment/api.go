@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
+
+	_ "embed"
 
 	"github.com/deifyed/xctl/pkg/tools/manifests"
 
@@ -79,4 +82,11 @@ func Reconcile(opts ReconcileOpts) error {
 	fmt.Fprintf(opts.Out, "\n\nReconciliation complete\n")
 
 	return nil
+}
+
+//go:embed cluster-template.yaml
+var clusterTemplate string //nolint:gochecknoglobals
+
+func Scaffold() io.Reader {
+	return strings.NewReader(clusterTemplate)
 }

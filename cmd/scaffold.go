@@ -5,10 +5,11 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/environment"
+
 	"github.com/deifyed/xctl/pkg/tools/i18n"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/tools/scaffolding"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +22,7 @@ var scaffoldCmd = &cobra.Command{ //nolint:gochecknoglobals
 
 		switch resource {
 		case strings.ToLower(v1alpha1.ClusterKind):
-			_, err := io.Copy(cmd.OutOrStdout(), scaffolding.Cluster())
+			_, err := io.Copy(cmd.OutOrStdout(), environment.Scaffold())
 			if err != nil {
 				return fmt.Errorf("scaffolding cluster template: %w", err)
 			}
