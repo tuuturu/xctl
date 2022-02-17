@@ -2,14 +2,14 @@ apiVersion: v1alpha1
 kind: Cluster
 
 metadata:
-  # Name of the cluster
+  # Name of the environment
   name: tuuturu-prod
-  # Associate following email with the cluster
+  # Associate following email with the environment
   email: mail@tuuturu.org
 
 spec:
-  # Associate following domain with the cluster
-  rootDomain: tuuturu.org
+  # Associate following domain with the environment
+  domain: tuuturu.org
 
   #plugins:
   #  certBot: true

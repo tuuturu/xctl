@@ -11,7 +11,7 @@ type ClusterSpecPlugins struct {
 }
 
 type ClusterSpec struct {
-	RootDomain string             `json:"rootDomain"`
+	Domain     string             `json:"domain"`
 	AdminEmail string             `json:"adminEmail"`
 	Plugins    ClusterSpecPlugins `json:"plugins"`
 }

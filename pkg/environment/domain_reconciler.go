@@ -24,7 +24,7 @@ func (d *domainReconciler) Reconcile(ctx reconciliation.Context) (reconciliation
 		return reconciliation.Result{}, fmt.Errorf("determining action: %w", err)
 	}
 
-	domain := cloud.Domain{Host: fmt.Sprintf("*.%s", ctx.ClusterDeclaration.Spec.RootDomain)}
+	domain := cloud.Domain{Host: fmt.Sprintf("*.%s", ctx.ClusterDeclaration.Spec.Domain)}
 
 	switch action {
 	case reconciliation.ActionCreate:
@@ -48,7 +48,7 @@ func (d *domainReconciler) Reconcile(ctx reconciliation.Context) (reconciliation
 
 func (d *domainReconciler) determineAction(ctx reconciliation.Context, cluster cloud.Cluster) (reconciliation.Action, error) { //nolint:lll
 	userIndication := reconciliation.DetermineUserIndication(ctx, true)
-	domain := cloud.Domain{Host: ctx.ClusterDeclaration.Spec.RootDomain}
+	domain := cloud.Domain{Host: ctx.ClusterDeclaration.Spec.Domain}
 
 	hasPrimaryDomain, err := d.domainService.HasPrimaryDomain(ctx.Ctx, domain)
 	if err != nil {

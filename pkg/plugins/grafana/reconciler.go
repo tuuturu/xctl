@@ -75,7 +75,7 @@ func (r reconciler) install(clients clientContainer, cluster v1alpha1.Cluster) e
 	}
 
 	grafanaPlugin, err := NewPlugin(NewPluginOpts{
-		Host:          fmt.Sprintf("grafana.%s", cluster.Spec.RootDomain),
+		Host:          fmt.Sprintf("grafana.%s", cluster.Spec.Domain),
 		AdminUsername: username,
 		AdminPassword: password,
 	})
