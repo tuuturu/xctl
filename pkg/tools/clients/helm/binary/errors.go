@@ -12,6 +12,8 @@ func errorHelper(err error, defaultErr error) error {
 		return helm.ErrUnreachable
 	case isConnectionTimedOut(err):
 		return helm.ErrTimeout
+	case isAlreadyExists(err):
+		return helm.ErrAlreadyExists
 	default:
 		return defaultErr
 	}

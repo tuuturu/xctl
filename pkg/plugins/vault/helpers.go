@@ -2,8 +2,11 @@ package vault
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/url"
+
+	"github.com/deifyed/xctl/pkg/tools/clients/helm"
 
 	"github.com/deifyed/xctl/pkg/tools/secrets"
 	"github.com/deifyed/xctl/pkg/tools/secrets/kubernetes"
@@ -27,7 +30,9 @@ func installVault(clients clientContainer) error {
 
 	err := clients.helm.Install(plugin)
 	if err != nil {
-		return fmt.Errorf("installing Helm chart: %w", err)
+		if !errors.Is(err, helm.ErrAlreadyExists) {
+			return fmt.Errorf("installing Helm chart: %w", err)
+		}
 	}
 
 	log.Debug("port forwarding vault container")
