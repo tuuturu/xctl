@@ -19,7 +19,7 @@ func errorHelper(err error, defaultErr error) error {
 	}
 }
 
-var reUnreachableErr = regexp.MustCompile(`.*EOF: Kubernetes cluster unreachable.*`)
+var reUnreachableErr = regexp.MustCompile(`.*Kubernetes cluster unreachable.*`)
 
 func isUnreachable(err error) bool {
 	return reUnreachableErr.MatchString(err.Error())
