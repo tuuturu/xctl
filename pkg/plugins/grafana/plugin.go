@@ -19,7 +19,7 @@ func NewPlugin(opts NewPluginOpts) (v1alpha1.Plugin, error) {
 
 	// URL: https://artifacthub.io/packages/helm/grafana/grafana
 	plugin.Spec.Helm.Chart = "grafana"
-	plugin.Spec.Helm.Version = "6.21.2"
+	plugin.Spec.Helm.Version = "6.21.8"
 
 	plugin.Spec.Helm.Repository.Name = "grafana"
 	plugin.Spec.Helm.Repository.URL = "https://grafana.github.io/helm-charts"
