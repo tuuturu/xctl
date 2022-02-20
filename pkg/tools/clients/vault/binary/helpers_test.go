@@ -2,12 +2,33 @@ package binary
 
 import (
 	"bytes"
+	"path"
 	"testing"
+
+	"github.com/deifyed/xctl/pkg/config"
+	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/tools/clients/vault"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestDownloadBinary(t *testing.T) {
+	t.Skipf("skipping due to actual download. should be ran after bumping and/or in CI")
+	t.Parallel()
+
+	fs := &afero.Afero{Fs: afero.NewMemMapFs()}
+
+	actualPath, err := getVaultPath(fs)
+	assert.NoError(t, err)
+
+	binariesDir, err := config.GetAbsoluteBinariesDir()
+	assert.NoError(t, err)
+
+	expectedPath := path.Join(binariesDir, "vault", version, "vault")
+
+	assert.Equal(t, expectedPath, actualPath)
+}
 
 func TestParsing(t *testing.T) {
 	t.Parallel()
