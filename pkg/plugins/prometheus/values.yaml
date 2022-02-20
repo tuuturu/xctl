@@ -1,5 +1,3 @@
-## Chart: https://artifacthub.io/packages/helm/prometheus-community/prometheus/15.1.3
-
 rbac:
   create: true
 
