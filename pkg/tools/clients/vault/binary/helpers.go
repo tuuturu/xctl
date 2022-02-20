@@ -26,8 +26,8 @@ func getVaultPath(fs *afero.Afero) (string, error) {
 		Version:     version,
 		Fs:          fs,
 		BinariesDir: binariesDir,
-		URL:         fmt.Sprintf("https://github.com/hashicorp/vault/archive/refs/tags/v%s.tar.gz", version),
-		UnpackingFn: []binaries.UnpackingFn{binaries.GzipUnpacker, binaries.GenerateTarUnpacker("vault")},
+		URL:         fmt.Sprintf("https://releases.hashicorp.com/vault/%s/vault_%s_linux_amd64.zip", version, version),
+		UnpackingFn: []binaries.UnpackingFn{binaries.GenerateZipUnpacker("vault")},
 	})
 	if err != nil {
 		return "", fmt.Errorf("downloading and checking checksum: %w", err)
