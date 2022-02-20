@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os/exec"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/deifyed/xctl/pkg/tools/clients/vault"
 
@@ -77,4 +80,29 @@ func attributesAsArray(m map[string]string) []string {
 	}
 
 	return result
+}
+
+func (c *client) runVaultCommand(args ...string) (io.Reader, error) {
+	cmd := exec.Command(c.vaultPath, args...) //nolint:gosec
+
+	stderr := bytes.Buffer{}
+	stdout := bytes.Buffer{}
+
+	cmd.Env = c.envAsArray()
+	cmd.Stderr = &stderr
+	cmd.Stdout = &stdout
+
+	err := cmd.Run()
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"stdout": stdout.String(),
+			"stderr": stderr.String(),
+		}).Debug("executing command")
+
+		err = fmt.Errorf("%s: %w", stderr.String(), err)
+
+		return nil, errorHandler(err, fmt.Errorf("executing command: %w", err))
+	}
+
+	return &stdout, nil
 }

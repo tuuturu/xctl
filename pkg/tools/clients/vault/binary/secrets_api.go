@@ -1,99 +1,53 @@
 package binary
 
 import (
-	"bytes"
 	"fmt"
-	"os/exec"
+	"io"
 	"strings"
-
-	"github.com/sirupsen/logrus"
 )
 
 func (c *client) Put(name string, secretAttributes map[string]string) error {
-	cmd := exec.Command(c.vaultPath, //nolint:gosec
+	_, err := c.runVaultCommand(
 		"kv",
 		"put",
 		fmt.Sprintf("secret/%s", name),
 		strings.Join(attributesAsArray(secretAttributes), " "),
 	)
-
-	stderr := bytes.Buffer{}
-	stdout := bytes.Buffer{}
-
-	cmd.Env = c.envAsArray()
-	cmd.Stderr = &stderr
-	cmd.Stdout = &stdout
-
-	err := cmd.Run()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"stdout": stdout.String(),
-			"stderr": stderr.String(),
-		}).Debug("executing command")
-
-		err = fmt.Errorf("%s: %w", stderr.String(), err)
-
-		return errorHandler(err, fmt.Errorf("executing command: %w", err))
+		return fmt.Errorf("running command: %w", err)
 	}
 
 	return nil
 }
 
 func (c *client) Get(name string, key string) (string, error) {
-	cmd := exec.Command(c.vaultPath, //nolint:gosec
+	result, err := c.runVaultCommand(
 		"kv",
 		"get",
 		"-field", key,
 		fmt.Sprintf("secret/%s", name),
 	)
-
-	stderr := bytes.Buffer{}
-	stdout := bytes.Buffer{}
-
-	cmd.Env = c.envAsArray()
-	cmd.Stderr = &stderr
-	cmd.Stdout = &stdout
-
-	err := cmd.Run()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"stdout": stdout.String(),
-			"stderr": stderr.String(),
-		}).Debug("executing command")
-
-		err = fmt.Errorf("%s: %w", stderr.String(), err)
-
-		return "", errorHandler(err, fmt.Errorf("executing command: %w", err))
+		return "", fmt.Errorf("running command: %w", err)
 	}
 
-	return stdout.String(), nil
+	buf, err := io.ReadAll(result)
+	if err != nil {
+		return "", fmt.Errorf("buffering: %w", err)
+	}
+
+	return string(buf), nil
 }
 
 func (c *client) Delete(name string) error {
-	cmd := exec.Command(c.vaultPath, //nolint:gosec
+	_, err := c.runVaultCommand(
 		"kv",
 		"metadata",
 		"delete",
 		fmt.Sprintf("secret/%s", name),
 	)
-
-	stderr := bytes.Buffer{}
-	stdout := bytes.Buffer{}
-
-	cmd.Env = c.envAsArray()
-	cmd.Stderr = &stderr
-	cmd.Stdout = &stdout
-
-	err := cmd.Run()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"stdout": stdout.String(),
-			"stderr": stderr.String(),
-		}).Debug("executing command")
-
-		err = fmt.Errorf("%s: %w", stderr.String(), err)
-
-		return errorHandler(err, fmt.Errorf("executing command: %w", err))
+		return fmt.Errorf("running command: %w", err)
 	}
 
 	return nil
