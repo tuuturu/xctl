@@ -7,19 +7,18 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/plugins/grafana"
+
 	"github.com/deifyed/xctl/pkg/tools/i18n"
 
 	"github.com/deifyed/xctl/cmd/hooks"
+	"github.com/deifyed/xctl/pkg/plugins/vault"
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
-	vaultClient "github.com/deifyed/xctl/pkg/tools/clients/vault"
-
-	"github.com/deifyed/xctl/pkg/plugins/vault"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud/linode"
-	"github.com/deifyed/xctl/pkg/plugins/grafana"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -57,9 +56,9 @@ var (
 
 			switch target {
 			case "grafana":
-				portForwardOpts = getGrafanaForwardOpts()
+				portForwardOpts = grafana.PortForwardOpts()
 			case "vault":
-				portForwardOpts = getVaultForwardOpts()
+				portForwardOpts = vault.PortForwardOpts()
 			default:
 				return fmt.Errorf("service %s not found", target)
 			}
@@ -124,37 +123,6 @@ var (
 		},
 	}
 )
-
-const (
-	grafanaPort      = 80
-	grafanaLocalPort = 8000
-)
-
-func getGrafanaForwardOpts() kubectl.PortForwardOpts {
-	plugin, _ := grafana.NewPlugin(grafana.NewPluginOpts{})
-
-	return kubectl.PortForwardOpts{
-		Service: kubectl.Service{
-			Name:      plugin.Metadata.Name,
-			Namespace: plugin.Metadata.Namespace,
-		},
-		ServicePort: grafanaPort,
-		LocalPort:   grafanaLocalPort,
-	}
-}
-
-func getVaultForwardOpts() kubectl.PortForwardOpts {
-	plugin := vault.NewVaultPlugin()
-
-	return kubectl.PortForwardOpts{
-		Service: kubectl.Service{
-			Name:      plugin.Metadata.Name,
-			Namespace: plugin.Metadata.Namespace,
-		},
-		ServicePort: vaultClient.DefaultPort,
-		LocalPort:   vaultClient.DefaultPort,
-	}
-}
 
 //nolint:gochecknoinits
 func init() {

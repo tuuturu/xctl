@@ -27,3 +27,5 @@ type clientContainer struct {
 	vault   vault.Client
 	helm    helm.Client
 }
+
+const port = 8200

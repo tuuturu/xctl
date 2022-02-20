@@ -27,3 +27,8 @@ type clientContainer struct {
 	helm    helm.Client
 	secrets secrets.Client
 }
+
+const (
+	grafanaPort      = 80
+	grafanaLocalPort = 8000
+)

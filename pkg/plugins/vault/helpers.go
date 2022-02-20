@@ -37,14 +37,7 @@ func installVault(clients clientContainer) error {
 
 	log.Debug("port forwarding vault container")
 
-	stopFn, err := clients.kubectl.PortForward(kubectl.PortForwardOpts{
-		Service: kubectl.Service{
-			Name:      plugin.Metadata.Name,
-			Namespace: plugin.Metadata.Namespace,
-		},
-		ServicePort: vault.DefaultPort,
-		LocalPort:   vault.DefaultPort,
-	})
+	stopFn, err := clients.kubectl.PortForward(PortForwardOpts())
 	if err != nil {
 		return fmt.Errorf("forwarding vault port: %w", err)
 	}

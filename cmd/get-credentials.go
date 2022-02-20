@@ -11,9 +11,7 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/secrets"
 
 	"github.com/deifyed/xctl/cmd/hooks"
-	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
-	"github.com/deifyed/xctl/pkg/tools/clients/vault"
 	vaultBinary "github.com/deifyed/xctl/pkg/tools/clients/vault/binary"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl"
@@ -74,16 +72,7 @@ var (
 				return fmt.Errorf("acquiring Kubernetes client: %w", err)
 			}
 
-			vaultPlugin := vaultPlugin.NewVaultPlugin()
-
-			stopFn, err := kubectlClient.PortForward(kubectl.PortForwardOpts{
-				Service: kubectl.Service{
-					Name:      vaultPlugin.Metadata.Name,
-					Namespace: vaultPlugin.Metadata.Namespace,
-				},
-				ServicePort: vault.DefaultPort,
-				LocalPort:   vault.DefaultPort,
-			})
+			stopFn, err := kubectlClient.PortForward(vaultPlugin.PortForwardOpts())
 			if err != nil {
 				return fmt.Errorf("forwarding vault: %w", err)
 			}

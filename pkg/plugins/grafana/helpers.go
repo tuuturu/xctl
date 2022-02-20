@@ -6,7 +6,6 @@ import (
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
-	vaultClient "github.com/deifyed/xctl/pkg/tools/clients/vault"
 	vaultBinary "github.com/deifyed/xctl/pkg/tools/clients/vault/binary"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -16,16 +15,7 @@ import (
 )
 
 func openVaultConnection(kubectlClient kubectl.Client) (kubectl.StopFn, error) {
-	vaultPlugin := vault.NewVaultPlugin()
-
-	stopFn, err := kubectlClient.PortForward(kubectl.PortForwardOpts{
-		Service: kubectl.Service{
-			Name:      vaultPlugin.Metadata.Name,
-			Namespace: vaultPlugin.Metadata.Namespace,
-		},
-		ServicePort: vaultClient.DefaultPort,
-		LocalPort:   vaultClient.DefaultPort,
-	})
+	stopFn, err := kubectlClient.PortForward(vault.PortForwardOpts())
 	if err != nil {
 		return nil, fmt.Errorf("setting up vault port forward: %w", err)
 	}
