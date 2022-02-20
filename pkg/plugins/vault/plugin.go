@@ -8,7 +8,7 @@ import (
 
 const vaultPluginName = "vault"
 
-func NewVaultPlugin() v1alpha1.Plugin {
+func NewPlugin() v1alpha1.Plugin {
 	plugin := v1alpha1.NewPlugin(vaultPluginName)
 
 	plugin.Metadata.Name = vaultPluginName

@@ -26,7 +26,7 @@ func installVault(clients clientContainer) error {
 
 	log.Debug("installing Helm chart")
 
-	plugin := NewVaultPlugin()
+	plugin := NewPlugin()
 
 	err := clients.helm.Install(plugin)
 	if err != nil {

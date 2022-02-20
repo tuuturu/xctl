@@ -27,7 +27,7 @@ func (v vaultReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.
 		return reconciliation.Result{}, fmt.Errorf("preparing clients: %w", err)
 	}
 
-	plugin := NewVaultPlugin()
+	plugin := NewPlugin()
 
 	action, err := v.determineAction(determineActionOpts{
 		rctx:       rctx,
