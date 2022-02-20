@@ -2,14 +2,13 @@ package ingress
 
 import "github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 
-const nginxIngressControllerPluginName = "ingress-nginx"
-
 func NewNginxIngressControllerPlugin() v1alpha1.Plugin {
 	plugin := v1alpha1.NewPlugin(nginxIngressControllerPluginName)
 
 	plugin.Metadata.Name = nginxIngressControllerPluginName
 	plugin.Metadata.Namespace = "kube-system"
 
+	// URL: https://github.com/kubernetes/ingress-nginx/
 	plugin.Spec.Helm.Chart = "ingress-nginx"
 	plugin.Spec.Helm.Version = "4.0.13"
 
@@ -18,3 +17,5 @@ func NewNginxIngressControllerPlugin() v1alpha1.Plugin {
 
 	return plugin
 }
+
+const nginxIngressControllerPluginName = "ingress-nginx"
