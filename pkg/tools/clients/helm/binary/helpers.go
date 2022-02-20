@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	// URL: https://github.com/helm/helm/releases
 	version = "3.8.0"
 	hash    = "8408c91e846c5b9ba15eb6b1a5a79fc22dd4d33ac6ea63388e5698d1b2320c8b"
 )
