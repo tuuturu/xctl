@@ -1,7 +1,7 @@
 package binary
 
 type kubeConfig struct {
-	CurrentContext string              `json:"current_context"`
+	CurrentContext string              `json:"current-context"`
 	Users          []kubeConfigUsers   `json:"users"`
 	Contexts       []kubeConfigContext `json:"contexts"`
 }
