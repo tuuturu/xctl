@@ -70,6 +70,7 @@ func Reconcile(opts ReconcileOpts) error {
 
 	_, err = scheduler.Run(context.Background())
 	if err != nil {
+		spin.FinalMSG = "❌"
 		spin.Stop()
 
 		return fmt.Errorf("scheduling: %w", err)
