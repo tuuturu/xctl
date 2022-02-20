@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	version = "1.21.0"
-	hash    = "aeca0018958c1cae0bf2f36f566315e52f87bdab38b440df349cd091e9f13f36"
+	version = "1.23.0"
+	hash    = "3f0398d4c8a5ff633e09abd0764ed3b9091fafbe3044970108794b02731c72d6"
 )
 
 func getKubectlPath(fs *afero.Afero) (string, error) {
