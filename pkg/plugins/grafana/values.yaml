@@ -1,8 +1,6 @@
-# https://artifacthub.io/packages/helm/grafana/grafana
 ## TODO:
 ## - Enable ingress and add TLS info :189
 ## - Set admin user / pass :332
-
 
 rbac:
   create: true

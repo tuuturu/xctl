@@ -17,6 +17,7 @@ func NewPlugin(opts NewPluginOpts) (v1alpha1.Plugin, error) {
 	plugin.Metadata.Name = pluginName
 	plugin.Metadata.Namespace = "kube-system"
 
+	// URL: https://artifacthub.io/packages/helm/grafana/grafana
 	plugin.Spec.Helm.Chart = "grafana"
 	plugin.Spec.Helm.Version = "6.21.2"
 
