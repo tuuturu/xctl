@@ -12,7 +12,7 @@ import (
 func (k kubectlBinaryClient) GetUserToken() (io.Reader, error) {
 	var kubeConfig kubeConfig
 
-	rawKubeConfig, err := os.ReadFile(k.kubectlPath)
+	rawKubeConfig, err := os.ReadFile(k.env[kubeConfigPathKey])
 	if err != nil {
 		return nil, fmt.Errorf("reading: %w", err)
 	}
