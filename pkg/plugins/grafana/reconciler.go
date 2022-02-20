@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 
 	"github.com/deifyed/xctl/pkg/tools/clients/helm"
@@ -33,7 +35,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		_ = stopFn()
 	}()
 
-	action, err := r.determineAction(rctx, clients.helm)
+	action, err := r.determineAction(rctx, clients.helm, clients.kubectl)
 	if err != nil {
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
@@ -107,12 +109,14 @@ func (r reconciler) uninstall(clients clientContainer) error {
 	return nil
 }
 
-func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client) (reconciliation.Action, error) { //nolint:lll
+//nolint:funlen
+func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client, kubectlClient kubectl.Client) (reconciliation.Action, error) { //nolint:lll
 	indication := reconciliation.DetermineUserIndication(rctx, rctx.EnvironmentManifest.Spec.Plugins.Grafana)
 
 	var (
 		clusterExists   = true
 		componentExists = true
+		vaultReady      = true
 	)
 
 	_, err := r.cloudProvider.GetCluster(rctx.Ctx, rctx.EnvironmentManifest)
@@ -134,6 +138,18 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 		if err != nil {
 			return "", fmt.Errorf("checking component existence: %w", err)
 		}
+
+		vaultReady, err = kubectlClient.PodReady(kubectl.Pod{
+			Name:      "vault-0",
+			Namespace: "kube-system",
+		})
+		if err != nil {
+			if !errors.Is(err, kubectl.ErrNotFound) {
+				return "", fmt.Errorf("checking vault ready status: %w", err)
+			}
+
+			vaultReady = false
+		}
 	}
 
 	switch indication {
@@ -144,6 +160,10 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 
 		if componentExists {
 			return reconciliation.ActionNoop, nil
+		}
+
+		if !vaultReady {
+			return reconciliation.ActionWait, nil
 		}
 
 		return reconciliation.ActionCreate, nil
