@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-const version = "1.8.4"
+const version = "1.9.3"
 
 func getVaultPath(fs *afero.Afero) (string, error) {
 	binariesDir, err := config.GetAbsoluteBinariesDir()
