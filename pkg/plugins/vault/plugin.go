@@ -15,7 +15,7 @@ func NewVaultPlugin() v1alpha1.Plugin {
 	plugin.Metadata.Namespace = "kube-system"
 
 	plugin.Spec.Helm.Chart = "vault"
-	plugin.Spec.Helm.Version = "0.17.1"
+	plugin.Spec.Helm.Version = "0.19.0"
 	plugin.Spec.Helm.Values = vaultValuesTemplate
 
 	plugin.Spec.Helm.Repository.Name = "hashicorp"
