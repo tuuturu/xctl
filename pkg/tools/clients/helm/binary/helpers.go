@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	version = "3.7.0"
-	hash    = "096e30f54c3ccdabe30a8093f8e128dba76bb67af697b85db6ed0453a2701bf9"
+	version = "3.8.0"
+	hash    = "8408c91e846c5b9ba15eb6b1a5a79fc22dd4d33ac6ea63388e5698d1b2320c8b"
 )
 
 func getHelmPath(fs *afero.Afero) (string, error) {
