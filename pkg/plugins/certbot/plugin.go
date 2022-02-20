@@ -12,6 +12,7 @@ func newCertbotPlugin() v1alpha1.Plugin {
 	plugin.Metadata.Name = certbotPluginName
 	plugin.Metadata.Namespace = "kube-system"
 
+	// URL: https://artifacthub.io/packages/helm/cert-manager/cert-manager/1.7.1
 	plugin.Spec.Helm.Chart = "cert-manager"
 	plugin.Spec.Helm.Version = "1.6.1"
 	plugin.Spec.Helm.Values = valuesTemplate
