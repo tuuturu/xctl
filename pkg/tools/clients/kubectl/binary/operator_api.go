@@ -1,10 +1,10 @@
 package binary
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"sigs.k8s.io/yaml"
 )
@@ -32,5 +32,5 @@ func (k kubectlBinaryClient) GetUserToken() (io.Reader, error) {
 		return nil, fmt.Errorf("getting current user: %w", err)
 	}
 
-	return bytes.NewReader([]byte(user.Token)), nil
+	return strings.NewReader(user.Token), nil
 }
