@@ -34,10 +34,10 @@ func Reconcile(opts ReconcileOpts) error {
 	}
 
 	var spinnerOut io.Writer
-	if opts.Debug {
-		spinnerOut = io.Discard
-	} else {
+	if logging.GetLevel() == logging.LevelInfo {
 		spinnerOut = opts.Out
+	} else {
+		spinnerOut = io.Discard
 	}
 
 	spin := spinner.NewSpinner(spinnerOut)

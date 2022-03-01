@@ -21,7 +21,6 @@ type ApplyRunEOpts struct {
 	Io         xctl.IOStreams
 	File       string
 	Purge      bool
-	Debug      bool
 }
 
 func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
@@ -63,7 +62,6 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 				Provider:   provider,
 				Manifest:   manifestSource,
 				Purge:      opts.Purge,
-				Debug:      opts.Debug,
 			})
 		case v1alpha1.ApplicationKind:
 			fmt.Fprintf(opts.Io.Out, "Applying application manifest %s, please wait\n\n", opts.File)
@@ -73,7 +71,6 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 				Filesystem: opts.Filesystem,
 				Manifest:   manifestSource,
 				Purge:      opts.Purge,
-				Debug:      opts.Debug,
 			})
 		default:
 			return fmt.Errorf("unknown kind %s", kind)

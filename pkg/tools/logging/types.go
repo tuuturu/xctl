@@ -16,6 +16,8 @@ type Logger interface {
 
 type Level string
 
+const LevelInfo = "info"
+
 type loggerOpts struct {
 	Out   io.Writer
 	Level Level

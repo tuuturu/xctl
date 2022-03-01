@@ -45,10 +45,3 @@ func GetAbsoluteBinariesDir() (string, error) {
 
 	return path.Join(xctlDir, DefaultBinariesDir), nil
 }
-
-// IsDebugMode returns a boolean representing if xctl is running is debug mode or not
-func IsDebugMode() bool {
-	debugMode := os.Getenv("XCTL_DEBUG")
-
-	return debugMode == "true"
-}

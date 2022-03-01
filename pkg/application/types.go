@@ -15,5 +15,4 @@ type ReconcileOpts struct {
 	Provider   cloud.Provider
 	Manifest   io.Reader
 	Purge      bool
-	Debug      bool
 }

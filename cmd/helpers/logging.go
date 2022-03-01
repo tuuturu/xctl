@@ -3,11 +3,20 @@ package helpers
 import (
 	"os"
 
+	"github.com/deifyed/xctl/pkg/tools/logging"
+
 	"github.com/sirupsen/logrus"
 )
 
 func InitializeLogging() {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetOutput(os.Stdout)
+	level := os.Getenv("XCTL_LOG_LEVEL")
+
+	if level == "" {
+		level = "info"
+	}
+
+	logging.SetLevel(level)
+	logging.SetOut(os.Stdout)
+
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 }

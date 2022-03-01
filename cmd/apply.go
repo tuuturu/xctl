@@ -8,8 +8,6 @@ import (
 	"github.com/deifyed/xctl/cmd/handlers"
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 
-	"github.com/deifyed/xctl/pkg/config"
-
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -23,7 +21,6 @@ var (
 		},
 		Filesystem: &afero.Afero{Fs: afero.NewOsFs()},
 		Purge:      false,
-		Debug:      config.IsDebugMode(),
 	}
 	applyCmd = &cobra.Command{ //nolint:gochecknoglobals
 		Use:   "apply",
