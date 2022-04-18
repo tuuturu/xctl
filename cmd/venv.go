@@ -8,6 +8,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/deifyed/xctl/cmd/helpers"
+
 	"github.com/deifyed/xctl/pkg/tools/i18n"
 
 	"github.com/deifyed/xctl/cmd/hooks"
@@ -102,15 +104,7 @@ var (
 
 //nolint:gochecknoinits
 func init() {
-	flags := venvCmd.Flags()
-
-	flags.StringVarP(
-		&venvCmdOpts.environmentDeclarationPath,
-		i18n.T("cmdFlagContextName"),
-		"c",
-		"-",
-		i18n.T("cmdFlagContextUsage"),
-	)
+	helpers.AddEnvironmentContextFlag(venvCmd.Flags(), &venvCmdOpts.environmentDeclarationPath)
 
 	rootCmd.AddCommand(venvCmd)
 }

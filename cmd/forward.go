@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/deifyed/xctl/cmd/helpers"
+
 	"github.com/deifyed/xctl/pkg/plugins/grafana"
 
 	"github.com/deifyed/xctl/pkg/tools/i18n"
@@ -126,15 +128,7 @@ var (
 
 //nolint:gochecknoinits
 func init() {
-	flags := forwardCmd.Flags()
-
-	flags.StringVarP(
-		&forwardCmdOpts.environmentManifestPath,
-		i18n.T("cmdFlagContextName"),
-		"c",
-		"-",
-		i18n.T("cmdFlagContextUsage"),
-	)
+	helpers.AddEnvironmentContextFlag(forwardCmd.Flags(), &forwardCmdOpts.environmentManifestPath)
 
 	rootCmd.AddCommand(forwardCmd)
 }

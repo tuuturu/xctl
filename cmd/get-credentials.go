@@ -6,6 +6,8 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/deifyed/xctl/cmd/helpers"
+
 	"github.com/deifyed/xctl/pkg/tools/i18n"
 
 	"github.com/deifyed/xctl/pkg/tools/secrets"
@@ -137,15 +139,7 @@ const getCredentialsTemplate = `
 
 //nolint:gochecknoinits
 func init() {
-	flags := getCredentialsCmd.Flags()
-
-	flags.StringVarP(
-		&getCredentialsCmdOpts.environmentManifestPath,
-		i18n.T("cmdFlagContextName"),
-		"c",
-		"-",
-		i18n.T("cmdFlagContextUsage"),
-	)
+	helpers.AddEnvironmentContextFlag(getCredentialsCmd.Flags(), &getCredentialsCmdOpts.environmentManifestPath)
 
 	getCmd.AddCommand(getCredentialsCmd)
 }
