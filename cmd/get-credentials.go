@@ -5,11 +5,13 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/deifyed/xctl/pkg/config"
+	"github.com/deifyed/xctl/pkg/plugins/grafana"
+	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
+
 	"github.com/deifyed/xctl/cmd/helpers"
 
 	"github.com/deifyed/xctl/pkg/tools/i18n"
-
-	"github.com/deifyed/xctl/pkg/tools/secrets"
 
 	"github.com/deifyed/xctl/cmd/hooks"
 
@@ -55,24 +57,19 @@ var (
 				return fmt.Errorf("authenticating with cloud provider: %w", err)
 			}
 
-			var secretsClient secrets.Client
-
-			username, err := secretsClient.Get("grafana", "adminUsername")
+			kubeconfigPath, err := config.GetAbsoluteKubeconfigPath(getCredentialsCmdOpts.environmentManifest.Metadata.Name)
 			if err != nil {
-				return fmt.Errorf("retrieving username: %w", err)
+				return fmt.Errorf("acquiring kubeconfig path: %w", err)
 			}
 
-			if username == "" {
-				username = "N/A"
-			}
-
-			password, err := secretsClient.Get("grafana", "adminPassword")
+			kubectlClient, err := kubectlBinary.New(getCredentialsCmdOpts.fs, kubeconfigPath)
 			if err != nil {
-				return fmt.Errorf("retrieving password: %w", err)
+				return fmt.Errorf("acquiring kubectl client: %w", err)
 			}
 
-			if password == "" {
-				password = "N/A"
+			credentials, err := grafana.Credentials(kubectlClient)
+			if err != nil {
+				return fmt.Errorf("acquiring Grafana credentials: %w", err)
 			}
 
 			t, err := template.New("credentials").Parse(getCredentialsTemplate)

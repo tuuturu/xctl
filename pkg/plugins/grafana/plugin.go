@@ -9,13 +9,16 @@ import (
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
 
-const pluginName = "grafana"
+const (
+	pluginName      = "grafana"
+	pluginNamespace = "kube-system"
+)
 
 func NewPlugin(opts NewPluginOpts) (v1alpha1.Plugin, error) {
 	plugin := v1alpha1.NewPlugin(pluginName)
 
 	plugin.Metadata.Name = pluginName
-	plugin.Metadata.Namespace = "kube-system"
+	plugin.Metadata.Namespace = pluginNamespace
 
 	// URL: https://artifacthub.io/packages/helm/grafana/grafana
 	plugin.Spec.Helm.Chart = "grafana"

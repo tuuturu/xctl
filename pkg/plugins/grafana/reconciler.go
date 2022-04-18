@@ -59,7 +59,7 @@ func (r reconciler) install(clients clientContainer, cluster v1alpha1.Environmen
 	username := uuid.New().String()
 	password := uuid.New().String()
 
-	err := clients.secrets.Put("grafana", map[string]string{
+	err := clients.secrets.Put(secretName(), map[string]string{
 		"adminUsername": username,
 		"adminPassword": password,
 	}) //nolint:godox    // TODO: Injecting into template is not ok

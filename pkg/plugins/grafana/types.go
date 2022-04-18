@@ -32,3 +32,9 @@ const (
 	grafanaPort      = 80
 	grafanaLocalPort = 8000
 )
+
+// CredentialsContainer contains information required to access Grafana
+type CredentialsContainer struct {
+	Username string
+	Password string
+}

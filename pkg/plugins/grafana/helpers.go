@@ -32,3 +32,7 @@ func prepareClients(fs *afero.Afero, cluster v1alpha1.Environment) (clientContai
 		helm:    helmClient,
 	}, nil
 }
+
+func secretName() string {
+	return fmt.Sprintf("xctl-%s", pluginName)
+}
