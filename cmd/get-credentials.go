@@ -16,6 +16,7 @@ import (
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud/linode"
+	"github.com/logrusorgru/aurora/v3"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -85,8 +86,8 @@ var (
 				Password    string
 			}{
 				ServiceName: target,
-				Username:    username,
-				Password:    password,
+				Username:    fmt.Sprint(aurora.Green(credentials.Username)),
+				Password:    fmt.Sprint(aurora.Green(credentials.Password)),
 			})
 			if err != nil {
 				return fmt.Errorf("printing credentials: %w", err)

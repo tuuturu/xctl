@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
+
+	"github.com/logrusorgru/aurora/v3"
 
 	"github.com/deifyed/xctl/cmd/helpers"
 
@@ -92,9 +95,9 @@ var (
 			}
 
 			_, _ = fmt.Fprintf(forwardCmdOpts.io.Out,
-				"Serving %s at http://localhost:%d\n",
-				target,
-				portForwardOpts.LocalPort,
+				"Serving %s at %s\n",
+				aurora.Green(strings.Title(target)),
+				aurora.Green(fmt.Sprintf("http://localhost:%d", portForwardOpts.LocalPort)),
 			)
 
 			var (
