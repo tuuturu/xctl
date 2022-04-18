@@ -459,7 +459,7 @@ datasources:
     datasources:
     - name: Prometheus
       type: prometheus
-      url: http://prometheus.kube-system
+      url: http://prometheus-server.kube-system
       access: proxy
       isDefault: true
 
