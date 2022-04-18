@@ -5,7 +5,6 @@ const EnvironmentKind = "Environment"
 type EnvironmentSpecPlugins struct {
 	CertBot                bool `json:"certBot"`
 	NginxIngressController bool `json:"nginxIngressController"`
-	Vault                  bool `json:"vault"`
 	Prometheus             bool `json:"prometheus"`
 	Grafana                bool `json:"grafana"`
 	Loki                   bool `json:"loki"`
@@ -33,7 +32,6 @@ func NewDefaultEnvironment() Environment {
 			Plugins: EnvironmentSpecPlugins{
 				CertBot:                true,
 				NginxIngressController: true,
-				Vault:                  true,
 				Prometheus:             true,
 				Grafana:                true,
 				Loki:                   true,
