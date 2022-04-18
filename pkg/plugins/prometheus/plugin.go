@@ -12,9 +12,9 @@ func NewPlugin() v1alpha1.Plugin {
 	plugin.Metadata.Name = pluginName
 	plugin.Metadata.Namespace = "kube-system"
 
-	// URL: https://artifacthub.io/packages/helm/prometheus-community/prometheus/15.1.3
+	// URL: https://artifacthub.io/packages/helm/prometheus-community/prometheus
 	plugin.Spec.Helm.Chart = "prometheus"
-	plugin.Spec.Helm.Version = "15.3.0"
+	plugin.Spec.Helm.Version = "15.8.4"
 	plugin.Spec.Helm.Values = template
 
 	plugin.Spec.Helm.Repository.Name = "prometheus-community"

@@ -10,7 +10,7 @@ func NewNginxIngressControllerPlugin() v1alpha1.Plugin {
 
 	// URL: https://github.com/kubernetes/ingress-nginx/
 	plugin.Spec.Helm.Chart = "ingress-nginx"
-	plugin.Spec.Helm.Version = "4.0.17"
+	plugin.Spec.Helm.Version = "4.0.19"
 
 	plugin.Spec.Helm.Repository.Name = "ingress-nginx"
 	plugin.Spec.Helm.Repository.URL = "https://kubernetes.github.io/ingress-nginx"
