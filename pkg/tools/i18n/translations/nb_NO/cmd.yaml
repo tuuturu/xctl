@@ -2,7 +2,7 @@
 
 ## Common flags
 cmdFlagContextName: context
-cmdFlagContextUsage: cluster declaration representing context of the operation
+cmdFlagContextUsage: environment manifest representing context of the operation
 
 ## Root command
 cmdRootShortDecsription: xctl provisions a known and complete production environment
