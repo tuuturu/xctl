@@ -107,7 +107,7 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 	var (
 		clusterExists   = true
 		componentExists = true
-		vaultReady      = true
+		ready           = true
 	)
 
 	_, err := r.cloudProvider.GetCluster(rctx.Ctx, rctx.EnvironmentManifest)
@@ -130,16 +130,16 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 			return "", fmt.Errorf("checking component existence: %w", err)
 		}
 
-		vaultReady, err = kubectlClient.PodReady(kubectl.Pod{
-			Name:      "vault-0",
-			Namespace: "kube-system",
+		ready, err = kubectlClient.PodReady(kubectl.Pod{
+			Name:      pluginName,
+			Namespace: pluginNamespace,
 		})
 		if err != nil {
 			if !errors.Is(err, kubectl.ErrNotFound) {
-				return "", fmt.Errorf("checking vault ready status: %w", err)
+				return "", fmt.Errorf("checking ready status: %w", err)
 			}
 
-			vaultReady = false
+			ready = false
 		}
 	}
 
@@ -153,7 +153,7 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 			return reconciliation.ActionNoop, nil
 		}
 
-		if !vaultReady {
+		if componentExists && !ready {
 			return reconciliation.ActionWait, nil
 		}
 
