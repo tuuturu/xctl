@@ -15,8 +15,6 @@ import (
 	"github.com/deifyed/xctl/pkg/plugins/prometheus"
 
 	"github.com/deifyed/xctl/pkg/plugins/certbot"
-	"github.com/deifyed/xctl/pkg/plugins/vault"
-
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -61,7 +59,6 @@ func Reconcile(opts ReconcileOpts) error {
 		ingress.NewReconciler(opts.Provider),
 		NewDomainReconciler(opts.Provider),
 		certbot.NewReconciler(opts.Provider),
-		vault.NewReconciler(opts.Provider),
 		prometheus.NewReconciler(opts.Provider),
 		grafana.NewReconciler(opts.Provider),
 	)

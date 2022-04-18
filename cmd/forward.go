@@ -14,7 +14,6 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/i18n"
 
 	"github.com/deifyed/xctl/cmd/hooks"
-	"github.com/deifyed/xctl/pkg/plugins/vault"
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
 
@@ -59,8 +58,6 @@ var (
 			switch target {
 			case "grafana":
 				portForwardOpts = grafana.PortForwardOpts()
-			case "vault":
-				portForwardOpts = vault.PortForwardOpts()
 			default:
 				return fmt.Errorf("service %s not found", target)
 			}

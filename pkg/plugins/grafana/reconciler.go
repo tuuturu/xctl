@@ -26,15 +26,6 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		return reconciliation.Result{}, fmt.Errorf("preparing clients: %w", err)
 	}
 
-	stopFn, err := openVaultConnection(clients.kubectl)
-	if err != nil {
-		return reconciliation.Result{}, fmt.Errorf("opening vault connection: %w", err)
-	}
-
-	defer func() {
-		_ = stopFn()
-	}()
-
 	action, err := r.determineAction(rctx, clients.helm, clients.kubectl)
 	if err != nil {
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)

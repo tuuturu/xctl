@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"text/template"
@@ -13,13 +12,10 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/secrets"
 
 	"github.com/deifyed/xctl/cmd/hooks"
-	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
-	vaultBinary "github.com/deifyed/xctl/pkg/tools/clients/vault/binary"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl"
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud/linode"
-	vaultPlugin "github.com/deifyed/xctl/pkg/plugins/vault"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -34,9 +30,10 @@ var (
 		fs: &afero.Afero{Fs: afero.NewOsFs()},
 	}
 	getCredentialsCmd = &cobra.Command{ //nolint:gochecknoglobals
-		Use:   "credentials",
-		Short: i18n.T("cmdGetCredentialsShortDescription"),
-		Args:  cobra.ExactArgs(1),
+		Use:    "credentials",
+		Short:  i18n.T("cmdGetCredentialsShortDescription"),
+		Args:   cobra.ExactArgs(1),
+		Hidden: true,
 		PreRunE: hooks.EnvironmentManifestInitializer(hooks.EnvironmentManifestInitializerOpts{
 			Io:                  getCredentialsCmdOpts.io,
 			Fs:                  getCredentialsCmdOpts.fs,
@@ -57,38 +54,7 @@ var (
 				return fmt.Errorf("authenticating with cloud provider: %w", err)
 			}
 
-			ctx := context.Background()
-
-			kubeConfigPath, err := ensureKubeConfig(ensureKubeConfigOpts{
-				fs:                  getCredentialsCmdOpts.fs,
-				ctx:                 ctx,
-				provider:            provider,
-				environmentManifest: getCredentialsCmdOpts.environmentManifest,
-			})
-			if err != nil {
-				return fmt.Errorf("setting up kubeconfig: %w", err)
-			}
-
-			kubectlClient, err := kubectlBinary.New(forwardCmdOpts.fs, kubeConfigPath)
-			if err != nil {
-				return fmt.Errorf("acquiring Kubernetes client: %w", err)
-			}
-
-			stopFn, err := kubectlClient.PortForward(vaultPlugin.PortForwardOpts())
-			if err != nil {
-				return fmt.Errorf("forwarding vault: %w", err)
-			}
-
-			defer func() {
-				_ = stopFn()
-			}()
-
 			var secretsClient secrets.Client
-
-			secretsClient, err = vaultBinary.New(getCredentialsCmdOpts.fs)
-			if err != nil {
-				return fmt.Errorf("preparing vault binary: %w", err)
-			}
 
 			username, err := secretsClient.Get("grafana", "adminUsername")
 			if err != nil {

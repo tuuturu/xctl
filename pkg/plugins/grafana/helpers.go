@@ -4,24 +4,12 @@ import (
 	"fmt"
 
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
-	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
-	vaultBinary "github.com/deifyed/xctl/pkg/tools/clients/vault/binary"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/config"
-	"github.com/deifyed/xctl/pkg/plugins/vault"
 	"github.com/spf13/afero"
 )
-
-func openVaultConnection(kubectlClient kubectl.Client) (kubectl.StopFn, error) {
-	stopFn, err := kubectlClient.PortForward(vault.PortForwardOpts())
-	if err != nil {
-		return nil, fmt.Errorf("setting up vault port forward: %w", err)
-	}
-
-	return stopFn, nil
-}
 
 func prepareClients(fs *afero.Afero, cluster v1alpha1.Environment) (clientContainer, error) {
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(cluster.Metadata.Name)
@@ -39,14 +27,8 @@ func prepareClients(fs *afero.Afero, cluster v1alpha1.Environment) (clientContai
 		return clientContainer{}, fmt.Errorf("acquiring Helm client: %w", err)
 	}
 
-	vc, err := vaultBinary.New(fs)
-	if err != nil {
-		return clientContainer{}, fmt.Errorf("acquiring Vault client: %w", err)
-	}
-
 	return clientContainer{
 		kubectl: kubectlClient,
 		helm:    helmClient,
-		secrets: vc,
 	}, nil
 }
