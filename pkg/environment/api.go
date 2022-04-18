@@ -6,6 +6,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/plugins/loki"
+
 	_ "embed"
 
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
@@ -61,6 +63,7 @@ func Reconcile(opts ReconcileOpts) error {
 		certbot.NewReconciler(opts.Provider),
 		prometheus.NewReconciler(opts.Provider),
 		grafana.NewReconciler(opts.Provider),
+		loki.NewReconciler(opts.Provider),
 	)
 
 	spin.Start()

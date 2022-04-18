@@ -8,6 +8,7 @@ type EnvironmentSpecPlugins struct {
 	Vault                  bool `json:"vault"`
 	Prometheus             bool `json:"prometheus"`
 	Grafana                bool `json:"grafana"`
+	Loki                   bool `json:"loki"`
 }
 
 type EnvironmentSpec struct {
@@ -35,6 +36,7 @@ func NewDefaultEnvironment() Environment {
 				Vault:                  true,
 				Prometheus:             true,
 				Grafana:                true,
+				Loki:                   true,
 			},
 		},
 	}
