@@ -2,7 +2,6 @@ package kubernetes
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
 	"io"
 
@@ -19,11 +18,7 @@ func (c client) Put(name string, secrets map[string]string) error {
 	encoded := make(map[string][]byte)
 
 	for key, value := range secrets {
-		result := make([]byte, base64.StdEncoding.EncodedLen(len(value)))
-
-		base64.StdEncoding.Encode(result, []byte(value))
-
-		encoded[key] = result
+		encoded[key] = []byte(value)
 	}
 
 	secret := v1.Secret{
@@ -75,17 +70,19 @@ func (c client) Get(name string, key string) (string, error) {
 			continue
 		}
 
-		result := make([]byte, base64.StdEncoding.DecodedLen(len(value)))
-
-		_, err = base64.StdEncoding.Decode(result, value)
-		if err != nil {
-			return "", fmt.Errorf("decoding base64: %w", err)
-		}
-
-		return string(result), nil
+		return string(value), nil
 	}
 
 	return "", fmt.Errorf("key %s not found", key)
+}
+
+func (c client) Delete(name string) error {
+	err := c.kubernetesClient.Delete(c.namespace, secretKind, name)
+	if err != nil {
+		return fmt.Errorf("deleting: %w", err)
+	}
+
+	return nil
 }
 
 func New(kubernetesClient kubectl.Client, namespace string) secrets.Client {

@@ -8,7 +8,7 @@ import (
 )
 
 func PortForwardOpts() kubectl.PortForwardOpts {
-	plugin, _ := NewPlugin(NewPluginOpts{})
+	plugin := NewPlugin()
 
 	return kubectl.PortForwardOpts{
 		Service: kubectl.Service{
@@ -23,12 +23,12 @@ func PortForwardOpts() kubectl.PortForwardOpts {
 func Credentials(client kubectl.Client) (CredentialsContainer, error) {
 	secretClient := kubernetes.New(client, pluginNamespace)
 
-	username, err := secretClient.Get(secretName(), "adminUsername")
+	username, err := secretClient.Get(secretName(), adminUsernameKey)
 	if err != nil {
 		return CredentialsContainer{}, fmt.Errorf("retrieving username: %w", err)
 	}
 
-	password, err := secretClient.Get(secretName(), "adminPassword")
+	password, err := secretClient.Get(secretName(), adminPasswordKey)
 	if err != nil {
 		return CredentialsContainer{}, fmt.Errorf("retrieving password: %w", err)
 	}

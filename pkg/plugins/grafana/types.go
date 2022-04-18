@@ -13,13 +13,13 @@ type reconciler struct {
 	cloudProvider cloud.Provider
 }
 
-type NewPluginOpts struct {
-	// Host defines the hostname Grafana should be available at
-	Host string
-	// AdminUsername defines the username of the admin user
-	AdminUsername string
-	// AdminPassword defines the password of the admin user
-	AdminPassword string
+type valuesOpts struct {
+	// SecretName defines the name of the secret of where to store plugin secrets
+	SecretName string
+	// SecretUsernameKey defines the key where the admin username is available
+	SecretUsernameKey string
+	// SecretPasswordKey defines the key where the admin password is available
+	SecretPasswordKey string
 }
 
 type clientContainer struct {
@@ -28,13 +28,15 @@ type clientContainer struct {
 	secrets secrets.Client
 }
 
-const (
-	grafanaPort      = 80
-	grafanaLocalPort = 8000
-)
-
 // CredentialsContainer contains information required to access Grafana
 type CredentialsContainer struct {
 	Username string
 	Password string
 }
+
+const (
+	grafanaPort      = 80
+	grafanaLocalPort = 8000
+	adminUsernameKey = "admin-user"
+	adminPasswordKey = "admin-password"
+)

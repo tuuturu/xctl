@@ -3,7 +3,6 @@ package grafana
 import (
 	"bytes"
 	_ "embed"
-	"fmt"
 	"text/template"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -14,7 +13,7 @@ const (
 	pluginNamespace = "kube-system"
 )
 
-func NewPlugin(opts NewPluginOpts) (v1alpha1.Plugin, error) {
+func NewPlugin() v1alpha1.Plugin {
 	plugin := v1alpha1.NewPlugin(pluginName)
 
 	plugin.Metadata.Name = pluginName
@@ -27,30 +26,26 @@ func NewPlugin(opts NewPluginOpts) (v1alpha1.Plugin, error) {
 	plugin.Spec.Helm.Repository.Name = "grafana"
 	plugin.Spec.Helm.Repository.URL = "https://grafana.github.io/helm-charts"
 
-	values, err := generateValues(opts)
-	if err != nil {
-		return v1alpha1.Plugin{}, fmt.Errorf("generating values: %w", err)
-	}
+	plugin.Spec.Helm.Values = generateValues(valuesOpts{
+		SecretName:        secretName(),
+		SecretUsernameKey: adminUsernameKey,
+		SecretPasswordKey: adminPasswordKey,
+	})
 
-	plugin.Spec.Helm.Values = values
-
-	return plugin, nil
+	return plugin
 }
 
-func generateValues(opts NewPluginOpts) (string, error) {
-	t, err := template.New("values").Parse(rawValues)
-	if err != nil {
-		return "", fmt.Errorf("parsing raw values: %w", err)
-	}
+func generateValues(opts valuesOpts) string {
+	t := template.Must(template.New("values").Parse(rawValues))
 
 	buf := bytes.Buffer{}
 
-	err = t.Execute(&buf, opts)
+	err := t.Execute(&buf, opts)
 	if err != nil {
-		return "", fmt.Errorf("injecting variables: %w", err)
+		panic(err)
 	}
 
-	return buf.String(), nil
+	return buf.String()
 }
 
 //go:embed values.yaml
