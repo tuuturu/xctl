@@ -3,6 +3,7 @@ package grafana
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 
@@ -174,7 +175,7 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 }
 
 func (r reconciler) String() string {
-	return "Grafana"
+	return strings.Title(pluginName)
 }
 
 func NewReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {
