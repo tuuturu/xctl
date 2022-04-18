@@ -3,6 +3,8 @@ package grafana
 import (
 	"fmt"
 
+	"github.com/deifyed/xctl/pkg/tools/secrets/kubernetes"
+
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
 
@@ -27,9 +29,12 @@ func prepareClients(fs *afero.Afero, cluster v1alpha1.Environment) (clientContai
 		return clientContainer{}, fmt.Errorf("acquiring Helm client: %w", err)
 	}
 
+	secretsClient := kubernetes.New(kubectlClient, pluginNamespace)
+
 	return clientContainer{
 		kubectl: kubectlClient,
 		helm:    helmClient,
+		secrets: secretsClient,
 	}, nil
 }
 
