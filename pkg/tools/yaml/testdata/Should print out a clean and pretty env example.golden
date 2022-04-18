@@ -1,0 +1,10 @@
+apiVersion: v1alpha1
+kind: Environment
+
+metadata:
+  name: tuuturu-prod
+  email: mail@tuuturu.org
+
+spec:
+  domain: tuuturu.org
+

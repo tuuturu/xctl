@@ -1,0 +1,20 @@
+apiVersion: v1alpha1
+kind: Environment
+
+metadata:
+  # Name of the environment
+  name: tuuturu-prod
+  # Associate following email with the environment
+  email: mail@tuuturu.org
+
+spec:
+  # Associate following domain with the environment
+  domain: tuuturu.org
+
+  #plugins:
+  #  certBot: true
+  #  grafana: true
+  #  nginxIngressController: true
+  #  prometheus: true
+  #  vault: true
+  #
