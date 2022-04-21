@@ -14,7 +14,7 @@ func NewPlugin() v1alpha1.Plugin {
 
 	// URL: https://artifacthub.io/packages/helm/prometheus-community/prometheus
 	plugin.Spec.Helm.Chart = "prometheus"
-	plugin.Spec.Helm.Version = "15.8.4"
+	plugin.Spec.Helm.Version = "15.8.5"
 	plugin.Spec.Helm.Values = template
 
 	plugin.Spec.Helm.Repository.Name = "prometheus-community"
