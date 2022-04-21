@@ -3,7 +3,10 @@ package prometheus
 import (
 	"errors"
 	"fmt"
+	"strings"
 
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 
 	"github.com/deifyed/xctl/pkg/tools/clients/helm"
@@ -30,6 +33,11 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		return reconciliation.Result{}, fmt.Errorf("acquiring Helm client: %w", err)
 	}
 
+	kubectlClient, err := kubectlBinary.New(rctx.Filesystem, kubeConfigPath)
+	if err != nil {
+		return reconciliation.Result{}, fmt.Errorf("acquiring Kubectl client: %w", err)
+	}
+
 	plugin := NewPlugin()
 
 	action, err := r.determineAction(rctx, helmClient, plugin)
@@ -46,6 +54,11 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 			return reconciliation.Result{}, fmt.Errorf("running helm install: %w", err)
 		}
 
+		err = handleManifests(kubectlClient.Apply, plugin.Spec.Manifests)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("applying manifest: %w", err)
+		}
+
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
 		log.Debug("deleting")
@@ -53,6 +66,11 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		err = helmClient.Delete(plugin)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("running helm delete: %w", err)
+		}
+
+		err = handleManifests(kubectlClient.Delete, plugin.Spec.Manifests)
+		if err != nil && !errors.Is(err, kubectl.ErrNotFound) {
+			return reconciliation.Result{}, fmt.Errorf("deleting manifest: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
@@ -112,7 +130,7 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 }
 
 func (r reconciler) String() string {
-	return "Prometheus"
+	return strings.Title(pluginName)
 }
 
 func NewReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {

@@ -20,10 +20,14 @@ func NewPlugin() v1alpha1.Plugin {
 	plugin.Spec.Helm.Repository.Name = "prometheus-community"
 	plugin.Spec.Helm.Repository.URL = "https://prometheus-community.github.io/helm-charts"
 
+	plugin.Spec.Manifests = []string{datasourceConfigMapTemplate}
+
 	return plugin
 }
 
 //go:embed values.yaml
 var template string //nolint:gochecknoglobals
+//go:embed datasource.yaml
+var datasourceConfigMapTemplate string
 
 const pluginName = "prometheus"

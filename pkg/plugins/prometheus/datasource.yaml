@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: xctl-datasource-prometheus
+  labels:
+    grafana_datasource: "1"
+
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.kube-system
+      access: proxy
+      isDefault: true
