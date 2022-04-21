@@ -1,7 +1,3 @@
-## TODO:
-## - Enable ingress and add TLS info :189
-## - Set admin user / pass :332
-
 rbac:
   create: true
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
@@ -447,21 +443,21 @@ extraVolumeMounts: []
 ## Pass the plugins you want installed as a list.
 ##
 plugins: []
-  # - digrich-bubblechart-panel
+# - digrich-bubblechart-panel
 # - grafana-clock-panel
 
 ## Configure grafana datasources
 ## ref: http://docs.grafana.org/administration/provisioning/#datasources
 ##
-datasources:
-  datasources.yaml:
-    apiVersion: 1
-    datasources:
-    - name: Prometheus
-      type: prometheus
-      url: http://prometheus-server.kube-system
-      access: proxy
-      isDefault: true
+datasources: {}
+#  datasources.yaml:
+#    apiVersion: 1
+#    datasources:
+#    - name: Prometheus
+#      type: prometheus
+#      url: http://prometheus-server.kube-system
+#      access: proxy
+#      isDefault: true
 
 ## Configure notifiers
 ## ref: http://docs.grafana.org/administration/provisioning/#alert-notification-channels
@@ -612,7 +608,7 @@ smtp:
 sidecar:
   image:
     repository: quay.io/kiwigrid/k8s-sidecar
-    tag: 1.15.1
+    #tag: 1.15.1
     sha: ""
   imagePullPolicy: IfNotPresent
   resources:
@@ -669,7 +665,7 @@ sidecar:
     # Additional dashboard sidecar volume mounts
     extraMounts: []
   datasources:
-    enabled: false
+    enabled: true
     # label that the configmaps with datasources are marked with
     label: grafana_datasource
     # value of label that the configmaps with datasources are set to
