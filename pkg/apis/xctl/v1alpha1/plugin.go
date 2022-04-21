@@ -15,6 +15,8 @@ type PluginSpec struct {
 	Helm PluginSpecHelm `json:"helm"`
 	// Secrets requests secrets from a path in the secret manager and populates a secret named after the plugin
 	Secrets map[string]string `json:"secrets"`
+	// Manifests contains manifests to apply to the cluster
+	Manifests PluginSpecManifests `json:"manifests"`
 }
 
 // PluginSpecHelmRepository contains information about a Helm repository
@@ -34,6 +36,8 @@ type PluginSpecHelm struct {
 	// Version defines the chart version
 	Version string
 }
+
+type PluginSpecManifests []string
 
 // NewPlugin initializes a plugin
 func NewPlugin(name string) Plugin {
