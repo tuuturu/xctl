@@ -24,10 +24,12 @@ type Poder interface {
 type Resourcer interface {
 	// Apply applies a manifest to the contextual cluster
 	Apply(manifest io.Reader) error
+	// Delete removes a manifest from teh contextual cluster
+	Delete(manifest io.Reader) error
 	// Get retrieves a named resource of a certain type from a specific namespace
 	Get(namespace string, resourceType string, name string) (io.Reader, error)
-	// Delete removes a named resource of a certain kind from a specific namespace
-	Delete(namespace string, kind string, name string) error
+	// DeleteResource removes a named resource of a certain kind from a specific namespace
+	DeleteResource(namespace string, kind string, name string) error
 }
 
 type Operator interface {
