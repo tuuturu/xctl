@@ -19,7 +19,7 @@ func NewPlugin() v1alpha1.Plugin {
 
 	// URL: https://artifacthub.io/packages/helm/grafana/loki
 	plugin.Spec.Helm.Chart = "loki"
-	plugin.Spec.Helm.Version = "2.11.0"
+	plugin.Spec.Helm.Version = "2.11.1"
 
 	plugin.Spec.Helm.Repository.Name = "grafana"
 	plugin.Spec.Helm.Repository.URL = "https://grafana.github.io/helm-charts"
