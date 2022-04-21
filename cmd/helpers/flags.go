@@ -1,9 +1,10 @@
 package helpers
 
 import (
+	"os"
+
 	"github.com/deifyed/xctl/pkg/tools/i18n"
 	"github.com/spf13/pflag"
-	"os"
 )
 
 // AddEnvironmentContextFlag ensures consistency between all commands requiring an environment context flag (-c)
