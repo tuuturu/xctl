@@ -25,9 +25,14 @@ func NewPlugin() v1alpha1.Plugin {
 	plugin.Spec.Helm.Repository.URL = "https://grafana.github.io/helm-charts"
 
 	plugin.Spec.Helm.Values = rawValues
+	plugin.Spec.Manifests = []string{rawDatasourcesCM}
 
 	return plugin
 }
 
-//go:embed values.yaml
-var rawValues string //nolint:gochecknoglobals
+var (
+	//go:embed values.yaml
+	rawValues string //nolint:gochecknoglobals
+	//go:embed datasource.yaml
+	rawDatasourcesCM string //nolint:gochecknoglobals
+)

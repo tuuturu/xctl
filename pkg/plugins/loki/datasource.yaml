@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: xctl-datasource-loki
+  labels:
+    grafana_datasource: "1"
+
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    - name: Loki
+      type: loki
+      url: http://loki.kube-system:3100
+      access: proxy

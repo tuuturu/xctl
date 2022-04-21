@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
+	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
+
 	"github.com/deifyed/xctl/pkg/config"
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 
@@ -30,6 +33,11 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		return reconciliation.Result{}, fmt.Errorf("preparing helm client: %w", err)
 	}
 
+	kubectlClient, err := kubectlBinary.New(rctx.Filesystem, kubeconfigPath)
+	if err != nil {
+		return reconciliation.Result{}, fmt.Errorf("acquiring Kubectl client: %w", err)
+	}
+
 	action, err := r.determineAction(rctx, helmClient)
 	if err != nil {
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
@@ -46,6 +54,11 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
 		}
 
+		err = handleManifests(kubectlClient.Apply, plugin.Spec.Manifests)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("applying manifest: %w", err)
+		}
+
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
 		log.Debug("deleting")
@@ -53,6 +66,11 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		err = helmClient.Delete(plugin)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("uninstalling: %w", err)
+		}
+
+		err = handleManifests(kubectlClient.Delete, plugin.Spec.Manifests)
+		if err != nil && !errors.Is(err, kubectl.ErrNotFound) {
+			return reconciliation.Result{}, fmt.Errorf("deleting manifest: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
