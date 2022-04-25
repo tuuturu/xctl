@@ -10,6 +10,15 @@ To be the quickest way to provision a complete and familiar infrastructure for y
 
 - [x] Linode
 
+## Installation
+
+I have yet to distribute a binary since it's still pretty early in the product life cycle. To install it, you need to
+install `Go 1.17`. After you've installed Go, run the following commands in the repository root directory:
+
+`make build && make install`
+
+This will install `xctl` into your `~/.local/bin/` folder. Add this folder to your path to use `xctl`.
+
 ## Usage
 
 ### Authenticate
@@ -44,11 +53,12 @@ After a committing and pushing the changes done by `xctl`, ArgoCD should soon sp
   - [x] Nginx Ingress Controller for routing traffic
   - [x] Certbot for your TLS needs
 - [ ] Secrets
-  - [x] Vault as the secret manager
+  - [ ] Vault as the secret manager
   - [ ] External Secrets for accessing secrets
-- [ ] Monitoring
-    - [ ] Prometheus for scraping metrics
-    - [ ] Promtail for scraping container logs
-    - [ ] Grafana for visualizing logs and metrics
+- [x] Monitoring
+  - [x] Grafana for visualizing logs and metrics
+  - [x] Prometheus for scraping metrics
+  - [x] Loki for collecting logs and making them queryable
+  - [x] Promtail for scraping container logs
 - [ ] CI/CD
-    - [ ] ArgoCD for continuous deployment
+  - [ ] ArgoCD for continuous deployment

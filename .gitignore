@@ -1,5 +1,6 @@
 debug/
 .idea/
 .kube/
+build/
 
 .env
