@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 
 	"github.com/deifyed/xctl/cmd/helpers"
@@ -147,6 +148,8 @@ func ensureKubeConfig(opts ensureKubeConfigOpts) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("acquiring KubeConfig path: %w", err)
 	}
+
+	kubeConfigPath = path.Join(path.Dir(kubeConfigPath), "kubeconfig-venv.yaml")
 
 	if _, err := os.Stat(kubeConfigPath); err == nil {
 		return kubeConfigPath, nil
