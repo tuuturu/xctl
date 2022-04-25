@@ -8,6 +8,7 @@ type EnvironmentSpecPlugins struct {
 	Prometheus             bool `json:"prometheus"`
 	Grafana                bool `json:"grafana"`
 	Loki                   bool `json:"loki"`
+	Promtail               bool `json:"promtail"`
 }
 
 type EnvironmentSpec struct {
@@ -35,6 +36,7 @@ func NewDefaultEnvironment() Environment {
 				Prometheus:             true,
 				Grafana:                true,
 				Loki:                   true,
+				Promtail:               true,
 			},
 		},
 	}

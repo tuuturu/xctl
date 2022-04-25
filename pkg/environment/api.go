@@ -6,6 +6,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/plugins/promtail"
+
 	"github.com/deifyed/xctl/pkg/plugins/loki"
 
 	_ "embed"
@@ -64,6 +66,7 @@ func Reconcile(opts ReconcileOpts) error {
 		prometheus.NewReconciler(opts.Provider),
 		grafana.NewReconciler(opts.Provider),
 		loki.NewReconciler(opts.Provider),
+		promtail.NewReconciler(opts.Provider),
 	)
 
 	spin.Start()
