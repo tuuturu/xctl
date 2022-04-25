@@ -3,6 +3,7 @@ kind: ConfigMap
 
 metadata:
   name: xctl-datasource-prometheus
+  namespace: kube-system
   labels:
     grafana_datasource: "1"
 
