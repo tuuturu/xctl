@@ -24,6 +24,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build frontend
+        working-directory: docs/frontend
         run: mkdocs build
 
       - name: GitHub Pages
