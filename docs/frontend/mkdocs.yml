@@ -9,6 +9,7 @@ edit_uri: null
 
 nav:
   - 'Getting started':
+      - 'Install XCTL': getting-started/installation.md
       - 'Create an environment': getting-started/apply-environment.md
       - 'Deploy an application': getting-started/apply-application.md
       - 'Delete an application': getting-started/delete-application.md
