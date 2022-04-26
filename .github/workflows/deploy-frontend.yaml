@@ -3,7 +3,8 @@ name: Deploy frontend
 on:
   push:
     branches: [main]
-
+    paths:
+      - docs/frontend
   workflow_dispatch:
 
 jobs:
@@ -34,3 +35,5 @@ jobs:
           # Build directory to deploy
           build_dir: docs/frontend/site
           fqdn: ''# optional
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
