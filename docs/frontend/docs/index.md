@@ -2,6 +2,8 @@
 
 XCTL is a tool that leverages [CNCF technology](https://www.cncf.io/) to bootstrap a production grade environment.
 
+⚠ Warning: This software is not ready for actual production usage ⚠
+
 ```shell
 xctl apply -f - << EOF
 apiVersion: v1alpha1
