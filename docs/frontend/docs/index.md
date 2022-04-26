@@ -23,8 +23,8 @@ will result in the following resources:
 * [Kubernetes](https://kubernetes.io/) for resource orchestration
 * [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) for routing
 * [CertManager](https://cert-manager.io/) configured with [Let's encrypt](https://letsencrypt.org/) for TLS
-* [Grafana](https://grafana.com/oss/grafana/), [Prometheus](https://grafana.com/oss/prometheus/)
-  , [Loki](https://grafana.com/oss/loki/) and [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/) for
+* [Grafana](https://grafana.com/oss/grafana/), [Prometheus](https://grafana.com/oss/prometheus/),
+  [Loki](https://grafana.com/oss/loki/) and [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/) for
   monitoring
 * [ArgoCD](https://argoproj.github.io/cd/) for continuous deployment (TBA)
 

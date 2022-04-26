@@ -5,11 +5,11 @@ site_author: Julius Pedersen
 
 theme: material
 repo_url: https://github.com/tuuturu/xctl
-edit_uri: null
+edit_uri: edit/main/docs/frontend/docs/
 
 nav:
   - 'Getting started':
-      - 'Install XCTL': getting-started/installation.md
+      - 'Setup': getting-started/preparation.md
       - 'Create an environment': getting-started/apply-environment.md
       - 'Deploy an application': getting-started/apply-application.md
       - 'Delete an application': getting-started/delete-application.md
