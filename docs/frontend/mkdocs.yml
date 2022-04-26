@@ -5,6 +5,7 @@ site_author: Julius Pedersen
 
 theme: material
 repo_url: https://github.com/tuuturu/xctl
+edit_uri: null
 
 nav:
   - 'Getting started':
