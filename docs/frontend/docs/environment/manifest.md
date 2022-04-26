@@ -1,10 +1,6 @@
 # Environment manifest
 
-<style>
-span.required {
-    color: red;
-}
-</style>
+Below is a list of all configuration attributes for an environment manifest.
 
 ## `apiVersion` <span class="required">required</span>
 
@@ -77,3 +73,9 @@ span.required {
 | Type    | Default | Description                          |
 |---------|---------|--------------------------------------|
 | boolean | true    | Scrapes logs and pushes them to Loki |
+
+<style>
+span.required {
+    color: red;
+}
+</style>

@@ -1,12 +1,3 @@
-<style>
-div.buttons {
-    width: 100%;
-    display: flex;
-
-    justify-content: center;
-}
-</style>
-
 # Xctl - A tool for managing a Kubernetes based infrastructure
 
 XCTL is a tool that leverages [CNCF technology](https://www.cncf.io/) to bootstrap a production grade environment.
@@ -38,3 +29,13 @@ will result in the following resources:
 <div class="buttons">
     <a class="md-button" href="/getting-started/apply-environment/">Get started</a>
 </div>
+
+<style>
+div.buttons {
+    width: 100%;
+    display: flex;
+
+    justify-content: center;
+}
+</style>
+
