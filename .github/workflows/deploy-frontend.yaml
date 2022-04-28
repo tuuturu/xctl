@@ -34,6 +34,6 @@ jobs:
         with:
           # Build directory to deploy
           build_dir: docs/frontend/site
-          fqdn: ''# optional
+          fqdn: 'xctl.tuuturu.org'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
