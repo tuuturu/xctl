@@ -4,7 +4,14 @@ const ApplicationKind = "Application"
 
 type Application struct {
 	TypeMeta `json:",inline"`
-	Metadata Metadata `json:"metadata"`
+	Metadata Metadata        `json:"metadata"`
+	Spec     ApplicationSpec `json:"spec"`
+}
+
+type ApplicationSpec struct {
+	Image string `json:"image"`
+	Port  string `json:"port"`
+	Url   string `json:"url"`
 }
 
 func NewApplication() Application {
@@ -12,6 +19,10 @@ func NewApplication() Application {
 		TypeMeta: TypeMeta{
 			Kind:       ApplicationKind,
 			APIVersion: apiVersion,
+		},
+		Metadata: Metadata{
+			Name:      "",
+			Namespace: "",
 		},
 	}
 }
