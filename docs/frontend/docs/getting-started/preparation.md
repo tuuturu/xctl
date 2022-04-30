@@ -20,7 +20,8 @@ make install
 
 This will install `xctl` into your `~/.local/bin` folder.
 
-⚠ Remember to add `~/.local/bin` to your path by adding `PATH=$PATH:~/.local/bin` to your `~/.bashrc` equivalent.
+!!! note
+    Remember to add `~/.local/bin` to your path by adding `export PATH=$PATH:~/.local/bin` to your `~/.bashrc` equivalent.
 
 To modify where the script installs `xctl`, use `INSTALL_DIR=<new directory>`. For example:
 
@@ -28,7 +29,11 @@ To modify where the script installs `xctl`, use `INSTALL_DIR=<new directory>`. F
 INSTALL_DIR=~/.local/binaries make install
 ```
 
-That should be it. `xctl` should now be available when running `xctl --help`.
+That should be it. `xctl` should now be available. Test by running a command. For example:
+
+```shell
+xctl --version
+```
 
 ## Authentication
 
