@@ -1,18 +1,49 @@
+# Configuration template: https://github.com/Andre601/mkdocs-template/blob/master/mkdocs.yml
+
 site_name: XCTL
 site_url: https://xctl.tuuturu.org
 site_description: A tool for managing a Kubernetes and CNCF based infrastructure
 site_author: Julius Pedersen
 
-theme: material
+theme:
+  name: material
+  highlightjs: true
+  features:
+    - header.hide
+    - search.highlight
+    - navigation.expand
+    - navigation.top
+    - toc.integrate
+  icon:
+    repo: fontawesome/brands/github
+  hljs_languages:
+    - yaml
+    - bash
+
 repo_url: https://github.com/tuuturu/xctl
 edit_uri: edit/main/docs/frontend/docs/
+
+markdown_extensions:
+  - codehilite:
+      linenums: true
+  - attr_list
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
 
 nav:
   - 'Getting started':
       - 'Setup': getting-started/preparation.md
-      - 'Create an environment': getting-started/apply-environment.md
-      - 'Deploy an application': getting-started/apply-application.md
-      - 'Delete an application': getting-started/delete-application.md
-      - 'Delete an environment': getting-started/delete-environment.md
+      - 'Create environment': getting-started/apply-environment.md
+      - 'Deploy application': getting-started/apply-application.md
+      - 'Delete application': getting-started/delete-application.md
+      - 'Delete environment': getting-started/delete-environment.md
   - 'Environment':
       - 'Manifest reference': environment/manifest.md
+  - 'Application':
+      - 'Manifest reference': application/manifest.md

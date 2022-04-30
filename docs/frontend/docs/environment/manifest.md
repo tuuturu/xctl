@@ -2,13 +2,17 @@
 
 Below is a list of all configuration attributes for an environment manifest.
 
-## `apiVersion` <span class="required">required</span>
+## `apiVersion`<span class="required">*</span>
+
+<span class="required">required</span>
 
 | Type   | Example  | Description                        |
 |--------|----------|------------------------------------|
 | string | v1alpha1 | Defines the version of the schema. |
 
-## `kind` <span class="required">required</span>
+## `kind`<span class="required">*</span>
+
+<span class="required">required</span>
 
 | Type   | Example     | Description                     |
 |--------|-------------|---------------------------------|
@@ -16,21 +20,25 @@ Below is a list of all configuration attributes for an environment manifest.
 
 ## `metadata`
 
-### `name` <span class="required">required</span>
+### `name`<span class="required">*</span>
+
+<span class="required">required</span>
 
 | Type   | Regex                  | Example            | Description                          |
 |--------|------------------------|--------------------|--------------------------------------|
 | string | `[a-z]+(-[a-z]+){0,2}` | tuuturu-production | Defines the name of the environment. |
 
-### `email` <span class="required">required</span>
+### `email`<span class="required">*</span>
+
+<span class="required">required</span>
 
 | Type   | Example          | Description                                                                                                                  |
 |--------|------------------|------------------------------------------------------------------------------------------------------------------------------|
 | string | xctl@example.com | Defines the email associated with the environment. Currently, only used for registering SSL certificates with Let's Encrypt. |
 
-## `spec`  <span class="required">required</span>
+## `spec`
 
-### `domain` <span class="required">required</span>
+### `domain`<span class="required">*</span>
 
 | Type   | Example     | Description                                       |
 |--------|-------------|---------------------------------------------------|
@@ -38,7 +46,7 @@ Below is a list of all configuration attributes for an environment manifest.
 
 ### `plugins`
 
-#### [`nginxIngressController`]()
+#### `nginxIngressController`
 
 | Type    | Default | Helm                                                                      | Description                          |
 |---------|---------|---------------------------------------------------------------------------|--------------------------------------|
