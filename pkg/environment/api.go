@@ -6,6 +6,9 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
+	"sigs.k8s.io/yaml"
+
 	"github.com/deifyed/xctl/pkg/plugins/promtail"
 
 	"github.com/deifyed/xctl/pkg/plugins/loki"
@@ -28,9 +31,9 @@ import (
 
 // Reconcile knows how to ensure reality for an environment is as declared in an environment manifest
 func Reconcile(opts ReconcileOpts) error {
-	log := logging.GetLogger("cmd", "cluster")
+	log := logging.GetLogger("cmd/apply", "environment")
 
-	manifest, err := extractEnvironmentManifest(opts.Manifest)
+	manifest, err := ExtractManifest(opts.Manifest)
 	if err != nil {
 		return fmt.Errorf("extracting manifest: %w", err)
 	}
@@ -89,8 +92,26 @@ func Reconcile(opts ReconcileOpts) error {
 }
 
 //go:embed environment-template.yaml
-var clusterTemplate string //nolint:gochecknoglobals
+var environmentTemplate string //nolint:gochecknoglobals
 
+// Scaffold returns a stream containing an environment template
 func Scaffold() io.Reader {
-	return strings.NewReader(clusterTemplate)
+	return strings.NewReader(environmentTemplate)
+}
+
+// ExtractManifest knows how to produce an environment manifest from a reader source
+func ExtractManifest(source io.Reader) (v1alpha1.Environment, error) {
+	manifest := v1alpha1.NewDefaultEnvironment()
+
+	rawManifest, err := io.ReadAll(source)
+	if err != nil {
+		return v1alpha1.Environment{}, fmt.Errorf("reading: %w", err)
+	}
+
+	err = yaml.Unmarshal(rawManifest, &manifest)
+	if err != nil {
+		return v1alpha1.Environment{}, fmt.Errorf("unmarshalling: %w", err)
+	}
+
+	return manifest, nil
 }

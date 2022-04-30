@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/application"
+
 	"github.com/deifyed/xctl/pkg/tools/yaml"
 
 	"github.com/deifyed/xctl/pkg/environment"
@@ -30,6 +32,8 @@ var (
 			switch resource {
 			case strings.ToLower(v1alpha1.EnvironmentKind):
 				output = environment.Scaffold()
+			case strings.ToLower(v1alpha1.ApplicationKind):
+				output = application.Scaffold()
 			default:
 				return fmt.Errorf("unable to recognize resource type \"%s\". Valid resource types are: %+v",
 					resource,

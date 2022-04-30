@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/deifyed/xctl/pkg/application"
 	"github.com/deifyed/xctl/pkg/cloud/linode"
@@ -17,10 +18,11 @@ import (
 )
 
 type ApplyRunEOpts struct {
-	Filesystem *afero.Afero
-	Io         xctl.IOStreams
-	File       string
-	Purge      bool
+	Filesystem         *afero.Afero
+	Io                 xctl.IOStreams
+	EnvironmentContext string
+	File               string
+	Purge              bool
 }
 
 func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
@@ -51,10 +53,10 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 			return fmt.Errorf("unable to authenticate: %w", err)
 		}
 
+		fmt.Fprintf(opts.Io.Out, "Applying %s manifest, please wait\n\n", strings.ToLower(kind))
+
 		switch kind {
 		case v1alpha1.EnvironmentKind:
-			fmt.Fprintf(opts.Io.Out, "Applying environment manifest, please wait\n\n")
-
 			return environment.Reconcile(environment.ReconcileOpts{
 				Out:        opts.Io.Out,
 				Err:        opts.Io.Err,
@@ -64,13 +66,11 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 				Purge:      opts.Purge,
 			})
 		case v1alpha1.ApplicationKind:
-			fmt.Fprintf(opts.Io.Out, "Applying application manifest %s, please wait\n\n", opts.File)
-
 			return application.Reconcile(application.ReconcileOpts{
-				Out:        opts.Io.Out,
-				Filesystem: opts.Filesystem,
-				Manifest:   manifestSource,
-				Purge:      opts.Purge,
+				Out:                 opts.Io.Out,
+				Filesystem:          opts.Filesystem,
+				ApplicationManifest: manifestSource,
+				Purge:               opts.Purge,
 			})
 		default:
 			return fmt.Errorf("unknown kind %s", kind)

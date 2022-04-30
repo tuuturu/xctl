@@ -9,10 +9,11 @@ import (
 
 // ReconcileOpts defines required data for reconciling an application
 type ReconcileOpts struct {
-	Out        io.Writer
-	Err        io.Writer
-	Filesystem *afero.Afero
-	Provider   cloud.Provider
-	Manifest   io.Reader
-	Purge      bool
+	Out                 io.Writer
+	Err                 io.Writer
+	Filesystem          *afero.Afero
+	Provider            cloud.Provider
+	EnvironmentManifest io.Reader
+	ApplicationManifest io.Reader
+	Purge               bool
 }

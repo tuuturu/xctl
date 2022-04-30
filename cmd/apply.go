@@ -3,6 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/deifyed/xctl/cmd/helpers"
+
 	"github.com/deifyed/xctl/pkg/tools/i18n"
 
 	"github.com/deifyed/xctl/cmd/handlers"
@@ -33,6 +35,7 @@ var (
 func init() {
 	flags := applyCmd.Flags()
 
+	helpers.AddEnvironmentContextFlag(flags, &applyCmdOpts.EnvironmentContext)
 	flags.StringVarP(&applyCmdOpts.File, "file", "f", "-", "file to apply")
 
 	rootCmd.AddCommand(applyCmd)

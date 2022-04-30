@@ -1,0 +1,10 @@
+apiVersion: v1alpha1
+kind: Application
+
+metadata:
+  name: hello
+
+spec:
+  image: ghcr.io/tuuturu/xctl-hello
+  port: 80
+  url: hello.tuuturu.org
