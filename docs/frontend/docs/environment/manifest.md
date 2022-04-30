@@ -38,41 +38,41 @@ Below is a list of all configuration attributes for an environment manifest.
 
 ### `plugins`
 
-#### `nginxIngressController`
+#### [`nginxIngressController`]()
 
-| Type    | Default | Description                          |
-|---------|---------|--------------------------------------|
-| boolean | true    | Handles traffic into the environment |
+| Type    | Default | Helm                                                                      | Description                          |
+|---------|---------|---------------------------------------------------------------------------|--------------------------------------|
+| boolean | true    | [chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx) | Handles traffic into the environment |
 
-#### `certBot`
+#### `cert-manager`
 
-| Type    | Default | Description                          |
-|---------|---------|--------------------------------------|
-| boolean | true    | Generates SSL certificates on demand |
+| Type    | Default | Helm                                                                    | Description                          |
+|---------|---------|-------------------------------------------------------------------------|--------------------------------------|
+| boolean | true    | [chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager) | Generates SSL certificates on demand |
 
 #### `grafana`
 
-| Type    | Default | Description                      |
-|---------|---------|----------------------------------|
-| boolean | true    | Visualises metrics, logs, traces |
+| Type    | Default | Helm                                                          | Description                      |
+|---------|---------|---------------------------------------------------------------|----------------------------------|
+| boolean | true    | [chart](https://artifacthub.io/packages/helm/grafana/grafana) | Visualises metrics, logs, traces |
 
 #### `prometheus`
 
-| Type    | Default | Description                     |
-|---------|---------|---------------------------------|
-| boolean | true    | Stores and exposes metrics data |
+| Type    | Default | Helm                                                                          | Description                     |
+|---------|---------|-------------------------------------------------------------------------------|---------------------------------|
+| boolean | true    | [chart](https://artifacthub.io/packages/helm/prometheus-community/prometheus) | Stores and exposes metrics data |
 
 #### `loki`
 
-| Type    | Default | Description                 |
-|---------|---------|-----------------------------|
-| boolean | true    | Stores and exposes log data |
+| Type    | Default | Helm                                                       | Description                 |
+|---------|---------|------------------------------------------------------------|-----------------------------|
+| boolean | true    | [chart](https://artifacthub.io/packages/helm/grafana/loki) | Stores and exposes log data |
 
 #### `promtail`
 
-| Type    | Default | Description                          |
-|---------|---------|--------------------------------------|
-| boolean | true    | Scrapes logs and pushes them to Loki |
+| Type    | Default | Helm                                                           | Description                          |
+|---------|---------|----------------------------------------------------------------|--------------------------------------|
+| boolean | true    | [chart](https://artifacthub.io/packages/helm/grafana/promtail) | Scrapes logs and pushes them to Loki |
 
 <style>
 span.required {
