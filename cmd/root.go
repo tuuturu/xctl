@@ -11,11 +11,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{ //nolint:gochecknoglobals
-	Use:   "xctl",
-	Short: i18n.T("cmdRootShortDecsription"),
+var rootCmd = &cobra.Command{
+	Use:     "xctl",
+	Short:   i18n.T("cmdRootShortDecsription"),
+	Version: "0.0.alpha",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return nil
+		return cmd.Help()
 	},
 }
 
