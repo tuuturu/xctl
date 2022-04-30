@@ -39,3 +39,9 @@ xctl --version
 
 `xctl` expects an `LINODE_TOKEN` environment variable to be set. To generate a Linode personal access token, follow the
 instructions [here](https://www.linode.com/docs/products/tools/linode-api/guides/get-access-token/).
+
+After you have a token, run the following command to authenticate:
+
+```shell
+export LINODE_TOKEN=<your token here>
+```
