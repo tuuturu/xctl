@@ -49,8 +49,8 @@ func (c *Scheduler) metadata(ctx context.Context) Context {
 		Ctx:                    ctx,
 		Filesystem:             c.fs,
 		Out:                    c.out,
-		EnvironmentManifest:    c.clusterDeclaration,
-		ApplicationDeclaration: c.applicationDeclaration,
+		EnvironmentManifest:    c.environmentManifest,
+		ApplicationDeclaration: c.applicationManifest,
 		Purge:                  c.purgeFlag,
 	}
 }
@@ -61,9 +61,9 @@ func NewScheduler(opts SchedulerOpts, reconcilers ...Reconciler) Scheduler {
 		fs:  opts.Filesystem,
 		out: opts.Out,
 
-		purgeFlag:              opts.PurgeFlag,
-		clusterDeclaration:     opts.ClusterDeclaration,
-		applicationDeclaration: opts.ApplicationDeclaration,
+		purgeFlag:           opts.PurgeFlag,
+		environmentManifest: opts.EnvironmentManifest,
+		applicationManifest: opts.ApplicationManifest,
 
 		reconciliationLoopDelayFunction: opts.ReconciliationLoopDelayFunction,
 		queueStepFunc:                   opts.QueueStepFunc,
@@ -82,8 +82,8 @@ type SchedulerOpts struct {
 	PurgeFlag bool
 	// ReconciliationLoopDelayFunction introduces delay to the reconciliation process
 	ReconciliationLoopDelayFunction func()
-	ClusterDeclaration              v1alpha1.Environment
-	ApplicationDeclaration          v1alpha1.Application
+	EnvironmentManifest             v1alpha1.Environment
+	ApplicationManifest             v1alpha1.Application
 	QueueStepFunc                   func(identifier string)
 }
 
@@ -92,9 +92,9 @@ type Scheduler struct {
 	fs  *afero.Afero
 	out io.Writer
 
-	purgeFlag              bool
-	clusterDeclaration     v1alpha1.Environment
-	applicationDeclaration v1alpha1.Application
+	purgeFlag           bool
+	environmentManifest v1alpha1.Environment
+	applicationManifest v1alpha1.Application
 
 	reconciliationLoopDelayFunction func()
 	queueStepFunc                   func(string)

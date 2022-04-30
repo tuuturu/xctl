@@ -49,7 +49,7 @@ func Reconcile(opts ReconcileOpts) error {
 		Filesystem:                      opts.Filesystem,
 		Out:                             opts.Out,
 		PurgeFlag:                       opts.Purge,
-		ClusterDeclaration:              manifest,
+		EnvironmentManifest:             manifest,
 		ReconciliationLoopDelayFunction: reconciliation.DefaultDelayFunction,
 		QueueStepFunc: func(identifier string) {
 			log.Debug(fmt.Sprintf("reconciling %s", identifier))
