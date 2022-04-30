@@ -23,7 +23,7 @@ spec:
 EOF
 ```
 
-will result in the following resources:
+will result in an environment consisting of the following technologies:
 
 <div class="technology">
   <img class="icon" src="/img/kubernetes-icon.svg">
