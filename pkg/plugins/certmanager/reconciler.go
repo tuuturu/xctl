@@ -1,4 +1,4 @@
-package certbot
+package certmanager
 
 import (
 	"fmt"
@@ -7,8 +7,6 @@ import (
 
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
-
-	"github.com/deifyed/xctl/pkg/tools/manifests"
 
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
@@ -20,7 +18,7 @@ import (
 )
 
 //nolint:funlen
-func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
+func (n reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
@@ -38,7 +36,7 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 		return reconciliation.Result{}, fmt.Errorf("acquiring Kubectl client: %w", err)
 	}
 
-	plugin := newCertbotPlugin()
+	plugin := newPlugin()
 
 	action, err := n.determineAction(determineActionOpts{
 		Ctx:    rctx,
@@ -61,12 +59,12 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 
 		log.Debug("configuring cluster issuer")
 
-		manifest, err := manifests.ResourceAsReader(newLetsEncryptClusterIssuer(rctx.EnvironmentManifest.Spec.AdminEmail))
+		issuerManifest, err := newClusterIssuers(rctx.EnvironmentManifest.Spec.AdminEmail)
 		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("creating cluster issuer: %w", err)
+			return reconciliation.Result{}, fmt.Errorf("creating issuer: %w", err)
 		}
 
-		err = kubectlClient.Apply(manifest)
+		err = kubectlClient.Apply(issuerManifest)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("creating cluster issuer: %w", err)
 		}
@@ -86,9 +84,9 @@ func (n certbotReconciler) Reconcile(rctx reconciliation.Context) (reconciliatio
 	return reconciliation.NoopWaitIndecisiveHandler(action)
 }
 
-func (n certbotReconciler) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
+func (n reconciler) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
 	log := opts.Logger
-	indication := reconciliation.DetermineUserIndication(opts.Ctx, opts.Ctx.EnvironmentManifest.Spec.Plugins.CertBot)
+	indication := reconciliation.DetermineUserIndication(opts.Ctx, opts.Ctx.EnvironmentManifest.Spec.Plugins.CertManager)
 
 	clusterExists, err := n.cloudProvider.HasCluster(opts.Ctx.Ctx, opts.Ctx.EnvironmentManifest)
 	if err != nil {
@@ -143,12 +141,12 @@ func (n certbotReconciler) determineAction(opts determineActionOpts) (reconcilia
 	return reconciliation.ActionNoop, reconciliation.ErrIndecisive
 }
 
-func (n certbotReconciler) String() string {
+func (n reconciler) String() string {
 	return "Certbot"
 }
 
 func NewReconciler(cloudProvider cloud.Provider) reconciliation.Reconciler {
-	return &certbotReconciler{
+	return &reconciler{
 		cloudProvider: cloudProvider,
 	}
 }

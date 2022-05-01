@@ -1,4 +1,4 @@
-package certbot
+package certmanager
 
 import (
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -8,9 +8,9 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 )
 
-const logFeature = "plugin/certbot"
+const logFeature = "plugin/certmanager"
 
-type certbotReconciler struct {
+type reconciler struct {
 	cloudProvider cloud.Provider
 }
 

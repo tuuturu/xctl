@@ -6,6 +6,10 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/plugins/certmanager"
+
+	"github.com/deifyed/xctl/pkg/plugins/dex"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"sigs.k8s.io/yaml"
 
@@ -21,7 +25,6 @@ import (
 
 	"github.com/deifyed/xctl/pkg/plugins/prometheus"
 
-	"github.com/deifyed/xctl/pkg/plugins/certbot"
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -65,11 +68,12 @@ func Reconcile(opts ReconcileOpts) error {
 		NewClusterReconciler(opts.Provider),
 		ingress.NewReconciler(opts.Provider),
 		NewDomainReconciler(opts.Provider),
-		certbot.NewReconciler(opts.Provider),
+		certmanager.NewReconciler(opts.Provider),
 		prometheus.NewReconciler(opts.Provider),
 		grafana.NewReconciler(opts.Provider),
 		loki.NewReconciler(opts.Provider),
 		promtail.NewReconciler(opts.Provider),
+		dex.NewReconciler(opts.Provider),
 	)
 
 	spin.Start()

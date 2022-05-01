@@ -3,12 +3,13 @@ package v1alpha1
 const EnvironmentKind = "Environment"
 
 type EnvironmentSpecPlugins struct {
-	CertBot                bool `json:"certBot"`
+	CertManager            bool `json:"certManager"`
 	NginxIngressController bool `json:"nginxIngressController"`
 	Prometheus             bool `json:"prometheus"`
 	Grafana                bool `json:"grafana"`
 	Loki                   bool `json:"loki"`
 	Promtail               bool `json:"promtail"`
+	Dex                    bool `json:"dex"`
 }
 
 type EnvironmentSpec struct {
@@ -31,12 +32,13 @@ func NewDefaultEnvironment() Environment {
 		},
 		Spec: EnvironmentSpec{
 			Plugins: EnvironmentSpecPlugins{
-				CertBot:                true,
+				CertManager:            true,
 				NginxIngressController: true,
 				Prometheus:             true,
 				Grafana:                true,
 				Loki:                   true,
 				Promtail:               true,
+				Dex:                    false,
 			},
 		},
 	}

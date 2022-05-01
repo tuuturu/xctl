@@ -12,8 +12,8 @@ spec:
   domain: tuuturu.org
 
   #plugins:
-  #  certBot: true
-  #  grafana: true
   #  nginxIngressController: true
+  #  certManager: true
+  #  grafana: true
   #  prometheus: true
   #  loki: true

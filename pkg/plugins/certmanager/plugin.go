@@ -1,4 +1,4 @@
-package certbot
+package certmanager
 
 import (
 	_ "embed"
@@ -6,10 +6,10 @@ import (
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
 
-func newCertbotPlugin() v1alpha1.Plugin {
-	plugin := v1alpha1.NewPlugin(certbotPluginName)
+func newPlugin() v1alpha1.Plugin {
+	plugin := v1alpha1.NewPlugin(certManagerName)
 
-	plugin.Metadata.Name = certbotPluginName
+	plugin.Metadata.Name = certManagerName
 	plugin.Metadata.Namespace = "kube-system"
 
 	// URL: https://artifacthub.io/packages/helm/cert-manager/cert-manager
@@ -23,7 +23,7 @@ func newCertbotPlugin() v1alpha1.Plugin {
 	return plugin
 }
 
-const certbotPluginName = "cert-manager"
+const certManagerName = "cert-manager"
 
 //go:embed values.yaml
 var valuesTemplate string //nolint:gochecknoglobals

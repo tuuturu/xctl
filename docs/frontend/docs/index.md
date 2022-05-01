@@ -65,6 +65,14 @@ will result in an environment consisting of the following technologies:
         for continuous deployment (TBA)
       </span>
     </div>
+
+    <div class="technology">
+      <img class="icon" src="/img/dex-icon.png">
+      <span class="content">
+        <a href="https://dexidp.io">Dex</a>
+        for authentication (TBA)
+      </span>
+    </div>
 </div>
 
 <style>
