@@ -10,6 +10,7 @@ type EnvironmentSpecPlugins struct {
 	Loki                   bool `json:"loki"`
 	Promtail               bool `json:"promtail"`
 	Dex                    bool `json:"dex"`
+	ArgoCD                 bool `json:"argoCD"`
 }
 
 type EnvironmentSpec struct {
@@ -39,6 +40,7 @@ func NewDefaultEnvironment() Environment {
 				Loki:                   true,
 				Promtail:               true,
 				Dex:                    false,
+				ArgoCD:                 false,
 			},
 		},
 	}

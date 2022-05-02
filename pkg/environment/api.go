@@ -7,25 +7,22 @@ import (
 	"strings"
 
 	"github.com/deifyed/xctl/pkg/plugins/certmanager"
+	"github.com/deifyed/xctl/pkg/plugins/grafana"
+	"github.com/deifyed/xctl/pkg/plugins/loki"
+	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
+	"github.com/deifyed/xctl/pkg/plugins/prometheus"
+	"github.com/deifyed/xctl/pkg/plugins/promtail"
+
+	"github.com/deifyed/xctl/pkg/plugins/argocd"
 
 	"github.com/deifyed/xctl/pkg/plugins/dex"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"sigs.k8s.io/yaml"
 
-	"github.com/deifyed/xctl/pkg/plugins/promtail"
-
-	"github.com/deifyed/xctl/pkg/plugins/loki"
-
 	_ "embed"
 
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
-
-	"github.com/deifyed/xctl/pkg/plugins/grafana"
-
-	"github.com/deifyed/xctl/pkg/plugins/prometheus"
-
-	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
@@ -74,6 +71,7 @@ func Reconcile(opts ReconcileOpts) error {
 		loki.NewReconciler(opts.Provider),
 		promtail.NewReconciler(opts.Provider),
 		dex.NewReconciler(opts.Provider),
+		argocd.NewReconciler(opts.Provider),
 	)
 
 	spin.Start()

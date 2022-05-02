@@ -5,6 +5,8 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/deifyed/xctl/pkg/plugins/argocd"
+
 	"github.com/deifyed/xctl/pkg/config"
 	"github.com/deifyed/xctl/pkg/plugins/grafana"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
@@ -68,6 +70,8 @@ var (
 			switch target {
 			case "grafana":
 				credentials, err = grafana.Credentials(kubectlClient)
+			case "argocd":
+				credentials, err = argocd.Credentials(kubectlClient)
 			default:
 				return fmt.Errorf("credentials for %s not found", target)
 			}

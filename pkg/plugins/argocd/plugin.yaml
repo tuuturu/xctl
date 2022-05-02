@@ -1,0 +1,14 @@
+apiVersion: v1alpha1
+kind: Plugin
+
+metadata:
+  name: argocd
+  namespace: operations
+
+spec:
+  helm:
+    chart: argo-cd # https://artifacthub.io/packages/helm/argo/argo-cd
+    version: 4.5.8
+    repository:
+      name: argo
+      url: https://argoproj.github.io/argo-helm

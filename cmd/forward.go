@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/plugins/argocd"
+
 	"github.com/logrusorgru/aurora/v3"
 
 	"github.com/deifyed/xctl/cmd/helpers"
@@ -61,6 +63,8 @@ var (
 			switch target {
 			case "grafana":
 				portForwardOpts = grafana.PortForwardOpts()
+			case "argocd":
+				portForwardOpts = argocd.PortForwardOpts()
 			default:
 				return fmt.Errorf("service %s not found", target)
 			}
