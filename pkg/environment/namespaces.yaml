@@ -1,0 +1,16 @@
+# Namespace containing all monitoring related resources. Grafana, Prometheus, Loki, Promtail, etc.
+apiVersion: v1
+kind: Namespace
+
+metadata:
+  name: monitoring
+
+---
+# Namespace containing all operations related resources. ArgoCD, Dex, etc.
+apiVersion: v1
+kind: Namespace
+
+metadata:
+  name: operations
+
+---

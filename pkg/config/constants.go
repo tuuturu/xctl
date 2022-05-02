@@ -19,6 +19,15 @@ const ( // Cluster
 	DefaultClusterNodeAmount = 2
 )
 
+const ( // Cluster namespaces
+	// DefaultOperationsNamespace defines the name of the operations namespace. This namespace contains operations
+	// related resources. I.e.: ArgoCD, Dex, etc.
+	DefaultOperationsNamespace = "operations"
+	// DefaultMonitoringNamespace defines the name of the monitoring namespace. This namespace contains monitoring
+	// related resources. I.e.: Grafana, Prometheus, Loki, Promtail, Tempo, etc.
+	DefaultMonitoringNamespace = "monitoring"
+)
+
 const ( // Domain
 	// DefaultSubdomainTTLSeconds defines the default time to live for a new domain
 	DefaultSubdomainTTLSeconds = 300

@@ -2,9 +2,13 @@ package environment
 
 import (
 	"context"
+	_ "embed"
 	"encoding/base64"
 	"fmt"
 	"path"
+	"strings"
+
+	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
 
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 
@@ -33,6 +37,16 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 		return reconciliation.Result{}, fmt.Errorf("checking cluster existence: %w", err)
 	}
 
+	kubeconfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
+	if err != nil {
+		return reconciliation.Result{}, fmt.Errorf("acquiring kubeconfig path: %w", err)
+	}
+
+	kubectlClient, err := kubectlBinary.New(rctx.Filesystem, kubeconfigPath)
+	if err != nil {
+		return reconciliation.Result{}, fmt.Errorf("preparing kubectl client: %w", err)
+	}
+
 	switch action {
 	case reconciliation.ActionCreate:
 		log.Debug("creating")
@@ -42,6 +56,11 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 			if err != nil {
 				return reconciliation.Result{}, fmt.Errorf("creating cluster: %w", err)
 			}
+		}
+
+		err = kubectlClient.Apply(strings.NewReader(namespacesTemplate))
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("applying namespaces: %w", err)
 		}
 
 		err = generateKubeconfig(rctx.Ctx, rctx.Filesystem, c.clusterService, rctx.EnvironmentManifest)
@@ -152,3 +171,6 @@ func NewClusterReconciler(clusterService cloud.ClusterService) reconciliation.Re
 type clusterReconciler struct {
 	clusterService cloud.ClusterService
 }
+
+//go:embed namespaces.yaml
+var namespacesTemplate string
