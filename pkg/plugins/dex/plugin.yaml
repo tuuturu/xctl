@@ -3,7 +3,7 @@ kind: Plugin
 
 metadata:
   name: dex
-  namespace: kube-system
+  namespace: operations
 
 spec:
   helm:
