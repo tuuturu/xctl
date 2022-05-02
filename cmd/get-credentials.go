@@ -46,10 +46,6 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			target := args[0]
 
-			if target != "grafana" {
-				return fmt.Errorf("credentials for %s not found", target)
-			}
-
 			provider := linode.NewLinodeProvider()
 
 			err := provider.Authenticate()
@@ -67,7 +63,15 @@ var (
 				return fmt.Errorf("acquiring kubectl client: %w", err)
 			}
 
-			credentials, err := grafana.Credentials(kubectlClient)
+			var credentials v1alpha1.PluginCredentials
+
+			switch target {
+			case "grafana":
+				credentials, err = grafana.Credentials(kubectlClient)
+			default:
+				return fmt.Errorf("credentials for %s not found", target)
+			}
+
 			if err != nil {
 				return fmt.Errorf("acquiring Grafana credentials: %w", err)
 			}
