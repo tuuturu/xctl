@@ -3,8 +3,9 @@ package argocd
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/deifyed/xctl/pkg/config"
 	"io"
+
+	"github.com/deifyed/xctl/pkg/config"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"

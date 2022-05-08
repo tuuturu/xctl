@@ -822,6 +822,7 @@ server:
 
   # -- Additional command line arguments to pass to Argo CD server
   extraArgs: []
+  # - --dex-server=http://dex.operations:5556
   #  - --insecure
 
   # This flag is used to either remove or pass the CLI flag --staticassets /shared/app to the Argo CD server app

@@ -15,8 +15,6 @@ import (
 
 	"github.com/deifyed/xctl/pkg/plugins/argocd"
 
-	"github.com/deifyed/xctl/pkg/plugins/dex"
-
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"sigs.k8s.io/yaml"
 
@@ -70,7 +68,6 @@ func Reconcile(opts ReconcileOpts) error {
 		grafana.NewReconciler(opts.Provider),
 		loki.NewReconciler(opts.Provider),
 		promtail.NewReconciler(opts.Provider),
-		dex.NewReconciler(opts.Provider),
 		argocd.NewReconciler(opts.Provider),
 	)
 
