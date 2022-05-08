@@ -58,14 +58,14 @@ func (c *clusterReconciler) Reconcile(rctx reconciliation.Context) (reconciliati
 			}
 		}
 
-		err = kubectlClient.Apply(strings.NewReader(namespacesTemplate))
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("applying namespaces: %w", err)
-		}
-
 		err = generateKubeconfig(rctx.Ctx, rctx.Filesystem, c.clusterService, rctx.EnvironmentManifest)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("generating kubeconfig: %w", err)
+		}
+
+		err = kubectlClient.Apply(strings.NewReader(namespacesTemplate))
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("applying namespaces: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
