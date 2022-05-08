@@ -35,7 +35,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
 
-	plugin, err := NewPlugin(generateURL(rctx.EnvironmentManifest.Spec.Domain))
+	plugin, err := NewPlugin(localURL)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("creating plugin: %w", err)
 	}
@@ -66,7 +66,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 //nolint:funlen
 func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client) (reconciliation.Action, error) { //nolint:lll
-	indication := reconciliation.DetermineUserIndication(rctx, rctx.EnvironmentManifest.Spec.Plugins.Promtail)
+	indication := reconciliation.DetermineUserIndication(rctx, rctx.EnvironmentManifest.Spec.Plugins.Dex)
 
 	var (
 		clusterExists   = true

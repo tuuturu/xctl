@@ -39,7 +39,8 @@ func NewPlugin(url string) (v1alpha1.Plugin, error) {
 const pluginName = "Dex"
 
 type pluginOpts struct {
-	URL string `json:"url"`
+	URL               string `json:"url"`
+	ArgoCDRedirectURI string `json:"argoCDRedirectURI"`
 }
 
 var (

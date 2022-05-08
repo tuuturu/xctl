@@ -54,6 +54,12 @@ config:
   storage:
     type: memory
   enablePasswordDB: true
+  staticClients:
+    - id: argocd
+      redirectURIs:
+        - {{.ArgoCDRedirectURI}}
+      name: 'ArgoCD'
+      secret: 'test'
 
 # -- Additional storage [volumes](https://kubernetes.io/docs/concepts/storage/volumes/).
 # See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes-1) for details.
@@ -173,7 +179,7 @@ service:
 
 ingress:
   # -- Enable [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
-  enabled: true
+  enabled: false
 
   # -- Ingress [class name](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class).
   className: ""
