@@ -3,6 +3,8 @@ package prometheus
 import (
 	_ "embed"
 
+	"github.com/deifyed/xctl/pkg/config"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
 
@@ -10,7 +12,7 @@ func NewPlugin() v1alpha1.Plugin {
 	plugin := v1alpha1.NewPlugin(pluginName)
 
 	plugin.Metadata.Name = pluginName
-	plugin.Metadata.Namespace = "kube-system"
+	plugin.Metadata.Namespace = config.DefaultMonitoringNamespace
 
 	// URL: https://artifacthub.io/packages/helm/prometheus-community/prometheus
 	plugin.Spec.Helm.Chart = "prometheus"

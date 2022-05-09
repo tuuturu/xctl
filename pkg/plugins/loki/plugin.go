@@ -3,12 +3,14 @@ package loki
 import (
 	_ "embed"
 
+	"github.com/deifyed/xctl/pkg/config"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
 
 const (
 	pluginName      = "loki"
-	pluginNamespace = "kube-system"
+	pluginNamespace = config.DefaultMonitoringNamespace
 )
 
 func NewPlugin() v1alpha1.Plugin {
