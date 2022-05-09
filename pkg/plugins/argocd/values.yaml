@@ -260,7 +260,7 @@ controller:
       servicePort: 8082
     serviceMonitor:
       # -- Enable a prometheus ServiceMonitor
-      enabled: false
+      enabled: true
       # -- Prometheus ServiceMonitor interval
       interval: 30s
       # -- Prometheus [RelabelConfigs] to apply to samples before scraping
@@ -272,7 +272,7 @@ controller:
       # prometheus: kube-prometheus
 
       # -- Prometheus ServiceMonitor namespace
-      namespace: "" # "monitoring"
+      namespace: "monitoring" # "monitoring"
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
     rules:
@@ -375,7 +375,7 @@ dex:
       labels: {}
     serviceMonitor:
       # -- Enable a prometheus ServiceMonitor
-      enabled: false
+      enabled: true
       # -- Prometheus ServiceMonitor interval
       interval: 30s
       # -- Prometheus [RelabelConfigs] to apply to samples before scraping
@@ -387,7 +387,7 @@ dex:
       # prometheus: kube-prometheus
 
       # -- Prometheus ServiceMonitor namespace
-      namespace: "" # "monitoring"
+      namespace: "monitoring" # "monitoring"
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
 
@@ -720,7 +720,7 @@ redis:
       portName: http-metrics
     serviceMonitor:
       # -- Enable a prometheus ServiceMonitor
-      enabled: false
+      enabled: true
       # -- Interval at which metrics should be scraped
       interval: 30s
       # -- Prometheus [RelabelConfigs] to apply to samples before scraping
@@ -732,7 +732,7 @@ redis:
       # prometheus: kube-prometheus
 
       # -- Prometheus ServiceMonitor namespace
-      namespace: "" # "monitoring"
+      namespace: "monitoring" # "monitoring"
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
 
@@ -993,7 +993,7 @@ server:
       servicePort: 8083
     serviceMonitor:
       # -- Enable a prometheus ServiceMonitor
-      enabled: false
+      enabled: true
       # -- Prometheus ServiceMonitor interval
       interval: 30s
       # -- Prometheus [RelabelConfigs] to apply to samples before scraping
@@ -1005,7 +1005,7 @@ server:
       # prometheus: kube-prometheus
 
       # -- Prometheus ServiceMonitor namespace
-      namespace: ""  # monitoring
+      namespace: "monitoring"  # monitoring
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
 
@@ -1570,7 +1570,7 @@ repoServer:
       servicePort: 8084
     serviceMonitor:
       # -- Enable a prometheus ServiceMonitor
-      enabled: false
+      enabled: true
       # -- Prometheus ServiceMonitor interval
       interval: 30s
       # -- Prometheus [RelabelConfigs] to apply to samples before scraping
@@ -1582,7 +1582,7 @@ repoServer:
       # prometheus: kube-prometheus
 
       # -- Prometheus ServiceMonitor namespace
-      namespace: "" # "monitoring"
+      namespace: "monitoring" # "monitoring"
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
 
@@ -1916,7 +1916,7 @@ applicationSet:
   ## Metrics service configuration
   metrics:
     # -- Deploy metrics service
-    enabled: false
+    enabled: true
     service:
       # -- Metrics service annotations
       annotations: {}
@@ -1938,7 +1938,7 @@ applicationSet:
       # prometheus: kube-prometheus
 
       # -- Prometheus ServiceMonitor namespace
-      namespace: ""  # monitoring
+      namespace: "monitoring"  # monitoring
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
 

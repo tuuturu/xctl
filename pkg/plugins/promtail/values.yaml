@@ -160,9 +160,9 @@ extraEnvFrom: []
 # ServiceMonitor configuration
 serviceMonitor:
   # -- If enabled, ServiceMonitor resources for Prometheus Operator are created
-  enabled: false
+  enabled: true
   # -- Alternative namespace for ServiceMonitor resources
-  namespace: null
+  namespace: monitoring
   # -- Namespace selector for ServiceMonitor resources
   namespaceSelector: {}
   # -- ServiceMonitor annotations
