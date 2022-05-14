@@ -35,10 +35,9 @@ var (
 		fs: &afero.Afero{Fs: afero.NewOsFs()},
 	}
 	getCredentialsCmd = &cobra.Command{ //nolint:gochecknoglobals
-		Use:    "credentials",
-		Short:  i18n.T("cmdGetCredentialsShortDescription"),
-		Args:   cobra.ExactArgs(1),
-		Hidden: true,
+		Use:   "credentials",
+		Short: i18n.T("cmdGetCredentialsShortDescription"),
+		Args:  cobra.ExactArgs(1),
 		PreRunE: hooks.EnvironmentManifestInitializer(hooks.EnvironmentManifestInitializerOpts{
 			Io:                  getCredentialsCmdOpts.io,
 			Fs:                  getCredentialsCmdOpts.fs,
