@@ -167,7 +167,7 @@ ingressShim: {}
 prometheus:
   enabled: true
   servicemonitor:
-    enabled: true
+    enabled: false
     namespace: "monitoring"
     prometheusInstance: default
     targetPort: 9402

@@ -224,7 +224,7 @@ updateStrategy:
   type: RollingUpdate
 
 serviceMonitor:
-  enabled: true
+  enabled: false
   namespace: monitoring
   interval: ""
   additionalLabels: {}
