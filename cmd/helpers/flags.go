@@ -13,7 +13,7 @@ func AddEnvironmentContextFlag(flags *pflag.FlagSet, contextFilepath *string) {
 		contextFilepath,
 		i18n.T("cmdFlagContextName"),
 		"c",
-		getEnv("XCTL_CONTEXT", "-"),
+		getEnv("XCTL_CONTEXT", ""),
 		i18n.T("cmdFlagContextUsage"),
 	)
 }
