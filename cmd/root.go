@@ -12,9 +12,10 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "xctl",
-	Short:   i18n.T("cmdRootShortDecsription"),
-	Version: "0.0.alpha",
+	Use:          "xctl",
+	Short:        i18n.T("cmdRootShortDecsription"),
+	Version:      "0.0.alpha",
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return cmd.Help()
 	},
