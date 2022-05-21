@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
+
 	"github.com/deifyed/xctl/pkg/config"
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 
@@ -20,9 +22,16 @@ import (
 func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
 	log := logging.GetLogger(logFeature, "reconciliation")
 
+	repo := repository{URL: rctx.EnvironmentManifest.Spec.Repository}
+
 	kubeconfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
 	if err != nil {
 		return reconciliation.Result{}, fmt.Errorf("acquiring kubeconfig path: %w", err)
+	}
+
+	kubectlClient, err := kubectlBinary.New(rctx.Filesystem, kubeconfigPath)
+	if err != nil {
+		return reconciliation.Result{}, fmt.Errorf("preparing kubectl client: %w", err)
 	}
 
 	helmClient, err := helmBinary.New(rctx.Filesystem, kubeconfigPath)
@@ -47,6 +56,26 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		err = helmClient.Install(plugin)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
+		}
+
+		keys, err := generateKey()
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("generating private/public key pair: %w", err)
+		}
+
+		secret, err := generateRepositorySecret(repo, keys.PrivateKey)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("generating repository secret: %w", err)
+		}
+
+		err = installDeployKey(rctx.Ctx, repo, keys.PublicKey)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("installing deploy key: %w", err)
+		}
+
+		err = kubectlClient.Apply(secret)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("applying secret: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
