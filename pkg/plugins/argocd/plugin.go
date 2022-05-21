@@ -25,8 +25,8 @@ func NewPlugin() (v1alpha1.Plugin, error) {
 const pluginName = "argocd"
 
 var (
-	//go:embed plugin.yaml
+	//go:embed templates/plugin.yaml
 	rawPlugin []byte //nolint:gochecknoglobals
-	//go:embed values.yaml
+	//go:embed templates/values.yaml
 	rawValues string //nolint:gochecknoglobals
 )
