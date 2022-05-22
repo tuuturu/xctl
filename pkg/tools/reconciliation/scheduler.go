@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/deifyed/xctl/pkg/tools/secrets"
+
 	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -49,6 +51,7 @@ func (c *Scheduler) metadata(ctx context.Context) Context {
 		Ctx:                    ctx,
 		Filesystem:             c.fs,
 		Out:                    c.out,
+		Keyring:                c.keyring,
 		EnvironmentManifest:    c.environmentManifest,
 		ApplicationDeclaration: c.applicationManifest,
 		Purge:                  c.purgeFlag,
@@ -58,8 +61,9 @@ func (c *Scheduler) metadata(ctx context.Context) Context {
 // NewScheduler initializes a Scheduler
 func NewScheduler(opts SchedulerOpts, reconcilers ...Reconciler) Scheduler {
 	return Scheduler{
-		fs:  opts.Filesystem,
-		out: opts.Out,
+		fs:      opts.Filesystem,
+		out:     opts.Out,
+		keyring: opts.Keyring,
 
 		purgeFlag:           opts.PurgeFlag,
 		environmentManifest: opts.EnvironmentManifest,
@@ -76,6 +80,8 @@ type SchedulerOpts struct {
 	Filesystem *afero.Afero
 	// Out provides reconcilers a way to express data
 	Out io.Writer
+	// Keyring provides reconcilers access to the keyring
+	Keyring secrets.Client
 
 	// Context of the scheduling. Signifies the intent of the user
 	// PurgeFlag indicates if everything should be deleted
@@ -89,8 +95,9 @@ type SchedulerOpts struct {
 
 // Scheduler knows how to run reconcilers in a reasonable way
 type Scheduler struct {
-	fs  *afero.Afero
-	out io.Writer
+	fs      *afero.Afero
+	out     io.Writer
+	keyring secrets.Client
 
 	purgeFlag           bool
 	environmentManifest v1alpha1.Environment

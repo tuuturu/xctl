@@ -5,6 +5,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/tools/secrets"
+
 	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
@@ -41,6 +43,7 @@ type Context struct {
 	Ctx        context.Context
 	Filesystem *afero.Afero
 	Out        io.Writer
+	Keyring    secrets.Client
 
 	EnvironmentManifest    v1alpha1.Environment
 	ApplicationDeclaration v1alpha1.Application

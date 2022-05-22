@@ -68,7 +68,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 			return reconciliation.Result{}, fmt.Errorf("generating repository secret: %w", err)
 		}
 
-		err = installDeployKey(rctx.Ctx, repo, keys.PublicKey)
+		err = installDeployKey(rctx.Ctx, rctx.Keyring, repo, keys.PublicKey)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("installing deploy key: %w", err)
 		}

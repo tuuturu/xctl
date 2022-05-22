@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
+
 	"github.com/deifyed/xctl/pkg/plugins/certmanager"
 	"github.com/deifyed/xctl/pkg/plugins/grafana"
 	"github.com/deifyed/xctl/pkg/plugins/loki"
@@ -35,6 +37,8 @@ func Reconcile(opts ReconcileOpts) error {
 		return fmt.Errorf("extracting manifest: %w", err)
 	}
 
+	keyringClient := keyring.Client{ClusterName: manifest.Metadata.Name}
+
 	var spinnerOut io.Writer
 	if logging.GetLevel() == logging.LevelInfo {
 		spinnerOut = opts.Out
@@ -48,6 +52,7 @@ func Reconcile(opts ReconcileOpts) error {
 	schedulerOpts := reconciliation.SchedulerOpts{
 		Filesystem:                      opts.Filesystem,
 		Out:                             opts.Out,
+		Keyring:                         keyringClient,
 		PurgeFlag:                       opts.Purge,
 		EnvironmentManifest:             manifest,
 		ReconciliationLoopDelayFunction: reconciliation.DefaultDelayFunction,

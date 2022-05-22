@@ -9,7 +9,11 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
+	"net/http"
 	"text/template"
+
+	"github.com/deifyed/xctl/pkg/tools/secrets"
+	"golang.org/x/oauth2"
 
 	"github.com/google/go-github/v44/github"
 
@@ -62,10 +66,21 @@ func generateRepositorySecret(repo repository, privateKey []byte) (io.Reader, er
 	return &buf, nil
 }
 
-func installDeployKey(ctx context.Context, repo repository, publicKey []byte) error {
-	client := github.NewClient(nil)
+func installDeployKey(ctx context.Context, secretClient secrets.Client, repo repository, publicKey []byte) error {
+	accessToken, err := secretClient.Get(config.DefaultSecretsGithubNamespace, config.DefaultSecretsGithubAccessTokenKey)
+	if err != nil {
+		return fmt.Errorf("retrieving access token: %w", err)
+	}
 
-	_, _, err := client.Repositories.CreateKey(ctx, repo.Owner(), repo.Name(), &github.Key{
+	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken})
+
+	oauth2Client := &http.Client{
+		Transport: &oauth2.Transport{Source: tokenSource},
+	}
+
+	client := github.NewClient(oauth2Client)
+
+	_, _, err = client.Repositories.CreateKey(ctx, repo.Owner(), repo.Name(), &github.Key{
 		Key:      github.String(string(publicKey)),
 		Title:    github.String("xctl-argocd"),
 		ReadOnly: github.Bool(true),
