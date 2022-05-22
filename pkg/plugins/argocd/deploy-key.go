@@ -6,6 +6,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	_ "embed"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"io"
@@ -55,9 +56,9 @@ func generateRepositorySecret(repo repository, privateKey []byte) (io.Reader, er
 	err = t.Execute(&buf, repositorySecretOpts{
 		SecretName:           toSecretName(repo.Name()),
 		OperationsNamespace:  config.DefaultOperationsNamespace,
-		RepositoryName:       repo.Name(),
-		RepositoryURI:        repo.URL,
-		RepositoryPrivateKey: string(privateKey),
+		RepositoryName:       b64(repo.Name()),
+		RepositoryURI:        b64(repo.URL),
+		RepositoryPrivateKey: b64(string(privateKey)),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("generating secret: %w", err)
@@ -84,6 +85,7 @@ func installDeployKey(ctx context.Context, secretClient secrets.Client, repo rep
 		Key:      github.String(string(publicKey)),
 		Title:    github.String("xctl-argocd"),
 		ReadOnly: github.Bool(true),
+		//RESEARCH: Verified flag
 	})
 	if err != nil {
 		return fmt.Errorf("creating: %w", err)
@@ -97,4 +99,14 @@ var repositorySecretTemplate string
 
 func toSecretName(name string) string {
 	return fmt.Sprintf("xctl-argocd-repository-%s", name)
+}
+
+func b64(raw string) string {
+	rawAsBytes := []byte(raw)
+
+	result := make([]byte, base64.StdEncoding.EncodedLen(len(rawAsBytes)))
+
+	base64.StdEncoding.Encode(result, rawAsBytes)
+
+	return string(result)
 }
