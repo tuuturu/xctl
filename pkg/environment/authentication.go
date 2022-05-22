@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"golang.org/x/term"
 	"net/http"
 	"os/exec"
 	"runtime"
 	"strings"
+	"syscall"
 
 	"github.com/deifyed/xctl/pkg/cloud/linode"
 
@@ -36,10 +38,18 @@ func Authenticate(manifest *v1alpha1.Environment) func(cmd *cobra.Command, args 
 			return fmt.Errorf("handling cloud provider authentication: %w", err)
 		}
 
+		successPrint := func(name string) {
+			fmt.Fprintf(cmd.OutOrStdout(), "[%s] %s\n", name, aurora.Green("OK"))
+		}
+
+		successPrint(strings.Title(manifest.Spec.Provider))
+
 		err = handleGithub(cmd.Context(), log, secretsClient)
 		if err != nil {
 			return fmt.Errorf("handling Github authentication: %w", err)
 		}
+
+		successPrint("Github")
 
 		return nil
 	}
@@ -57,16 +67,29 @@ func handleCloudProvider(ctx context.Context, log logging.Logger, secretsClient 
 		return fmt.Errorf("unknown cloud provider %s", providerName)
 	}
 
-	prompter := func(msg string) string {
-		var result string
+	err := provider.Authenticate(secretsClient)
+	if err != nil {
+		return fmt.Errorf("authenticating with existing credentials: %w", err)
+	} else {
+		err = provider.ValidateAuthentication(ctx)
+		if err == nil {
+			return nil
+		}
 
-		fmt.Print(msg)
-		fmt.Scanln(&result)
-
-		return result
+		if err != nil {
+			return fmt.Errorf("validating existing credentials: %w", err)
+		}
 	}
 
-	err := provider.AuthenticationFlow(secretsClient, prompter)
+	prompter := func(msg string) string {
+		fmt.Print(msg)
+		rawResult, _ := term.ReadPassword(syscall.Stdin)
+		fmt.Print("\n")
+
+		return string(rawResult)
+	}
+
+	err = provider.AuthenticationFlow(secretsClient, prompter)
 	if err != nil {
 		return fmt.Errorf("executing cloud provider authentication flow: %w", err)
 	}
