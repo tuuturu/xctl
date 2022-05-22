@@ -3,12 +3,13 @@ package keyring
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/99designs/keyring"
 )
 
 // Put knows how to store secrets in a keyring
 func (c Client) Put(name string, secrets map[string]string) error {
-	ring, err := keyring.Open(keyring.Config{ServiceName: generateServiceName(c.ClusterName)})
+	var ring, err = keyring.Open(keyring.Config{ServiceName: generateServiceName(c.ClusterName)})
 	if err != nil {
 		return fmt.Errorf("opening keyring: %w", err)
 	}
@@ -38,7 +39,7 @@ func (c Client) Get(name string, key string) (string, error) {
 
 	item, err := ring.Get(name)
 	if err != nil {
-		return "", fmt.Errorf("retrieving secret: %w", err)
+		return "", handleError(fmt.Errorf("retrieving secret: %w", err))
 	}
 
 	var content map[string]string

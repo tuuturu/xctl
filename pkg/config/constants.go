@@ -33,6 +33,17 @@ const ( // Domain
 	DefaultSubdomainTTLSeconds = 300
 )
 
+const ( // Github
+	// DefaultGithubOAuthClientID defines the client ID to use for Github authentication
+	// This will likely be configurable so that an organization can create their own setup later on and distribute a
+	// config file
+	DefaultGithubOAuthClientID = "e467c92d9072c78d20d9"
+	// DefaultSecretsGithubNamespace defines the namespace where Github secrets reside
+	DefaultSecretsGithubNamespace = "/github"
+	// DefaultSecretsGithubAccessTokenKey defines the key of the Github access token
+	DefaultSecretsGithubAccessTokenKey = "access-token"
+)
+
 const ( // Internal filesystem directories
 	// DefaultEnvironmentsDir defines the folder containing environment directories
 	DefaultEnvironmentsDir = "environments"

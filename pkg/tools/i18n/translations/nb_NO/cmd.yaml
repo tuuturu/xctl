@@ -27,3 +27,6 @@ cmdScaffoldShortDescription: Scaffold resource templates
 
 ## Venv
 cmdVenvShortDescription: Activate a virtual environment
+
+## Login
+cmdLoginShortDescription: Authenticate with your environment
