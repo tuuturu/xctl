@@ -35,10 +35,10 @@ var (
 			case strings.ToLower(v1alpha1.ApplicationKind):
 				output = application.Scaffold()
 			default:
-				return fmt.Errorf("unable to recognize resource type \"%s\". Valid resource types are: %+v",
-					resource,
-					[]string{strings.ToLower(v1alpha1.EnvironmentKind)},
-				)
+				return &i18n.HumanReadableError{
+					Content: "resource not found",
+					Key:     "cmd/scaffold/resourceNotFound",
+				}
 			}
 
 			if scaffoldCmdOpts.Raw {

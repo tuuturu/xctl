@@ -1,1 +1,2 @@
-not authenticated: There seems to be a problem with your authentication token. Please ensure the token is correct.
+cloud/notAuthenticated: There seems to be a problem with your authentication token. Please ensure the token is correct.
+cmd/scaffold/resourceNotFound: Resource not found. Available resources are "environment" and "application"

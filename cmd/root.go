@@ -12,10 +12,11 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:          "xctl",
-	Short:        i18n.T("cmdRootShortDecsription"),
-	Version:      "0.0.alpha",
-	SilenceUsage: true,
+	Use:           "xctl",
+	Short:         i18n.T("cmdRootShortDecsription"),
+	Version:       "0.0.alpha",
+	SilenceUsage:  true,
+	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return cmd.Help()
 	},
@@ -27,7 +28,7 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		userError := helpers.ErrorTranslator(err)
 
-		_, _ = fmt.Fprintln(os.Stderr, userError)
+		_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", userError)
 
 		os.Exit(1)
 	}
