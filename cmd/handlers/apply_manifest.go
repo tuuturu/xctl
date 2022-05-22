@@ -27,24 +27,28 @@ type ApplyRunEOpts struct {
 
 func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) (err error) {
-		var originalManifestSource io.Reader
+		var manifestSource io.Reader
 
 		if opts.File == "-" {
-			originalManifestSource = opts.Io.In
+			manifestSource = opts.Io.In
 		} else {
-			originalManifestSource, err = opts.Filesystem.Open(opts.File)
+			manifestSource, err = opts.Filesystem.Open(opts.File)
 			if err != nil {
 				return fmt.Errorf("opening manifest file: %w", err)
 			}
 		}
 
-		manifestSource := &bytes.Buffer{}
-		tee := io.TeeReader(originalManifestSource, manifestSource)
+		rawManifest, err := io.ReadAll(manifestSource)
+		if err != nil {
+			return fmt.Errorf("buffering: %w", err)
+		}
 
-		kind, err := v1alpha1.InferKindFromManifest(tee)
+		kind, err := v1alpha1.InferKindFromManifest(bytes.NewReader(rawManifest))
 		if err != nil {
 			return fmt.Errorf("inferring kind: %w", err)
 		}
+
+		manifest := bytes.NewReader(rawManifest)
 
 		provider := linode.NewLinodeProvider()
 
@@ -62,14 +66,14 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 				Err:        opts.Io.Err,
 				Filesystem: opts.Filesystem,
 				Provider:   provider,
-				Manifest:   manifestSource,
+				Manifest:   manifest,
 				Purge:      opts.Purge,
 			})
 		case v1alpha1.ApplicationKind:
 			return application.Reconcile(application.ReconcileOpts{
 				Out:                 opts.Io.Out,
 				Filesystem:          opts.Filesystem,
-				ApplicationManifest: manifestSource,
+				ApplicationManifest: manifest,
 				Purge:               opts.Purge,
 			})
 		default:
