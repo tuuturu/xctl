@@ -34,24 +34,3 @@ That should be it. `xctl` should now be available. Test by running a command. Fo
 ```shell
 xctl --version
 ```
-
-## Authentication
-
-### Provider
-
-`xctl` expects an `LINODE_TOKEN` environment variable to be set. To generate a Linode personal access token, follow the
-instructions [here](https://www.linode.com/docs/products/tools/linode-api/guides/get-access-token/).
-
-After you have a token, run the following command to authenticate:
-
-```shell
-export LINODE_TOKEN=<your token here>
-```
-
-### Github
-
-After scaffolding an environment manifest template and configuring it, run
-```shell
-xctl login -c environment.yaml
-```
-to authenticate with Github. 

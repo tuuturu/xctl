@@ -18,7 +18,10 @@ Configure the application as required.
 Generate necessary Kubernetes and ArgoCD configuration by running the following command:
 
 ```shell
-xctl apply -f application.yaml
+xctl apply --file application.yaml --context environment.yaml
 ```
 
 After you've configured the generated files, commit and push the changes.
+
+!!! tip
+    To avoid having to specify the environment context for contextual commands, use `xctl venv`

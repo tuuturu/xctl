@@ -29,6 +29,10 @@ markdown_extensions:
   - attr_list
   - toc:
       permalink: true
+  # Admonition
+  # !!! [type] "custom title"
+  #    Message
+  # Types: note, summary, info, tip, success, help, warning, fail, danger, bug, example, quote,
   - admonition
   - pymdownx.superfences
   - pymdownx.tasklist

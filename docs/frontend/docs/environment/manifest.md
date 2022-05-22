@@ -38,6 +38,12 @@ Below is a list of all configuration attributes for an environment manifest.
 
 ## `spec`
 
+### `provider`<span class="required">*</span>
+
+| Type   | Example | Description                                           |
+|--------|---------|-------------------------------------------------------|
+| string | linode  | Defines the cloud provider to use for the environment |
+
 ### `domain`<span class="required">*</span>
 
 | Type   | Example     | Description                                       |
