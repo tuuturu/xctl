@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
+
 	"github.com/deifyed/xctl/pkg/plugins/argocd"
 
 	"github.com/logrusorgru/aurora/v3"
@@ -70,7 +72,9 @@ var (
 
 			provider := linode.NewLinodeProvider()
 
-			err := provider.Authenticate()
+			keyringClient := keyring.Client{EnvironmentName: forwardCmdOpts.EnvironmentManifest.Metadata.Name}
+
+			err := provider.Authenticate(keyringClient)
 			if err != nil {
 				return fmt.Errorf("authenticating with cloud provider: %w", err)
 			}

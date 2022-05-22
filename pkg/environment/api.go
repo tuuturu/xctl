@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/cloud/linode"
+
 	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
 
 	"github.com/deifyed/xctl/pkg/plugins/certmanager"
@@ -37,7 +39,13 @@ func Reconcile(opts ReconcileOpts) error {
 		return fmt.Errorf("extracting manifest: %w", err)
 	}
 
-	keyringClient := keyring.Client{ClusterName: manifest.Metadata.Name}
+	keyringClient := keyring.Client{EnvironmentName: manifest.Metadata.Name}
+	provider := linode.NewLinodeProvider()
+
+	err = provider.Authenticate(keyringClient)
+	if err != nil {
+		return fmt.Errorf("unable to authenticate: %w", err)
+	}
 
 	var spinnerOut io.Writer
 	if logging.GetLevel() == logging.LevelInfo {
@@ -64,15 +72,15 @@ func Reconcile(opts ReconcileOpts) error {
 	}
 
 	scheduler := reconciliation.NewScheduler(schedulerOpts,
-		NewClusterReconciler(opts.Provider),
-		ingress.NewReconciler(opts.Provider),
-		NewDomainReconciler(opts.Provider),
-		certmanager.NewReconciler(opts.Provider),
-		prometheus.NewReconciler(opts.Provider),
-		grafana.NewReconciler(opts.Provider),
-		loki.NewReconciler(opts.Provider),
-		promtail.NewReconciler(opts.Provider),
-		argocd.NewReconciler(opts.Provider),
+		NewClusterReconciler(provider),
+		ingress.NewReconciler(provider),
+		NewDomainReconciler(provider),
+		certmanager.NewReconciler(provider),
+		prometheus.NewReconciler(provider),
+		grafana.NewReconciler(provider),
+		loki.NewReconciler(provider),
+		promtail.NewReconciler(provider),
+		argocd.NewReconciler(provider),
 	)
 
 	spin.Start()

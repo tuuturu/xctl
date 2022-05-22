@@ -44,6 +44,11 @@ const ( // Github
 	DefaultSecretsGithubAccessTokenKey = "access-token"
 )
 
+const ( // Cloud provider
+	// DefaultSecretsCloudProviderNamespace defines teh namespace where cloud provider secrets reside
+	DefaultSecretsCloudProviderNamespace = "/cloudprovider"
+)
+
 const ( // Internal filesystem directories
 	// DefaultEnvironmentsDir defines the folder containing environment directories
 	DefaultEnvironmentsDir = "environments"

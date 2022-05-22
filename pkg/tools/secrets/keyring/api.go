@@ -9,7 +9,7 @@ import (
 
 // Put knows how to store secrets in a keyring
 func (c Client) Put(name string, secrets map[string]string) error {
-	var ring, err = keyring.Open(keyring.Config{ServiceName: generateServiceName(c.ClusterName)})
+	var ring, err = keyring.Open(keyring.Config{ServiceName: generateServiceName(c.EnvironmentName)})
 	if err != nil {
 		return fmt.Errorf("opening keyring: %w", err)
 	}
@@ -32,7 +32,7 @@ func (c Client) Put(name string, secrets map[string]string) error {
 
 // Get knows how to retrieve secrets from a keyring
 func (c Client) Get(name string, key string) (string, error) {
-	ring, err := keyring.Open(keyring.Config{ServiceName: generateServiceName(c.ClusterName)})
+	ring, err := keyring.Open(keyring.Config{ServiceName: generateServiceName(c.EnvironmentName)})
 	if err != nil {
 		return "", fmt.Errorf("opening keyring: %w", err)
 	}
@@ -54,7 +54,7 @@ func (c Client) Get(name string, key string) (string, error) {
 
 // Delete knows how to remove secrets from a keyring
 func (c Client) Delete(name string) error {
-	ring, err := keyring.Open(keyring.Config{ServiceName: generateServiceName(c.ClusterName)})
+	ring, err := keyring.Open(keyring.Config{ServiceName: generateServiceName(c.EnvironmentName)})
 	if err != nil {
 		return fmt.Errorf("opening keyring: %w", err)
 	}

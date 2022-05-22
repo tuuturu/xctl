@@ -9,6 +9,8 @@ import (
 	"path"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
+
 	"github.com/deifyed/xctl/cmd/helpers"
 
 	"github.com/deifyed/xctl/pkg/tools/i18n"
@@ -57,8 +59,9 @@ var (
 		}),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			provider := linode.NewLinodeProvider()
+			keyringClient := keyring.Client{EnvironmentName: venvCmdOpts.environmentManifest.Metadata.Name}
 
-			err := provider.Authenticate()
+			err := provider.Authenticate(keyringClient)
 			if err != nil {
 				return fmt.Errorf("authenticating with cloud provider: %w", err)
 			}

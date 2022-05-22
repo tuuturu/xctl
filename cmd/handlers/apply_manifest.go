@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/deifyed/xctl/pkg/application"
-	"github.com/deifyed/xctl/pkg/cloud/linode"
 	"github.com/deifyed/xctl/pkg/environment"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl"
@@ -24,13 +23,6 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 			return fmt.Errorf("interpreting manifest: %w", err)
 		}
 
-		provider := linode.NewLinodeProvider()
-
-		err = provider.Authenticate()
-		if err != nil {
-			return fmt.Errorf("unable to authenticate: %w", err)
-		}
-
 		fmt.Fprintf(opts.Io.Out, "Applying %s manifest, please wait\n\n", strings.ToLower(kind))
 
 		switch kind {
@@ -40,7 +32,6 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 				Out:        opts.Io.Out,
 				Err:        opts.Io.Err,
 				Filesystem: opts.Filesystem,
-				Provider:   provider,
 				Manifest:   manifest,
 				Purge:      opts.Purge,
 			})

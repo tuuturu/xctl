@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 
-	"github.com/deifyed/xctl/pkg/cloud"
 	"github.com/spf13/afero"
 )
 
@@ -14,7 +13,6 @@ type ReconcileOpts struct {
 	Out        io.Writer
 	Err        io.Writer
 	Filesystem *afero.Afero
-	Provider   cloud.Provider
 	Manifest   io.Reader
 	Purge      bool
 }

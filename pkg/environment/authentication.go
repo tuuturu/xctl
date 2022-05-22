@@ -9,7 +9,10 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/cloud/linode"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
+	"github.com/deifyed/xctl/pkg/cloud"
 	"github.com/deifyed/xctl/pkg/config"
 	"github.com/deifyed/xctl/pkg/tools/github"
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -24,17 +27,61 @@ import (
 func Authenticate(manifest *v1alpha1.Environment) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		var (
-			secretsClient = keyring.Client{ClusterName: manifest.Metadata.Name}
+			secretsClient = keyring.Client{EnvironmentName: manifest.Metadata.Name}
 			log           = logging.GetLogger("environment", "authenticate")
 		)
 
-		err := handleGithub(cmd.Context(), log, secretsClient)
+		err := handleCloudProvider(cmd.Context(), log, secretsClient, manifest.Spec.Provider)
+		if err != nil {
+			return fmt.Errorf("handling cloud provider authentication: %w", err)
+		}
+
+		err = handleGithub(cmd.Context(), log, secretsClient)
 		if err != nil {
 			return fmt.Errorf("handling Github authentication: %w", err)
 		}
 
 		return nil
 	}
+}
+
+func handleCloudProvider(ctx context.Context, log logging.Logger, secretsClient keyring.Client, providerName string) error {
+	log.Debug("Checking for existing cloud provider credentials")
+
+	var provider cloud.AuthenticationService
+
+	switch providerName {
+	case "linode":
+		provider = linode.NewLinodeProvider()
+	default:
+		return fmt.Errorf("unknown cloud provider %s", providerName)
+	}
+
+	prompter := func(msg string) string {
+		var result string
+
+		fmt.Print(msg)
+		fmt.Scanln(&result)
+
+		return result
+	}
+
+	err := provider.AuthenticationFlow(secretsClient, prompter)
+	if err != nil {
+		return fmt.Errorf("executing cloud provider authentication flow: %w", err)
+	}
+
+	err = provider.Authenticate(secretsClient)
+	if err != nil {
+		return fmt.Errorf("authenticating with provider: %w", err)
+	}
+
+	err = provider.ValidateAuthentication(ctx)
+	if err != nil {
+		return fmt.Errorf("validating credentials: %w", err)
+	}
+
+	return nil
 }
 
 var errInvalidAccessToken = errors.New("invalid token")

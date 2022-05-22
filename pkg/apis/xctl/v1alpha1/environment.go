@@ -13,6 +13,7 @@ type EnvironmentSpecPlugins struct {
 }
 
 type EnvironmentSpec struct {
+	Provider   string                 `json:"provider"`
 	Domain     string                 `json:"domain"`
 	Repository string                 `json:"repository"`
 	AdminEmail string                 `json:"adminEmail"`
