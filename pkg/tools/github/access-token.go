@@ -7,12 +7,21 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
 // requestDeviceCode knows how to retrieve the device code for the Device Code Flow
 func requestDeviceCode(client http.Client, clientID string) (DeviceCodeResponse, error) {
-	payload, err := json.Marshal(deviceCodeRequest{ClientID: clientID})
+	payload, err := json.Marshal(deviceCodeRequest{
+		ClientID: clientID,
+		Scope: strings.Join(
+			[]string{
+				"repo", // For installing a deploy key - ArgoCD
+			},
+			",",
+		),
+	})
 	if err != nil {
 		return DeviceCodeResponse{}, fmt.Errorf("preparing payload: %w", err)
 	}
