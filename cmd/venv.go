@@ -56,8 +56,6 @@ var (
 			SourcePath:          &venvCmdOpts.environmentDeclarationPath,
 		}),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.Background()
-
 			provider := linode.NewLinodeProvider()
 
 			err := provider.Authenticate()
@@ -67,7 +65,7 @@ var (
 
 			kubeConfigPath, err := ensureKubeConfig(ensureKubeConfigOpts{
 				fs:                  venvCmdOpts.fs,
-				ctx:                 ctx,
+				ctx:                 cmd.Context(),
 				provider:            provider,
 				environmentManifest: venvCmdOpts.environmentManifest,
 			})

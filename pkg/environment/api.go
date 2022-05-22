@@ -1,7 +1,6 @@
 package environment
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -73,7 +72,7 @@ func Reconcile(opts ReconcileOpts) error {
 
 	spin.Start()
 
-	_, err = scheduler.Run(context.Background())
+	_, err = scheduler.Run(opts.Context)
 	if err != nil {
 		spin.FinalMSG = "❌\n\n"
 		spin.Stop()

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -25,7 +26,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	helpers.InitializeLogging()
 
-	if err := rootCmd.Execute(); err != nil {
+	if err := rootCmd.ExecuteContext(context.Background()); err != nil {
 		userError := helpers.ErrorTranslator(err)
 
 		_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", userError)

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"context"
 	"io"
 
 	"github.com/deifyed/xctl/pkg/cloud"
@@ -9,6 +10,7 @@ import (
 
 // ReconcileOpts defines required data for reconciling an application
 type ReconcileOpts struct {
+	Context             context.Context
 	Out                 io.Writer
 	Err                 io.Writer
 	Filesystem          *afero.Afero

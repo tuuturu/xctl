@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -76,11 +75,9 @@ var (
 				return fmt.Errorf("authenticating with cloud provider: %w", err)
 			}
 
-			ctx := context.Background()
-
 			kubeConfigPath, err := ensureKubeConfig(ensureKubeConfigOpts{
 				fs:                  forwardCmdOpts.fs,
-				ctx:                 ctx,
+				ctx:                 cmd.Context(),
 				provider:            provider,
 				environmentManifest: forwardCmdOpts.EnvironmentManifest,
 			})

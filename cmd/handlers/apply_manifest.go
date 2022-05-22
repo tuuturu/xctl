@@ -36,6 +36,7 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 		switch kind {
 		case v1alpha1.EnvironmentKind:
 			return environment.Reconcile(environment.ReconcileOpts{
+				Context:    cmd.Context(),
 				Out:        opts.Io.Out,
 				Err:        opts.Io.Err,
 				Filesystem: opts.Filesystem,
@@ -45,6 +46,7 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 			})
 		case v1alpha1.ApplicationKind:
 			return application.Reconcile(application.ReconcileOpts{
+				Context:             cmd.Context(),
 				Out:                 opts.Io.Out,
 				Filesystem:          opts.Filesystem,
 				ApplicationManifest: manifest,

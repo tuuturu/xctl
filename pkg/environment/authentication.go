@@ -24,12 +24,11 @@ import (
 func Authenticate(manifest *v1alpha1.Environment) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		var (
-			ctx           = context.Background()
 			secretsClient = keyring.Client{ClusterName: manifest.Metadata.Name}
 			log           = logging.GetLogger("environment", "authenticate")
 		)
 
-		err := handleGithub(ctx, log, secretsClient)
+		err := handleGithub(cmd.Context(), log, secretsClient)
 		if err != nil {
 			return fmt.Errorf("handling Github authentication: %w", err)
 		}
