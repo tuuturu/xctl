@@ -6,11 +6,11 @@ import (
 
 const secretServiceItemNotFound = "The specified item could not be found in the keyring"
 
-func handleError(err error) error {
+func handleError(err error, defaultError error) error {
 	switch err.Error() {
 	case secretServiceItemNotFound:
 		return secrets.ErrNotFound
 	default:
-		return err
+		return defaultError
 	}
 }

@@ -79,12 +79,15 @@ func (a *authenticationService) Authenticate(secretsClient secrets.Client) error
 
 func (a *authenticationService) ValidateAuthentication(ctx context.Context) error {
 	_, response, err := a.client.Repositories.ListAll(ctx, &github.RepositoryListAllOptions{})
-	if err != nil {
-		return fmt.Errorf("listing repositories: %w", err)
+	if response.StatusCode == http.StatusUnauthorized {
+		return cloud.ErrNotAuthenticated
+	}
+	if response.StatusCode == http.StatusForbidden {
+		return cloud.ErrNotAuthorized
 	}
 
-	if response.StatusCode == http.StatusUnauthorized || response.StatusCode == http.StatusForbidden {
-		return errors.New("invalid access token")
+	if err != nil {
+		return fmt.Errorf("listing repositories: %w", err)
 	}
 
 	return nil

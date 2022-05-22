@@ -39,7 +39,7 @@ func (c Client) Get(name string, key string) (string, error) {
 
 	item, err := ring.Get(name)
 	if err != nil {
-		return "", handleError(fmt.Errorf("retrieving secret: %w", err))
+		return "", handleError(err, fmt.Errorf("retrieving secret: %w", err))
 	}
 
 	var content map[string]string

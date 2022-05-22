@@ -15,4 +15,6 @@ var (
 		Content: "not authenticated",
 		Key:     "cloud/notAuthenticated",
 	}
+	// ErrNotAuthorized indicates missing rights
+	ErrNotAuthorized = errors.New("not authorized")
 )

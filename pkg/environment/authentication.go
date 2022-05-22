@@ -2,7 +2,9 @@ package environment
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/deifyed/xctl/pkg/tools/secrets"
 	"strings"
 	"syscall"
 
@@ -64,14 +66,16 @@ func handleProvider(ctx context.Context, log logging.Logger, secretsClient keyri
 
 	err := provider.Authenticate(secretsClient)
 	if err != nil {
-		return fmt.Errorf("authenticating with existing credentials: %w", err)
+		if !errors.Is(err, secrets.ErrNotFound) {
+			return fmt.Errorf("authenticating with existing credentials: %w", err)
+		}
 	} else {
 		err = provider.ValidateAuthentication(ctx)
 		if err == nil {
 			return nil
 		}
 
-		if err != nil {
+		if err != nil && !errors.Is(err, cloud.ErrNotAuthenticated) {
 			return fmt.Errorf("validating existing credentials: %w", err)
 		}
 	}
@@ -104,7 +108,7 @@ func prompter(msg string, hidden bool) string {
 
 		result = string(rawResult)
 	} else {
-		fmt.Scanln(result)
+		fmt.Scanln(&result)
 	}
 
 	fmt.Print("\n")
