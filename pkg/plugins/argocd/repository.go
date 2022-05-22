@@ -2,14 +2,19 @@ package argocd
 
 import "regexp"
 
-var repositoryRe = regexp.MustCompile(`(?P<protocol>\w+)@(?P<owner>[\w.]+)/(?P<name>\w+)`)
+var repositoryRe = regexp.MustCompile(`(?P<protocol>\w+)@(?P<host>[\w.]+):(?P<owner>\w+)/(?P<name>\w+)`)
 
 func (r repository) findItem(key string) string {
-	match := repositoryRe.FindStringSubmatch(r.URL)
+	groupNames := repositoryRe.SubexpNames()
+	matches := repositoryRe.FindAllStringSubmatch(r.URL, -1)
 
-	for i, name := range match {
-		if name == key {
-			return match[i]
+	for _, match := range matches {
+		for groupIdx, group := range match {
+			name := groupNames[groupIdx]
+
+			if name == key {
+				return group
+			}
 		}
 	}
 
