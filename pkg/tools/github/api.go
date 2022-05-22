@@ -1,84 +1,91 @@
 package github
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
-	"time"
+	"strings"
+
+	"github.com/deifyed/xctl/pkg/cloud"
+	"github.com/deifyed/xctl/pkg/config"
+	"github.com/deifyed/xctl/pkg/tools/secrets"
+	"github.com/google/go-github/v44/github"
+	"github.com/logrusorgru/aurora/v3"
+	"golang.org/x/oauth2"
 )
 
-// RequestDeviceCode knows how to retrieve the device code for the Device Code Flow
-func RequestDeviceCode(client http.Client, clientID string) (DeviceCodeResponse, error) {
-	payload, err := json.Marshal(deviceCodeRequest{ClientID: clientID})
-	if err != nil {
-		return DeviceCodeResponse{}, fmt.Errorf("preparing payload: %w", err)
-	}
-
-	request, err := http.NewRequest(
-		http.MethodPost,
-		"https://github.com/login/device/code",
-		bytes.NewReader(payload),
-	)
-	if err != nil {
-		return DeviceCodeResponse{}, fmt.Errorf("building request: %w", err)
-	}
-
-	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("Accept", "application/json")
-
-	rawResponse, err := client.Do(request)
-	if err != nil {
-		return DeviceCodeResponse{}, fmt.Errorf("executing request: %w", err)
-	}
-
-	rawResponseBytes, err := io.ReadAll(rawResponse.Body)
-	if err != nil {
-		return DeviceCodeResponse{}, fmt.Errorf("buffering: %w", err)
-	}
-
-	var response DeviceCodeResponse
-
-	err = json.Unmarshal(rawResponseBytes, &response)
-	if err != nil {
-		return DeviceCodeResponse{}, fmt.Errorf("unmarshalling: %w", err)
-	}
-
-	return response, nil
+func Authenticator() cloud.AuthenticationService {
+	return &authenticationService{}
 }
 
-// PollForAccessToken knows how to poll and wait for a response from the user to a Device Token Flow
-func PollForAccessToken(client http.Client, clientID string, deviceCodeResponse DeviceCodeResponse) (string, error) {
-	expiry := time.Now().Add(time.Duration(deviceCodeResponse.ExpiresIn) * time.Second)
-	interval := time.Duration(deviceCodeResponse.Interval) * time.Second
+func (a *authenticationService) AuthenticationFlow(secretsClient secrets.Client, userInputPrompter cloud.UserInputPrompter) error {
+	httpClient := http.Client{}
 
-	var (
-		accessToken string
-		err         error
-	)
-
-	for time.Now().Before(expiry) {
-		time.Sleep(interval)
-
-		accessToken, err = requestAccessToken(client, clientID, deviceCodeResponse.DeviceCode)
-
-		switch {
-		case err == nil:
-			return accessToken, nil
-		case errors.Is(err, errPending):
-			continue
-		case errors.Is(err, errSlowDown):
-			interval = interval + (5 * time.Second)
-		case errors.Is(err, ErrExpiredToken):
-			return "", fmt.Errorf("device token expired: %w", err)
-		case errors.Is(err, ErrAccessDenied):
-			return "", fmt.Errorf("user canceled: %w", err)
-		default:
-			return "", fmt.Errorf("requesting access token: %w", err)
-		}
+	deviceCodeResponse, err := requestDeviceCode(httpClient, config.DefaultGithubOAuthClientID)
+	if err != nil {
+		return fmt.Errorf("requesting device code: %w", err)
 	}
 
-	return "", errors.New("device token expired")
+	println(fmt.Sprintf(
+		"%s Enter the following code when prompted: %s",
+		aurora.Yellow("Attention!"),
+		aurora.Green(deviceCodeResponse.UserCode),
+	))
+
+	response := userInputPrompter("Ready? [y/N] ", false)
+
+	if strings.ToLower(response) != "y" {
+		return errors.New("user aborted")
+	}
+
+	err = openBrowser(deviceCodeResponse.VerificationURI)
+	if err != nil {
+		return fmt.Errorf("opening verification URI: %w", err)
+	}
+
+	accessToken, err := pollForAccessToken(httpClient, config.DefaultGithubOAuthClientID, deviceCodeResponse)
+	if err != nil {
+		return fmt.Errorf("polling for access token: %w", err)
+	}
+
+	err = secretsClient.Put(
+		config.DefaultSecretsGithubNamespace,
+		map[string]string{config.DefaultSecretsGithubAccessTokenKey: accessToken},
+	)
+	if err != nil {
+		return fmt.Errorf("storing access token: %w", err)
+	}
+
+	return nil
+}
+
+func (a *authenticationService) Authenticate(secretsClient secrets.Client) error {
+	accessToken, err := secretsClient.Get(config.DefaultSecretsGithubNamespace, config.DefaultSecretsGithubAccessTokenKey)
+	if err != nil {
+		return fmt.Errorf("retrieving credentials: %w", err)
+	}
+
+	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken})
+
+	oauth2Client := &http.Client{
+		Transport: &oauth2.Transport{Source: tokenSource},
+	}
+
+	a.client = github.NewClient(oauth2Client)
+
+	return nil
+}
+
+func (a *authenticationService) ValidateAuthentication(ctx context.Context) error {
+	_, response, err := a.client.Repositories.ListAll(ctx, &github.RepositoryListAllOptions{})
+	if err != nil {
+		return fmt.Errorf("listing repositories: %w", err)
+	}
+
+	if response.StatusCode == http.StatusUnauthorized || response.StatusCode == http.StatusForbidden {
+		return errors.New("invalid access token")
+	}
+
+	return nil
 }

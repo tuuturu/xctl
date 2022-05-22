@@ -6,7 +6,7 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/secrets"
 )
 
-type UserInputPrompter func(message string) (input string)
+type UserInputPrompter func(message string, hidden bool) (input string)
 
 type AuthenticationService interface {
 	// AuthenticationFlow knows how to gather necessary information to authenticate with a cloud provider. It should

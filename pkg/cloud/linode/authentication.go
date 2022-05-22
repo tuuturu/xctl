@@ -19,7 +19,7 @@ func (p *provider) AuthenticationFlow(secretsClient secrets.Client, userInputPro
 	accessToken := os.Getenv(linodego.APIEnvVar)
 
 	if accessToken == "" {
-		accessToken = userInputPrompter("Please enter your Linode personal access token: ")
+		accessToken = userInputPrompter("Please enter your Linode personal access token: ", true)
 	}
 
 	err := secretsClient.Put(

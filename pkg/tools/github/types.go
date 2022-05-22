@@ -1,5 +1,13 @@
 package github
 
+import (
+	"github.com/google/go-github/v44/github"
+)
+
+type authenticationService struct {
+	client *github.Client
+}
+
 const (
 	grantType = "urn:ietf:params:oauth:grant-type:device_code"
 )
