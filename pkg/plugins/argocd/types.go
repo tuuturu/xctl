@@ -16,11 +16,11 @@ type keyPair struct {
 }
 
 type repositorySecretOpts struct {
-	SecretName          string
-	RepositoryName      string
-	RepositoryURL       string
-	PrivateKey          string
-	OperationsNamespace string
+	SecretName           string
+	RepositoryName       string
+	RepositoryURI        string
+	RepositoryPrivateKey string
+	OperationsNamespace  string
 }
 
 type repository struct {

@@ -53,11 +53,11 @@ func generateRepositorySecret(repo repository, privateKey []byte) (io.Reader, er
 	buf := bytes.Buffer{}
 
 	err = t.Execute(&buf, repositorySecretOpts{
-		SecretName:          toSecretName(repo.Name()),
-		OperationsNamespace: config.DefaultOperationsNamespace,
-		RepositoryName:      repo.Name(),
-		RepositoryURL:       repo.URL,
-		PrivateKey:          string(privateKey),
+		SecretName:           toSecretName(repo.Name()),
+		OperationsNamespace:  config.DefaultOperationsNamespace,
+		RepositoryName:       repo.Name(),
+		RepositoryURI:        repo.URL,
+		RepositoryPrivateKey: string(privateKey),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("generating secret: %w", err)
