@@ -56,4 +56,14 @@ const ( // Internal filesystem directories
 	DefaultKubeconfigFilename = "kubeconfig.yaml"
 	// DefaultBinariesDir defines the name of the directory containing binaries
 	DefaultBinariesDir = "binaries"
+	// DefaultInfrastructureDir defines the name of the directory where xctl will store and modify IAC
+	DefaultInfrastructureDir = "infrastructure"
+	// DefaultApplicationsDir defines the name of the directory where xctl will store application configuration
+	DefaultApplicationsDir = "applications"
+	// DefaultApplicationBaseDir defines the name of the directory where xctl will store application configuration that
+	// spans environments
+	DefaultApplicationBaseDir = "base"
+	// DefaultApplicationsOverlaysDir defines the name of the directory where xctl will store the environment specific
+	// application configuration
+	DefaultApplicationsOverlaysDir = "overlays"
 )

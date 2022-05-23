@@ -5,16 +5,18 @@ import (
 	"io"
 	"strings"
 
-	"github.com/deifyed/xctl/pkg/cloud/linode"
-
-	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
-
 	"github.com/deifyed/xctl/pkg/plugins/certmanager"
 	"github.com/deifyed/xctl/pkg/plugins/grafana"
 	"github.com/deifyed/xctl/pkg/plugins/loki"
 	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 	"github.com/deifyed/xctl/pkg/plugins/prometheus"
 	"github.com/deifyed/xctl/pkg/plugins/promtail"
+
+	"github.com/deifyed/xctl/pkg/tools/paths"
+
+	"github.com/deifyed/xctl/pkg/cloud/linode"
+
+	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
 
 	"github.com/deifyed/xctl/pkg/plugins/argocd"
 
@@ -54,6 +56,11 @@ func Reconcile(opts ReconcileOpts) error {
 		spinnerOut = io.Discard
 	}
 
+	absoluteRepositoryRootDir, err := paths.AbsoluteRepositoryRootDirectory()
+	if err != nil {
+		return fmt.Errorf("acquiring root directory: %w", err)
+	}
+
 	spin := spinner.NewSpinner(spinnerOut)
 	spin.FinalMSG = "✅"
 
@@ -61,9 +68,10 @@ func Reconcile(opts ReconcileOpts) error {
 		Filesystem:                      opts.Filesystem,
 		Out:                             opts.Out,
 		Keyring:                         keyringClient,
+		RootDirectory:                   absoluteRepositoryRootDir,
 		PurgeFlag:                       opts.Purge,
-		EnvironmentManifest:             manifest,
 		ReconciliationLoopDelayFunction: reconciliation.DefaultDelayFunction,
+		EnvironmentManifest:             manifest,
 		QueueStepFunc: func(identifier string) {
 			log.Debug(fmt.Sprintf("reconciling %s", identifier))
 

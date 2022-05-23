@@ -40,10 +40,11 @@ const (
 
 // Context represents metadata required by most if not all operations on services
 type Context struct {
-	Ctx        context.Context
-	Filesystem *afero.Afero
-	Out        io.Writer
-	Keyring    secrets.Client
+	Ctx           context.Context
+	Filesystem    *afero.Afero
+	Out           io.Writer
+	Keyring       secrets.Client
+	RootDirectory string
 
 	EnvironmentManifest    v1alpha1.Environment
 	ApplicationDeclaration v1alpha1.Application

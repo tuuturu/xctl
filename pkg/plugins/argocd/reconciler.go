@@ -78,6 +78,20 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 			return reconciliation.Result{}, fmt.Errorf("applying secret: %w", err)
 		}
 
+		applicationsAppManifest, err := establishConfiguration(
+			rctx.Filesystem,
+			rctx.RootDirectory,
+			rctx.EnvironmentManifest,
+		)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("establishing configuration")
+		}
+
+		err = kubectlClient.Apply(applicationsAppManifest)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("applying applications app manifest: %w", err)
+		}
+
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
 		log.Debug("deleting")

@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/deifyed/xctl/pkg/tools/secrets"
 	"strings"
 	"syscall"
+
+	"github.com/deifyed/xctl/pkg/tools/secrets"
 
 	"github.com/deifyed/xctl/pkg/tools/github"
 	"golang.org/x/term"
