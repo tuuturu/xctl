@@ -50,7 +50,9 @@ func Reconcile(opts ReconcileOpts) error {
 		},
 	}
 
-	scheduler := reconciliation.NewScheduler(schedulerOpts)
+	scheduler := reconciliation.NewScheduler(schedulerOpts,
+		reconciler{},
+	)
 
 	spin.Start()
 
@@ -71,7 +73,7 @@ func Reconcile(opts ReconcileOpts) error {
 	return nil
 }
 
-//go:embed application-template.yaml
+//go:embed templates/application.yaml
 var applicationTemplate string //nolint:gochecknoglobals
 
 // Scaffold returns a stream containing an application template

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mock-app
+  template:
+    metadata:
+      labels:
+        app: mock-app
+    spec:
+      containers:
+        - image: xctl.tuuturu.org/mock-app:v0.0.1
+          name: mock-app
+
+---

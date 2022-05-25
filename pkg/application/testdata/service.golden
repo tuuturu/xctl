@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-app
+spec:
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    app: mock-app
+  type: ClusterIP
+
+---

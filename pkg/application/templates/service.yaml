@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.ApplicationName}}
+spec:
+  ports:
+    - port: 80
+      targetPort: {{.ApplicationPort}}
+  selector:
+    app: {{.ApplicationName}}
+  type: ClusterIP
+
+---

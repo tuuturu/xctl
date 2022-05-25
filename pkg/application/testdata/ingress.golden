@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mock-app
+spec:
+  rules:
+    - host: mock-app.tuuturu.org
+      http:
+        paths:
+          - backend:
+              service:
+                name: mock-app
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - mock-app.tuuturu.org
+      secretName: mock-app-tls
+
+---
