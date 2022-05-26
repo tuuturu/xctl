@@ -84,10 +84,24 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 			rctx.EnvironmentManifest,
 		)
 		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("establishing configuration")
+			return reconciliation.Result{}, fmt.Errorf("establishing configuration: %w", err)
 		}
 
 		err = kubectlClient.Apply(applicationsAppManifest)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("applying applications app manifest: %w", err)
+		}
+
+		namespacesAppManifest, err := establishNamespacesConfiguration(
+			rctx.Filesystem,
+			rctx.RootDirectory,
+			rctx.EnvironmentManifest,
+		)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("establishing namespaces configuration: %w", err)
+		}
+
+		err = kubectlClient.Apply(namespacesAppManifest)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("applying applications app manifest: %w", err)
 		}

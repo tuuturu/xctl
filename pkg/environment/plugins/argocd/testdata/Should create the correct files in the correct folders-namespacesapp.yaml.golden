@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: namespaces
+  namespace: operations
+spec:
+  destination:
+    namespace: operations
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: infrastructure/mock-env/argocd/namespaces
+    repoURL: git@github.com:mockorg/mock.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+
+---

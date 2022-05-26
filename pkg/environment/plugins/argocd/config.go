@@ -47,7 +47,7 @@ func establishConfiguration(fs *afero.Afero, absoluteRepositoryRootDirectory str
 		return nil, fmt.Errorf("building applications readme: %w", err)
 	}
 
-	err = fs.WriteReader(path.Join(absoluteApplicationsDir, applicationsReadmeFilename), applicationsReadme)
+	err = fs.WriteReader(path.Join(absoluteApplicationsDir, readmeFilename), applicationsReadme)
 	if err != nil {
 		return nil, fmt.Errorf("writing applications readme: %w", err)
 	}
@@ -97,7 +97,7 @@ func applicationsDir(root string, environmentName string) string {
 
 const (
 	applicationsApplicationsFilename = "applications.yaml"
-	applicationsReadmeFilename       = "README.md"
+	readmeFilename                   = "README.md"
 )
 
 type buildApplicationsApplicationOpts struct {
