@@ -1,4 +1,4 @@
-package application
+package manifests
 
 import (
 	"path"
@@ -42,15 +42,15 @@ func TestReconciler_Reconcile(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			fs := &afero.Afero{Fs: afero.NewMemMapFs()}
-			r := reconciler{}
-
 			appDir := path.Join(
 				"/",
 				config.DefaultInfrastructureDir,
 				config.DefaultApplicationsDir,
 				tc.withApp.Metadata.Name,
 			)
+
+			fs := &afero.Afero{Fs: afero.NewMemMapFs()}
+			r := Reconciler(appDir)
 
 			_, err := r.Reconcile(reconciliation.Context{
 				Filesystem:             fs,

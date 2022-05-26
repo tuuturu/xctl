@@ -1,14 +1,49 @@
-package application
+package manifests
 
 import (
 	"bytes"
 	_ "embed"
 	"fmt"
 	"io"
+	"path"
 	"text/template"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
+
+func writeBaseManifests(fs readerWriter, targetDir string, application v1alpha1.Application) error {
+	deployment, err := scaffoldDeployment(application)
+	if err != nil {
+		return fmt.Errorf("scaffolding deployment: %w", err)
+	}
+
+	err = fs.WriteReader(path.Join(targetDir, "deployment.yaml"), deployment)
+	if err != nil {
+		return fmt.Errorf("writing deployment: %w", err)
+	}
+
+	service, err := scaffoldService(application)
+	if err != nil {
+		return fmt.Errorf("scaffolding service: %w", err)
+	}
+
+	err = fs.WriteReader(path.Join(targetDir, "service.yaml"), service)
+	if err != nil {
+		return fmt.Errorf("writing service: %w", err)
+	}
+
+	ingress, err := scaffoldIngress(application)
+	if err != nil {
+		return fmt.Errorf("scaffolding ingress: %w", err)
+	}
+
+	err = fs.WriteReader(path.Join(targetDir, "ingress.yaml"), ingress)
+	if err != nil {
+		return fmt.Errorf("writing ingress: %w", err)
+	}
+
+	return nil
+}
 
 //go:embed templates/deployment.yaml
 var deploymentTemplate string

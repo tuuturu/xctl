@@ -6,6 +6,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/tools/paths"
+
 	"github.com/deifyed/xctl/pkg/application"
 	"github.com/deifyed/xctl/pkg/environment"
 
@@ -25,23 +27,30 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 
 		fmt.Fprintf(opts.Io.Out, "Applying %s manifest, please wait\n\n", strings.ToLower(kind))
 
+		absoluteRepositoryRootDirectory, err := paths.AbsoluteRepositoryRootDirectory()
+		if err != nil {
+			return fmt.Errorf("acquiring repository root directory: %w", err)
+		}
+
 		switch kind {
 		case v1alpha1.EnvironmentKind:
 			return environment.Reconcile(environment.ReconcileOpts{
 				Context:    cmd.Context(),
-				Out:        opts.Io.Out,
-				Err:        opts.Io.Err,
+				Out:        cmd.OutOrStdout(),
+				Err:        cmd.OutOrStderr(),
 				Filesystem: opts.Filesystem,
 				Manifest:   manifest,
 				Purge:      opts.Purge,
 			})
 		case v1alpha1.ApplicationKind:
 			return application.Reconcile(application.ReconcileOpts{
-				Context:             cmd.Context(),
-				Out:                 opts.Io.Out,
-				Filesystem:          opts.Filesystem,
-				ApplicationManifest: manifest,
-				Purge:               opts.Purge,
+				Context:                 cmd.Context(),
+				Out:                     cmd.OutOrStdout(),
+				Err:                     cmd.OutOrStderr(),
+				Filesystem:              opts.Filesystem,
+				RepositoryRootDirectory: absoluteRepositoryRootDirectory,
+				ApplicationManifest:     manifest,
+				Purge:                   opts.Purge,
 			})
 		default:
 			return fmt.Errorf("unknown kind %s", kind)

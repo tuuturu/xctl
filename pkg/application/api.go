@@ -6,6 +6,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/application/manifests"
+
 	"github.com/deifyed/xctl/pkg/environment"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
@@ -40,6 +42,7 @@ func Reconcile(opts ReconcileOpts) error {
 		Filesystem:                      opts.Filesystem,
 		Out:                             opts.Out,
 		PurgeFlag:                       opts.Purge,
+		RootDirectory:                   opts.RepositoryRootDirectory,
 		EnvironmentManifest:             environmentManifest,
 		ApplicationManifest:             applicationManifest,
 		ReconciliationLoopDelayFunction: reconciliation.DefaultDelayFunction,
@@ -50,8 +53,10 @@ func Reconcile(opts ReconcileOpts) error {
 		},
 	}
 
+	absoluteApplicationDirectory := applicationsDir(opts.RepositoryRootDirectory, applicationManifest.Metadata.Name)
+
 	scheduler := reconciliation.NewScheduler(schedulerOpts,
-		reconciler{},
+		manifests.Reconciler(absoluteApplicationDirectory),
 	)
 
 	spin.Start()
