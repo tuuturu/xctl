@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"io"
 	"path"
-	"sigs.k8s.io/yaml"
 	"text/template"
+
+	"sigs.k8s.io/yaml"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )

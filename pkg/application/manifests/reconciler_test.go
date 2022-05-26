@@ -42,12 +42,16 @@ func TestReconciler_Reconcile(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
+			environmentContext := v1alpha1.Environment{Metadata: v1alpha1.Metadata{Name: "mock-cluster"}}
+
 			appDir := path.Join(
 				"/",
 				config.DefaultInfrastructureDir,
 				config.DefaultApplicationsDir,
 				tc.withApp.Metadata.Name,
 			)
+			baseDir := path.Join(appDir, config.DefaultApplicationBaseDir)
+			overlaysDir := path.Join(appDir, config.DefaultApplicationsOverlaysDir, environmentContext.Metadata.Name)
 
 			fs := &afero.Afero{Fs: afero.NewMemMapFs()}
 			r := Reconciler(appDir)
@@ -55,15 +59,21 @@ func TestReconciler_Reconcile(t *testing.T) {
 			_, err := r.Reconcile(reconciliation.Context{
 				Filesystem:             fs,
 				RootDirectory:          "/",
+				EnvironmentManifest:    environmentContext,
 				ApplicationDeclaration: tc.withApp,
 			})
 			assert.NoError(t, err)
 
 			g := goldie.New(t)
 
-			equalsGoldie(t, g, fs, path.Join(appDir, config.DefaultApplicationBaseDir, "deployment.yaml"), "deployment")
-			equalsGoldie(t, g, fs, path.Join(appDir, config.DefaultApplicationBaseDir, "service.yaml"), "service")
-			equalsGoldie(t, g, fs, path.Join(appDir, config.DefaultApplicationBaseDir, "ingress.yaml"), "ingress")
+			// Base
+			equalsGoldie(t, g, fs, path.Join(baseDir, "deployment.yaml"), "deployment")
+			equalsGoldie(t, g, fs, path.Join(baseDir, "service.yaml"), "service")
+			equalsGoldie(t, g, fs, path.Join(baseDir, "ingress.yaml"), "ingress")
+			equalsGoldie(t, g, fs, path.Join(baseDir, "kustomization.yaml"), "base-kustomization")
+
+			// Overlays
+			equalsGoldie(t, g, fs, path.Join(overlaysDir, "kustomization.yaml"), "overlays-kustomization")
 		})
 	}
 }
