@@ -44,7 +44,9 @@ metadata:
   email: demo@example.com
 
 spec:
-domain: example.com
+  provider: linode
+  domain: example.com
+  repository: git@github.com:tuuturu/iac.git
 EOF
 ```
 
@@ -56,7 +58,7 @@ After a few minutes you'll have a running Kubernetes cluster with the technologi
 To be able to run `kubectl` commands, use `xctl venv -c environment.yaml` to create a subshell with the environment
 variable `KUBECONFIG` set.
 
-### Deploying an app (To be implemented)
+### Deploying an app
 
 ```shell
 xctl apply -f - << EOF
@@ -86,8 +88,8 @@ After a committing and pushing the changes done by `xctl`, ArgoCD should soon sp
   - [x] Prometheus for scraping metrics
   - [x] Loki for collecting logs and making them queryable
   - [x] Promtail for scraping container logs
-- [ ] CI/CD
-  - [ ] ArgoCD for continuous deployment
+- [x] CI/CD
+  - [x] ArgoCD for continuous deployment
 - [ ] Secrets
   - [ ] Vault as the secret manager
   - [ ] External Secrets for accessing secrets
