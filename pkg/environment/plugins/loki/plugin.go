@@ -1,7 +1,10 @@
 package loki
 
 import (
+	"bytes"
 	_ "embed"
+	"text/template"
+	"time"
 
 	"github.com/deifyed/xctl/pkg/config"
 
@@ -26,10 +29,34 @@ func NewPlugin() v1alpha1.Plugin {
 	plugin.Spec.Helm.Repository.Name = "grafana"
 	plugin.Spec.Helm.Repository.URL = "https://grafana.github.io/helm-charts"
 
-	plugin.Spec.Helm.Values = rawValues
-	plugin.Spec.Manifests = []string{rawDatasourcesCM}
+	plugin.Spec.Helm.Values = values()
+	plugin.Spec.Manifests = []string{monitoringNamespaceCM()}
 
 	return plugin
+}
+
+func monitoringNamespaceCM() string {
+	t := template.Must(template.New("datasource").Parse(rawDatasourcesCM))
+
+	buf := bytes.Buffer{}
+
+	_ = t.Execute(&buf, struct {
+		MonitoringNamespace string
+	}{MonitoringNamespace: config.DefaultMonitoringNamespace})
+
+	return buf.String()
+}
+
+func values() string {
+	t := template.Must(template.New("values").Parse(rawValues))
+
+	buf := bytes.Buffer{}
+
+	_ = t.Execute(&buf, struct {
+		Date string
+	}{time.Now().Format("2006-01-02")})
+
+	return buf.String()
 }
 
 var (

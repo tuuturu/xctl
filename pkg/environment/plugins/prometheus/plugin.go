@@ -1,7 +1,9 @@
 package prometheus
 
 import (
+	"bytes"
 	_ "embed"
+	"text/template"
 
 	"github.com/deifyed/xctl/pkg/config"
 
@@ -16,19 +18,31 @@ func NewPlugin() v1alpha1.Plugin {
 
 	// URL: https://artifacthub.io/packages/helm/prometheus-community/prometheus
 	plugin.Spec.Helm.Chart = "prometheus"
-	plugin.Spec.Helm.Version = "15.8.5"
-	plugin.Spec.Helm.Values = template
+	plugin.Spec.Helm.Version = "15.9.0"
+	plugin.Spec.Helm.Values = valuesTemplate
 
 	plugin.Spec.Helm.Repository.Name = "prometheus-community"
 	plugin.Spec.Helm.Repository.URL = "https://prometheus-community.github.io/helm-charts"
 
-	plugin.Spec.Manifests = []string{datasourceConfigMapTemplate}
+	plugin.Spec.Manifests = []string{datasourceConfigmap()}
 
 	return plugin
 }
 
+func datasourceConfigmap() string {
+	t := template.Must(template.New("datasource").Parse(datasourceConfigMapTemplate))
+
+	buf := bytes.Buffer{}
+
+	_ = t.Execute(&buf, struct {
+		MonitoringNamespace string
+	}{MonitoringNamespace: config.DefaultMonitoringNamespace})
+
+	return buf.String()
+}
+
 //go:embed values.yaml
-var template string //nolint:gochecknoglobals
+var valuesTemplate string //nolint:gochecknoglobals
 //go:embed datasource.yaml
 var datasourceConfigMapTemplate string
 
