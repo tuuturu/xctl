@@ -303,7 +303,7 @@ config:
       # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet for reference
       - job_name: kubernetes-pods
         pipeline_stages:
-          {{- toYaml .Values.config.snippets.pipelineStages | nindent 4 }}
+          {- toYaml .Values.config.snippets.pipelineStages | nindent 4 }
         kubernetes_sd_configs:
           - role: pod
         relabel_configs:
@@ -326,14 +326,14 @@ config:
             regex: ^;*([^;]+)(;.*)?$
             action: replace
             target_label: component
-          {{- if .Values.config.snippets.addScrapeJobLabel }}
+          {- if .Values.config.snippets.addScrapeJobLabel }
           - replacement: kubernetes-pods
             target_label: scrape_job
-          {{- end }}
-          {{- toYaml .Values.config.snippets.common | nindent 4 }}
-          {{- with .Values.config.snippets.extraRelabelConfigs }}
-          {{- toYaml . | nindent 4 }}
-          {{- end }}
+          {- end }
+          {- toYaml .Values.config.snippets.common | nindent 4 }
+          {- with .Values.config.snippets.extraRelabelConfigs }
+          {- toYaml . | nindent 4 }
+          {- end }
 
   # -- Config file contents for Promtail.
   # Must be configured as string.
@@ -341,21 +341,21 @@ config:
   # @default -- See `values.yaml`
   file: |
     server:
-      log_level: {{ .Values.config.logLevel }}
-      http_listen_port: {{ .Values.config.serverPort }}
+      log_level: { .Values.config.logLevel }
+      http_listen_port: { .Values.config.serverPort }
 
     clients:
-      - url: {{ tpl .Values.config.lokiAddress . }}
-      {{- with .Values.config.snippets.extraClientConfigs }}
-      {{- toYaml . | nindent 2 }}
-      {{- end }}
+      - url: { tpl .Values.config.lokiAddress . }
+      {- with .Values.config.snippets.extraClientConfigs }
+      {- toYaml . | nindent 2 }
+      {- end }
 
     positions:
       filename: /run/promtail/positions.yaml
 
     scrape_configs:
-      {{- tpl .Values.config.snippets.scrapeConfigs . | nindent 2 }}
-      {{- tpl .Values.config.snippets.extraScrapeConfigs . | nindent 2 }}
+      {- tpl .Values.config.snippets.scrapeConfigs . | nindent 2 }
+      {- tpl .Values.config.snippets.extraScrapeConfigs . | nindent 2 }
 
 networkPolicy:
   # -- Specifies whether Network Policies should be created
