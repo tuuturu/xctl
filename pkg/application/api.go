@@ -6,6 +6,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/application/plugins/namespace"
+
 	"github.com/deifyed/xctl/pkg/application/plugins/argocd"
 
 	"github.com/deifyed/xctl/pkg/application/manifests"
@@ -60,6 +62,7 @@ func Reconcile(opts ReconcileOpts) error {
 
 	scheduler := reconciliation.NewScheduler(schedulerOpts,
 		manifests.Reconciler(absoluteApplicationDirectory),
+		namespace.Reconciler(absoluteEnvironmentDirectory),
 		argocd.Reconciler(absoluteEnvironmentDirectory),
 	)
 
