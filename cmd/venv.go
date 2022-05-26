@@ -78,6 +78,7 @@ var (
 
 			env := venv.MergeVariables(os.Environ(), []string{
 				fmt.Sprintf("KUBECONFIG=%s", kubeConfigPath),
+				fmt.Sprintf("XCTL_CONTEXT=%s", venvCmdOpts.environmentDeclarationPath),
 			})
 
 			workDir, err := venvCmdOpts.fs.TempDir("/tmp", "xctl")
