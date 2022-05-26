@@ -33,7 +33,7 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		return reconciliation.Result{}, nil
 	case reconciliation.ActionDelete:
-		err := rctx.Filesystem.Remove(applicationPath)
+		err := rctx.Filesystem.RemoveAll(applicationPath)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("removing: %w", err)
 		}
