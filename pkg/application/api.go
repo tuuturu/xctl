@@ -6,6 +6,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/application/plugins/argocd"
+
 	"github.com/deifyed/xctl/pkg/application/manifests"
 
 	"github.com/deifyed/xctl/pkg/environment"
@@ -54,9 +56,11 @@ func Reconcile(opts ReconcileOpts) error {
 	}
 
 	absoluteApplicationDirectory := applicationsDir(opts.RepositoryRootDirectory, applicationManifest.Metadata.Name)
+	absoluteEnvironmentDirectory := environmentDir(opts.RepositoryRootDirectory, environmentManifest.Metadata.Name)
 
 	scheduler := reconciliation.NewScheduler(schedulerOpts,
 		manifests.Reconciler(absoluteApplicationDirectory),
+		argocd.Reconciler(absoluteEnvironmentDirectory),
 	)
 
 	spin.Start()

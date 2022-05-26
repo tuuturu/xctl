@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mock-app
+  namespace: operations
+spec:
+  destination:
+    namespace: mock-namespace
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: infrastructure/applications/mock-app/overlays/mock-cluster
+    repoURL: git@github.com:mock-org/mock-repo.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
+
+---
