@@ -40,7 +40,7 @@ func NewDefaultEnvironment() Environment {
 				Grafana:                true,
 				Loki:                   true,
 				Promtail:               true,
-				ArgoCD:                 false,
+				ArgoCD:                 true,
 			},
 		},
 	}
