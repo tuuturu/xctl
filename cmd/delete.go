@@ -3,6 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/deifyed/xctl/cmd/helpers"
+
 	"github.com/deifyed/xctl/pkg/tools/i18n"
 
 	"github.com/deifyed/xctl/cmd/handlers"
@@ -32,6 +34,7 @@ var (
 func init() {
 	flags := deleteCmd.Flags()
 
+	helpers.AddEnvironmentContextFlag(flags, &deleteCmdOpts.EnvironmentContext)
 	flags.StringVarP(&deleteCmdOpts.File, "file", "f", "-", "file representing resource to delete")
 
 	rootCmd.AddCommand(deleteCmd)
