@@ -3,13 +3,20 @@ kind: Environment
 
 metadata:
   # Name of the environment
-  name: tuuturu-prod
+  name: example-prod
   # Associate following email with the environment
-  email: mail@tuuturu.org
+  email: mail@example.com
 
 spec:
+  # Specify desired cloud provider
+  provider: linode
   # Associate following domain with the environment
-  domain: tuuturu.org
+  domain: example.com
+  # Specify associated Infrastructure As Code (IAC) repository
+  repository: git@github.com:example/infrastructure.git
+
+  #users:
+  #  - email: user@example.com
 
   #plugins:
   #  nginxIngressController: true
@@ -17,3 +24,4 @@ spec:
   #  grafana: true
   #  prometheus: true
   #  loki: true
+  #  argocd: true
