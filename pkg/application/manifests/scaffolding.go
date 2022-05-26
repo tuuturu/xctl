@@ -6,40 +6,66 @@ import (
 	"fmt"
 	"io"
 	"path"
+	"sigs.k8s.io/yaml"
 	"text/template"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
 
 func writeBaseManifests(fs readerWriter, targetDir string, application v1alpha1.Application) error {
+	resources := make([]string, 0)
+
 	deployment, err := scaffoldDeployment(application)
 	if err != nil {
 		return fmt.Errorf("scaffolding deployment: %w", err)
 	}
 
-	err = fs.WriteReader(path.Join(targetDir, "deployment.yaml"), deployment)
+	deploymentFilename := "deployment.yaml"
+	resources = append(resources, deploymentFilename)
+
+	err = fs.WriteReader(path.Join(targetDir, deploymentFilename), deployment)
 	if err != nil {
 		return fmt.Errorf("writing deployment: %w", err)
 	}
 
-	service, err := scaffoldService(application)
-	if err != nil {
-		return fmt.Errorf("scaffolding service: %w", err)
+	if requiresNetworking(application) {
+		service, err := scaffoldService(application)
+		if err != nil {
+			return fmt.Errorf("scaffolding service: %w", err)
+		}
+
+		serviceFilename := "service.yaml"
+		resources = append(resources, serviceFilename)
+
+		err = fs.WriteReader(path.Join(targetDir, serviceFilename), service)
+		if err != nil {
+			return fmt.Errorf("writing service: %w", err)
+		}
 	}
 
-	err = fs.WriteReader(path.Join(targetDir, "service.yaml"), service)
-	if err != nil {
-		return fmt.Errorf("writing service: %w", err)
+	if requiresIngress(application) {
+		ingress, err := scaffoldIngress(application)
+		if err != nil {
+			return fmt.Errorf("scaffolding ingress: %w", err)
+		}
+
+		ingressFilename := "ingress.yaml"
+		resources = append(resources, ingressFilename)
+
+		err = fs.WriteReader(path.Join(targetDir, ingressFilename), ingress)
+		if err != nil {
+			return fmt.Errorf("writing ingress: %w", err)
+		}
 	}
 
-	ingress, err := scaffoldIngress(application)
+	rawKustomization, err := yaml.Marshal(&kustomize{Resources: resources})
 	if err != nil {
-		return fmt.Errorf("scaffolding ingress: %w", err)
+		return fmt.Errorf("marshalling kustomization file: %w", err)
 	}
 
-	err = fs.WriteReader(path.Join(targetDir, "ingress.yaml"), ingress)
+	err = fs.WriteReader(path.Join(targetDir, "kustomization.yaml"), bytes.NewReader(rawKustomization))
 	if err != nil {
-		return fmt.Errorf("writing ingress: %w", err)
+		return fmt.Errorf("writing kustomization: %w", err)
 	}
 
 	return nil
@@ -118,4 +144,12 @@ func scaffoldIngress(application v1alpha1.Application) (io.Reader, error) {
 	}
 
 	return &buf, nil
+}
+
+func requiresNetworking(application v1alpha1.Application) bool {
+	return application.Spec.Port != ""
+}
+
+func requiresIngress(application v1alpha1.Application) bool {
+	return requiresNetworking(application) && application.Spec.Url != ""
 }
