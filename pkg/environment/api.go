@@ -5,20 +5,19 @@ import (
 	"io"
 	"strings"
 
-	"github.com/deifyed/xctl/pkg/plugins/certmanager"
-	"github.com/deifyed/xctl/pkg/plugins/grafana"
-	"github.com/deifyed/xctl/pkg/plugins/loki"
-	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
-	"github.com/deifyed/xctl/pkg/plugins/prometheus"
-	"github.com/deifyed/xctl/pkg/plugins/promtail"
+	"github.com/deifyed/xctl/pkg/environment/plugins/argocd"
+	"github.com/deifyed/xctl/pkg/environment/plugins/certmanager"
+	"github.com/deifyed/xctl/pkg/environment/plugins/grafana"
+	"github.com/deifyed/xctl/pkg/environment/plugins/loki"
+	ingress "github.com/deifyed/xctl/pkg/environment/plugins/nginx-ingress-controller"
+	"github.com/deifyed/xctl/pkg/environment/plugins/prometheus"
+	"github.com/deifyed/xctl/pkg/environment/plugins/promtail"
 
 	"github.com/deifyed/xctl/pkg/tools/paths"
 
 	"github.com/deifyed/xctl/pkg/cloud/linode"
 
 	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
-
-	"github.com/deifyed/xctl/pkg/plugins/argocd"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"sigs.k8s.io/yaml"

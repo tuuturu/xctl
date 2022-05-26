@@ -5,12 +5,12 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/deifyed/xctl/pkg/environment/plugins/argocd"
+	"github.com/deifyed/xctl/pkg/environment/plugins/grafana"
+
 	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
 
-	"github.com/deifyed/xctl/pkg/plugins/argocd"
-
 	"github.com/deifyed/xctl/pkg/config"
-	"github.com/deifyed/xctl/pkg/plugins/grafana"
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
 
 	"github.com/deifyed/xctl/cmd/helpers"

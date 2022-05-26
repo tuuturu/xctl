@@ -3,12 +3,12 @@ package certmanager
 import (
 	"fmt"
 
+	ingress "github.com/deifyed/xctl/pkg/environment/plugins/nginx-ingress-controller"
+
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
-
-	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 

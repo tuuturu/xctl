@@ -8,6 +8,8 @@ import (
 	"path"
 	"strings"
 
+	ingress "github.com/deifyed/xctl/pkg/environment/plugins/nginx-ingress-controller"
+
 	kubectlBinary "github.com/deifyed/xctl/pkg/tools/clients/kubectl/binary"
 
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
@@ -18,8 +20,6 @@ import (
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
-
-	ingress "github.com/deifyed/xctl/pkg/plugins/nginx-ingress-controller"
 
 	"github.com/deifyed/xctl/pkg/cloud"
 	"github.com/deifyed/xctl/pkg/config"

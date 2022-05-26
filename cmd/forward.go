@@ -7,15 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
+	"github.com/deifyed/xctl/pkg/environment/plugins/argocd"
+	"github.com/deifyed/xctl/pkg/environment/plugins/grafana"
 
-	"github.com/deifyed/xctl/pkg/plugins/argocd"
+	"github.com/deifyed/xctl/pkg/tools/secrets/keyring"
 
 	"github.com/logrusorgru/aurora/v3"
 
 	"github.com/deifyed/xctl/cmd/helpers"
-
-	"github.com/deifyed/xctl/pkg/plugins/grafana"
 
 	"github.com/deifyed/xctl/pkg/tools/i18n"
 
