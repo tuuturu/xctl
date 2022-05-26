@@ -43,6 +43,11 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 				Purge:      opts.Purge,
 			})
 		case v1alpha1.ApplicationKind:
+			_, environmentContext, err := interpretManifest(opts.Filesystem, opts.Io.In, opts.EnvironmentContext)
+			if err != nil {
+				return fmt.Errorf("interpreting environment context: %w", err)
+			}
+
 			return application.Reconcile(application.ReconcileOpts{
 				Context:                 cmd.Context(),
 				Out:                     cmd.OutOrStdout(),
@@ -50,6 +55,7 @@ func ApplyRunE(opts *ApplyRunEOpts) func(*cobra.Command, []string) error {
 				Filesystem:              opts.Filesystem,
 				RepositoryRootDirectory: absoluteRepositoryRootDirectory,
 				ApplicationManifest:     manifest,
+				EnvironmentManifest:     environmentContext,
 				Purge:                   opts.Purge,
 			})
 		default:
