@@ -14,7 +14,7 @@ type ApplicationSpec struct {
 	Url   string `json:"url"`
 }
 
-func NewApplication() Application {
+func NewDefaultApplication() Application {
 	return Application{
 		TypeMeta: TypeMeta{
 			Kind:       ApplicationKind,
@@ -22,7 +22,7 @@ func NewApplication() Application {
 		},
 		Metadata: Metadata{
 			Name:      "",
-			Namespace: "",
+			Namespace: "default",
 		},
 	}
 }

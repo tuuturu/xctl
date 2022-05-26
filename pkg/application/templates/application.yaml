@@ -2,9 +2,16 @@ apiVersion: v1alpha1
 kind: Application
 
 metadata:
+  # Specify the name of your application
   name: hello
+  #namespace: default
 
 spec:
+  # Specify the container image URI
   image: ghcr.io/tuuturu/xctl-hello
-  port: 80
-  url: hello.tuuturu.org
+
+  ## Specify the port the application listens to. Leaving it empty will deny connections from inside the cluster.
+  #port: 80
+
+  ## Specify the URL the application should be available at. Leaving it empty will deny internet traffic
+  #url: hello.tuuturu.org

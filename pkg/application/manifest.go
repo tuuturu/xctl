@@ -14,7 +14,7 @@ func extractManifest(in io.Reader) (v1alpha1.Application, error) {
 		return v1alpha1.Application{}, fmt.Errorf("buffering: %w", err)
 	}
 
-	var application v1alpha1.Application
+	application := v1alpha1.NewDefaultApplication()
 
 	err = yaml.Unmarshal(raw, &application)
 	if err != nil {
