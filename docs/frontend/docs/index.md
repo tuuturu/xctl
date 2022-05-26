@@ -19,7 +19,9 @@ metadata:
   email: demo@example.com
 
 spec:
+  provider: linode
   domain: example.com
+  repository: git@github.com:example-org/example-app.git
 EOF
 ```
 
@@ -62,15 +64,7 @@ will result in an environment consisting of the following technologies:
       <img class="icon" src="/img/argocd-icon.png">
       <span class="content">
         <a href="https://argoproj.github.io/cd/">ArgoCD</a>
-        for continuous deployment (TBA)
-      </span>
-    </div>
-
-    <div class="technology">
-      <img class="icon" src="/img/dex-icon.png">
-      <span class="content">
-        <a href="https://dexidp.io">Dex</a>
-        for authentication (TBA)
+        for continuous deployment
       </span>
     </div>
 </div>

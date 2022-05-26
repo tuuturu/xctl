@@ -4,6 +4,7 @@
 
 * [Go 1.17](https://go.dev/)
 * [Linode account](https://www.linode.com/)
+* [Github account](https://www.github.com/)
 
 ## Installation
 
