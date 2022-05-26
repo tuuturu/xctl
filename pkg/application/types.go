@@ -19,3 +19,8 @@ type ReconcileOpts struct {
 	ApplicationManifest io.Reader
 	Purge               bool
 }
+
+// readerWriter simplifies requirements for afero's fs.WriteReader func
+type readerWriter interface {
+	WriteReader(string, io.Reader) error
+}

@@ -4,6 +4,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/deifyed/xctl/pkg/config"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 	"github.com/sebdah/goldie/v2"
@@ -43,6 +45,13 @@ func TestReconciler_Reconcile(t *testing.T) {
 			fs := &afero.Afero{Fs: afero.NewMemMapFs()}
 			r := reconciler{}
 
+			appDir := path.Join(
+				"/",
+				config.DefaultInfrastructureDir,
+				config.DefaultApplicationsDir,
+				tc.withApp.Metadata.Name,
+			)
+
 			_, err := r.Reconcile(reconciliation.Context{
 				Filesystem:             fs,
 				RootDirectory:          "/",
@@ -52,11 +61,9 @@ func TestReconciler_Reconcile(t *testing.T) {
 
 			g := goldie.New(t)
 
-			appDir := path.Join("/", "applications", tc.withApp.Metadata.Name)
-
-			equalsGoldie(t, g, fs, path.Join(appDir, "base", "deployment.yaml"), "deployment")
-			equalsGoldie(t, g, fs, path.Join(appDir, "base", "service.yaml"), "service")
-			equalsGoldie(t, g, fs, path.Join(appDir, "base", "ingress.yaml"), "ingress")
+			equalsGoldie(t, g, fs, path.Join(appDir, config.DefaultApplicationBaseDir, "deployment.yaml"), "deployment")
+			equalsGoldie(t, g, fs, path.Join(appDir, config.DefaultApplicationBaseDir, "service.yaml"), "service")
+			equalsGoldie(t, g, fs, path.Join(appDir, config.DefaultApplicationBaseDir, "ingress.yaml"), "ingress")
 		})
 	}
 }
