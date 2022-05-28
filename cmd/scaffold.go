@@ -29,10 +29,10 @@ var (
 			var output io.Reader
 			resource := strings.ToLower(args[0])
 
-			switch resource {
-			case strings.ToLower(v1alpha1.EnvironmentKind):
+			switch {
+			case contains([]string{v1alpha1.EnvironmentKind, "env"}, resource):
 				output = environment.Scaffold()
-			case strings.ToLower(v1alpha1.ApplicationKind):
+			case contains([]string{v1alpha1.ApplicationKind, "app"}, resource):
 				output = application.Scaffold()
 			default:
 				return &i18n.HumanReadableError{
@@ -54,6 +54,16 @@ var (
 		},
 	}
 )
+
+func contains(haystack []string, needle string) bool {
+	for _, item := range haystack {
+		if strings.EqualFold(item, needle) {
+			return true
+		}
+	}
+
+	return false
+}
 
 //nolint:gochecknoinits
 func init() {
