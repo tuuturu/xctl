@@ -242,7 +242,7 @@ config:
   # @default -- See `values.yaml`
   snippets:
     pipelineStages:
-      - cri: {}
+      - docker: {}
     common:
       - action: replace
         source_labels:
