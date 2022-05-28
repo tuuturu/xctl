@@ -13,6 +13,6 @@ data:
     datasources:
     - name: Prometheus
       type: prometheus
-      url: http://prometheus-server.kube-system
+      url: http://prometheus-server
       access: proxy
       isDefault: true
