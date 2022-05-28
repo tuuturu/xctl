@@ -76,7 +76,7 @@ config:
     reject_old_samples_max_age: 168h
   schema_config:
     configs:
-      - from: {{.Date}}
+      - from: '{{{.Date}}}'
         store: boltdb-shipper
         object_store: filesystem
         schema: v11

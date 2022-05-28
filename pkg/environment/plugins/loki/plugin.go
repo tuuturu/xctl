@@ -48,7 +48,8 @@ func monitoringNamespaceCM() string {
 }
 
 func values() string {
-	t := template.Must(template.New("values").Parse(rawValues))
+	t := template.New("values").Delims("{{{", "}}}")
+	t = template.Must(t.Parse(rawValues))
 
 	buf := bytes.Buffer{}
 
