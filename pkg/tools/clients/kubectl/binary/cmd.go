@@ -9,8 +9,19 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/logging"
 )
 
-func (k kubectlBinaryClient) runCommand(log logging.Logger, args ...string) (io.Reader, error) {
-	cmd := exec.Command(k.kubectlPath, args...)
+type runCommandOpts struct {
+	Log       logging.Logger
+	Namespace string
+	Stdin     io.Reader
+	Args      []string
+}
+
+func (k kubectlBinaryClient) runCommand(opts runCommandOpts) (io.Reader, error) {
+	if opts.Namespace != "" {
+		opts.Args = append([]string{"--namespace", opts.Namespace}, opts.Args...)
+	}
+
+	cmd := exec.Command(k.kubectlPath, opts.Args...)
 
 	stderr := bytes.Buffer{}
 	stdout := bytes.Buffer{}
@@ -19,9 +30,13 @@ func (k kubectlBinaryClient) runCommand(log logging.Logger, args ...string) (io.
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
+	if opts.Stdin != nil {
+		cmd.Stdin = opts.Stdin
+	}
+
 	err := cmd.Run()
 	if err != nil {
-		log.Debug("executing command", commandLogFields{
+		opts.Log.Debug("executing command", commandLogFields{
 			Stdout: stdout.String(),
 			Stderr: stderr.String(),
 		})

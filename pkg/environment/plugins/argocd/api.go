@@ -29,7 +29,11 @@ func Credentials(client kubectl.Client) (v1alpha1.PluginCredentials, error) {
 		return v1alpha1.PluginCredentials{}, fmt.Errorf("preparing plugin: %w", err)
 	}
 
-	secret, err := client.Get(plugin.Metadata.Namespace, "secret", "argocd-initial-admin-secret")
+	secret, err := client.Get(kubectl.Selector{
+		Namespace: plugin.Metadata.Namespace,
+		Kind:      kubectl.SecretKind,
+		Name:      "argocd-initial-admin-secret",
+	})
 	if err != nil {
 		return v1alpha1.PluginCredentials{}, fmt.Errorf("retrieving secret: %w", err)
 	}

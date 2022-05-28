@@ -48,7 +48,11 @@ func (c client) Put(name string, secrets map[string]string) error {
 }
 
 func (c client) Get(name string, key string) (string, error) {
-	manifest, err := c.kubernetesClient.Get(c.namespace, secretKind, name)
+	manifest, err := c.kubernetesClient.Get(kubectl.Selector{
+		Namespace: c.namespace,
+		Kind:      secretKind,
+		Name:      name,
+	})
 	if err != nil {
 		return "", fmt.Errorf("retrieving secret: %w", err)
 	}
@@ -77,7 +81,11 @@ func (c client) Get(name string, key string) (string, error) {
 }
 
 func (c client) Delete(name string) error {
-	err := c.kubernetesClient.DeleteResource(c.namespace, secretKind, name)
+	err := c.kubernetesClient.DeleteResource(kubectl.Selector{
+		Namespace: c.namespace,
+		Kind:      secretKind,
+		Name:      name,
+	})
 	if err != nil {
 		return fmt.Errorf("deleting: %w", err)
 	}

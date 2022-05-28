@@ -17,8 +17,6 @@ type Poder interface {
 	PodExec(PodExecOpts, ...string) error
 	// PortForward opens a port forwarding connection and returns a function to close that connection
 	PortForward(PortForwardOpts) (StopFn, error)
-	// PodReady returns a boolean indicating if the pod is ready or not
-	PodReady(Pod) (bool, error)
 }
 
 type Resourcer interface {
@@ -27,9 +25,9 @@ type Resourcer interface {
 	// Delete removes a manifest from teh contextual cluster
 	Delete(manifest io.Reader) error
 	// Get retrieves a named resource of a certain type from a specific namespace
-	Get(namespace string, resourceType string, name string) (io.Reader, error)
+	Get(Selector) (io.Reader, error)
 	// DeleteResource removes a named resource of a certain kind from a specific namespace
-	DeleteResource(namespace string, kind string, name string) error
+	DeleteResource(Selector) error
 	// IsReady knows if a Kubernetes resource is ready or not
 	IsReady(Selector) (bool, error)
 }

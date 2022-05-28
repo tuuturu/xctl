@@ -1,11 +1,9 @@
 package binary
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
-	"os/exec"
 
 	"github.com/deifyed/xctl/pkg/tools/clients/kubectl"
 
@@ -15,132 +13,63 @@ import (
 )
 
 func (k kubectlBinaryClient) Apply(manifest io.Reader) error {
-	log := logging.GetLogger(logFeature, "apply")
-
-	cmd := exec.Command(k.kubectlPath, "apply", "-f", "-") //nolint:gosec
-
-	stderr := bytes.Buffer{}
-	stdout := bytes.Buffer{}
-
-	cmd.Env = k.envAsArray()
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	cmd.Stdin = manifest
-
-	err := cmd.Run()
+	_, err := k.runCommand(runCommandOpts{
+		Log:   logging.GetLogger(logFeature, "apply"),
+		Stdin: manifest,
+		Args:  []string{"apply", "-f", "-"},
+	})
 	if err != nil {
-		log.Debug("executing command", commandLogFields{
-			Stdout: stdout.String(),
-			Stderr: stderr.String(),
-		})
-
-		err = fmt.Errorf("%s: %w", stderr.String(), err)
-
-		return errorHandler(err, fmt.Errorf("executing pod command: %s", err))
+		return fmt.Errorf("applying: %w", err)
 	}
 
 	return nil
 }
 
 func (k kubectlBinaryClient) Delete(manifest io.Reader) error {
-	log := logging.GetLogger(logFeature, "delete")
-
-	cmd := exec.Command(k.kubectlPath, "delete", "-f", "-") //nolint:gosec
-
-	stderr := bytes.Buffer{}
-	stdout := bytes.Buffer{}
-
-	cmd.Env = k.envAsArray()
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	cmd.Stdin = manifest
-
-	err := cmd.Run()
+	_, err := k.runCommand(runCommandOpts{
+		Log:   logging.GetLogger(logFeature, "delete"),
+		Stdin: manifest,
+		Args:  []string{"delete", "-f", "-"},
+	})
 	if err != nil {
-		log.Debug("executing command", commandLogFields{
-			Stdout: stdout.String(),
-			Stderr: stderr.String(),
-		})
-
-		err = fmt.Errorf("%s: %w", stderr.String(), err)
-
-		return errorHandler(err, fmt.Errorf("executing pod command: %s", err))
+		return fmt.Errorf("deleting: %w", err)
 	}
 
 	return nil
 }
 
-func (k kubectlBinaryClient) Get(namespace string, resourceType string, name string) (io.Reader, error) {
-	log := logging.GetLogger(logFeature, "get")
-
-	cmd := exec.Command(k.kubectlPath,
-		"get",
-		"--namespace", namespace,
-		"--output", "yaml",
-		resourceType, name,
-	)
-
-	stderr := bytes.Buffer{}
-	stdout := bytes.Buffer{}
-
-	cmd.Env = k.envAsArray()
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
+func (k kubectlBinaryClient) Get(selector kubectl.Selector) (io.Reader, error) {
+	stdout, err := k.runCommand(runCommandOpts{
+		Log:       logging.GetLogger(logFeature, "get"),
+		Namespace: selector.Namespace,
+		Args:      []string{"get", selector.Kind, selector.Name, "--output", "yaml"},
+	})
 	if err != nil {
-		log.Debug("executing command", commandLogFields{
-			Stdout: stdout.String(),
-			Stderr: stderr.String(),
-		})
-
-		err = fmt.Errorf("%s: %w", stderr.String(), err)
-
-		return nil, errorHandler(err, fmt.Errorf("executing pod command: %s", err))
+		return nil, fmt.Errorf("retrieving: %w", err)
 	}
 
-	return &stdout, nil
+	return stdout, nil
 }
 
-func (k kubectlBinaryClient) DeleteResource(namespace string, kind string, name string) error {
-	log := logging.GetLogger(logFeature, "delete")
-
-	cmd := exec.Command(k.kubectlPath,
-		"delete",
-		"--namespace", namespace,
-		kind, name,
-	)
-
-	stderr := bytes.Buffer{}
-	stdout := bytes.Buffer{}
-
-	cmd.Env = k.envAsArray()
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
+func (k kubectlBinaryClient) DeleteResource(selector kubectl.Selector) error {
+	_, err := k.runCommand(runCommandOpts{
+		Log:       logging.GetLogger(logFeature, "delete"),
+		Namespace: selector.Namespace,
+		Args:      []string{"delete", selector.Kind, selector.Name},
+	})
 	if err != nil {
-		log.Debug("executing command", commandLogFields{
-			Stdout: stdout.String(),
-			Stderr: stderr.String(),
-		})
-
-		err = fmt.Errorf("%s: %w", stderr.String(), err)
-
-		return errorHandler(err, fmt.Errorf("executing pod command: %s", err))
+		return fmt.Errorf("deleting: %w", err)
 	}
 
 	return nil
 }
 
 func (k kubectlBinaryClient) IsReady(selector kubectl.Selector) (bool, error) {
-	log := logging.GetLogger(logFeature, "isReady")
-
-	responseStream, err := k.runCommand(log,
-		"--namespace", selector.Namespace,
-		"get", selector.Kind, selector.Name,
-		"--output", "json",
-	)
+	responseStream, err := k.runCommand(runCommandOpts{
+		Log:       logging.GetLogger(logFeature, "isReady"),
+		Namespace: selector.Namespace,
+		Args:      []string{"get", selector.Kind, selector.Name, "--output", "json"},
+	})
 	if err != nil {
 		return false, fmt.Errorf("querying: %w", err)
 	}
