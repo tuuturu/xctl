@@ -2,6 +2,7 @@ package binary
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os/exec"
@@ -130,6 +131,37 @@ func (k kubectlBinaryClient) DeleteResource(namespace string, kind string, name 
 	}
 
 	return nil
+}
+
+func (k kubectlBinaryClient) IsReady(selector kubectl.Selector) (bool, error) {
+	log := logging.GetLogger(logFeature, "isReady")
+
+	responseStream, err := k.runCommand(log,
+		"--namespace", selector.Namespace,
+		"get", selector.Kind, selector.Name,
+		"--output", "json",
+	)
+	if err != nil {
+		return false, fmt.Errorf("querying: %w", err)
+	}
+
+	rawResponse, err := io.ReadAll(responseStream)
+	if err != nil {
+		return false, fmt.Errorf("buffering: %w", err)
+	}
+
+	var response struct {
+		Status struct {
+			AvailableReplicas int `json:"availableReplicas"`
+		} `json:"status"`
+	}
+
+	err = json.Unmarshal(rawResponse, &response)
+	if err != nil {
+		return false, fmt.Errorf("unmarshalling: %w", err)
+	}
+
+	return response.Status.AvailableReplicas > 0, nil
 }
 
 func New(fs *afero.Afero, kubeConfigPath string) (kubectl.Client, error) {

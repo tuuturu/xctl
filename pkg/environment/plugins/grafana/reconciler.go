@@ -117,9 +117,10 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 			return "", fmt.Errorf("checking component existence: %w", err)
 		}
 
-		ready, err = kubectlClient.PodReady(kubectl.Pod{
-			Name:      pluginName,
+		ready, err = kubectlClient.IsReady(kubectl.Selector{
 			Namespace: pluginNamespace,
+			Kind:      kubectl.DeploymentKind,
+			Name:      pluginName,
 		})
 		if err != nil {
 			if !errors.Is(err, kubectl.ErrNotFound) {

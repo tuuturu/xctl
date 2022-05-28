@@ -30,6 +30,8 @@ type Resourcer interface {
 	Get(namespace string, resourceType string, name string) (io.Reader, error)
 	// DeleteResource removes a named resource of a certain kind from a specific namespace
 	DeleteResource(namespace string, kind string, name string) error
+	// IsReady knows if a Kubernetes resource is ready or not
+	IsReady(Selector) (bool, error)
 }
 
 type Operator interface {
@@ -42,6 +44,16 @@ type Client interface {
 	Poder
 	Resourcer
 	Operator
+}
+
+// Selector describes a resource in the cluster
+type Selector struct {
+	// Namespace defines what namespace the resource resides in
+	Namespace string
+	// Kind defines what type of resource it is
+	Kind string
+	// Name defines the name of the resource
+	Name string
 }
 
 // PodExecOpts defines required data for executing commands on a pod
