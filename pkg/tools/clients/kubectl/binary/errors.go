@@ -17,7 +17,7 @@ func errorHandler(err error, defaultError error) error {
 	}
 }
 
-var reErrNotFound = regexp.MustCompile(`Error from server \(NotFound\): pods ".+" not found\W`)
+var reErrNotFound = regexp.MustCompile(`Error from server \(NotFound\): [\w.]+ ".+" not found\W`)
 
 func isErrNotFound(err error) bool {
 	return reErrNotFound.MatchString(err.Error())
