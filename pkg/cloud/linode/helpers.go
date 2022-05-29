@@ -17,6 +17,7 @@ func defaultLabels(cluster v1alpha1.Environment, extraLabels ...string) []string
 	return result
 }
 
+// N.B: max length for Linode labels are 32
 func componentNamer(cluster v1alpha1.Environment, componentType string, id string) string {
 	componentName := strings.Join([]string{config.ApplicationName, cluster.Metadata.Name, componentType, id}, "-")
 	componentName = strings.ToLower(componentName)

@@ -59,6 +59,7 @@ func (p *provider) getClusterNodes(ctx context.Context, clusterID int) ([]cloud.
 		}
 
 		nodes = append(nodes, cloud.ClusterNode{
+			ID:   instance.ID,
 			Name: instance.Label,
 			IPv4: localIP,
 		})

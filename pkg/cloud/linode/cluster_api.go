@@ -5,9 +5,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/deifyed/xctl/pkg/config"
+
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 	"github.com/deifyed/xctl/pkg/cloud"
-	"github.com/deifyed/xctl/pkg/config"
 	"github.com/linode/linodego"
 )
 
@@ -43,6 +44,16 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Environm
 		return fmt.Errorf("awaiting creation of cluster: %w", err)
 	}
 
+	_, err = p.createClusterNodesFirewall(ctx, manifest, cluster.ID)
+	if err != nil {
+		return fmt.Errorf("creating cluster node firewall: %w", err)
+	}
+
+	_, err = p.createNodebalancerFirewall(ctx, manifest, cluster.ID)
+	if err != nil {
+		return fmt.Errorf("creating nodebalancer firewall: %w", err)
+	}
+
 	return nil
 }
 
@@ -67,6 +78,16 @@ func (p *provider) DeleteCluster(ctx context.Context, manifest v1alpha1.Environm
 	err = p.awaitDeletion(ctx, manifest)
 	if err != nil {
 		return fmt.Errorf("awaiting deletion of cluster: %w", err)
+	}
+
+	err = p.deleteClusterNodesFirewall(ctx, manifest)
+	if err != nil {
+		return fmt.Errorf("deleting cluster nodes firewall: %w", err)
+	}
+
+	err = p.deleteNodebalancerFirewall(ctx, manifest)
+	if err != nil {
+		return fmt.Errorf("deleting nodebalancer firewall: %w", err)
 	}
 
 	return nil

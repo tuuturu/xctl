@@ -19,6 +19,8 @@ type ClusterNode struct {
 	Name string
 	// IPv4 defines the IPv4 address the node is available at
 	IPv4 string
+	// ID defines the ID of the node
+	ID int
 }
 
 type Cluster struct {
