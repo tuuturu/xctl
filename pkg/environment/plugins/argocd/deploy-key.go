@@ -54,7 +54,7 @@ func generateRepositorySecret(repo repository, privateKey []byte) (io.Reader, er
 	buf := bytes.Buffer{}
 
 	err = t.Execute(&buf, repositorySecretOpts{
-		SecretName:           toSecretName(repo.Name()),
+		SecretName:           toRepositorySecretName(repo.Name()),
 		OperationsNamespace:  config.DefaultOperationsNamespace,
 		RepositoryName:       b64(repo.Name()),
 		RepositoryURI:        b64(repo.URL),
@@ -97,7 +97,7 @@ func installDeployKey(ctx context.Context, secretClient secrets.Client, repo rep
 //go:embed templates/ssh-secret.yaml
 var repositorySecretTemplate string
 
-func toSecretName(name string) string {
+func toRepositorySecretName(name string) string {
 	return fmt.Sprintf("xctl-argocd-repository-%s", name)
 }
 
