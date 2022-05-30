@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"text/template"
 
 	"github.com/deifyed/xctl/pkg/tools/secrets"
@@ -67,23 +68,56 @@ func generateRepositorySecret(repo repository, privateKey []byte) (io.Reader, er
 	return &buf, nil
 }
 
-func installDeployKey(ctx context.Context, secretClient secrets.Client, repo repository, publicKey []byte) error {
-	accessToken, err := secretClient.Get(config.DefaultSecretsGithubNamespace, config.DefaultSecretsGithubAccessTokenKey)
+func deleteKey(ctx context.Context, secretClient secrets.Client, clusterName string, repo repository) error {
+	client, err := authenticatedClient(secretClient)
 	if err != nil {
-		return fmt.Errorf("retrieving access token: %w", err)
+		return fmt.Errorf("preparing client: %w", err)
 	}
 
-	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken})
-
-	oauth2Client := &http.Client{
-		Transport: &oauth2.Transport{Source: tokenSource},
+	keys, _, err := client.Repositories.ListKeys(ctx, repo.Owner(), repo.Name(), &github.ListOptions{})
+	if err != nil {
+		return fmt.Errorf("listing keys: %w", err)
 	}
 
-	client := github.NewClient(oauth2Client)
+	expectedName := deployKeyName(clusterName)
+	var keyToRemove int64 = -1
 
-	_, _, err = client.Repositories.CreateKey(ctx, repo.Owner(), repo.Name(), &github.Key{
-		Key:      github.String(string(publicKey)),
-		Title:    github.String("xctl-argocd"),
+	for _, key := range keys {
+		if strings.EqualFold(expectedName, *key.Title) {
+			keyToRemove = *key.ID
+
+			break
+		}
+	}
+
+	if keyToRemove == -1 {
+		return nil
+	}
+
+	_, err = client.Repositories.DeleteKey(ctx, repo.Owner(), repo.Name(), keyToRemove)
+	if err != nil {
+		return fmt.Errorf("deleting: %w", err)
+	}
+
+	return nil
+}
+
+type installDeployKeyOpts struct {
+	SecretClient secrets.Client
+	ClusterName  string
+	Repository   repository
+	PublicKey    []byte
+}
+
+func installDeployKey(ctx context.Context, opts installDeployKeyOpts) error {
+	client, err := authenticatedClient(opts.SecretClient)
+	if err != nil {
+		return fmt.Errorf("preparing client: %w", err)
+	}
+
+	_, _, err = client.Repositories.CreateKey(ctx, opts.Repository.Owner(), opts.Repository.Name(), &github.Key{
+		Key:      github.String(string(opts.PublicKey)),
+		Title:    github.String(deployKeyName(opts.ClusterName)),
 		ReadOnly: github.Bool(true),
 		//RESEARCH: Verified flag
 	})
@@ -96,6 +130,25 @@ func installDeployKey(ctx context.Context, secretClient secrets.Client, repo rep
 
 //go:embed templates/ssh-secret.yaml
 var repositorySecretTemplate string
+
+func authenticatedClient(secretClient secrets.Client) (*github.Client, error) {
+	accessToken, err := secretClient.Get(config.DefaultSecretsGithubNamespace, config.DefaultSecretsGithubAccessTokenKey)
+	if err != nil {
+		return nil, fmt.Errorf("retrieving access token: %w", err)
+	}
+
+	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken})
+
+	oauth2Client := &http.Client{
+		Transport: &oauth2.Transport{Source: tokenSource},
+	}
+
+	return github.NewClient(oauth2Client), nil
+}
+
+func deployKeyName(clusterName string) string {
+	return fmt.Sprintf("%s-%s-%s", config.ApplicationName, clusterName, strings.ToLower(pluginName))
+}
 
 func toRepositorySecretName(name string) string {
 	return fmt.Sprintf("xctl-argocd-repository-%s", name)

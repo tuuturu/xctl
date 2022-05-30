@@ -1,7 +1,6 @@
 package argocd
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -11,8 +10,6 @@ import (
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
 
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
-
-	"github.com/deifyed/xctl/pkg/tools/clients/helm"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 
@@ -53,57 +50,9 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 	case reconciliation.ActionCreate:
 		log.Debug("installing")
 
-		err = helmClient.Install(plugin)
+		err = installArgoCD(rctx, helmClient, kubectlClient, repo)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
-		}
-
-		keys, err := generateKey()
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("generating private/public key pair: %w", err)
-		}
-
-		secret, err := generateRepositorySecret(repo, keys.PrivateKey)
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("generating repository secret: %w", err)
-		}
-
-		err = installDeployKey(rctx.Ctx, rctx.Keyring, repo, keys.PublicKey)
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("installing deploy key: %w", err)
-		}
-
-		err = kubectlClient.Apply(secret)
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("applying secret: %w", err)
-		}
-
-		applicationsAppManifest, err := establishConfiguration(
-			rctx.Filesystem,
-			rctx.RootDirectory,
-			rctx.EnvironmentManifest,
-		)
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("establishing configuration: %w", err)
-		}
-
-		err = kubectlClient.Apply(applicationsAppManifest)
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("applying applications app manifest: %w", err)
-		}
-
-		namespacesAppManifest, err := establishNamespacesConfiguration(
-			rctx.Filesystem,
-			rctx.RootDirectory,
-			rctx.EnvironmentManifest,
-		)
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("establishing namespaces configuration: %w", err)
-		}
-
-		err = kubectlClient.Apply(namespacesAppManifest)
-		if err != nil {
-			return reconciliation.Result{}, fmt.Errorf("applying applications app manifest: %w", err)
 		}
 
 		return reconciliation.Result{Requeue: false}, nil
@@ -115,66 +64,15 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 			return reconciliation.Result{}, fmt.Errorf("uninstalling: %w", err)
 		}
 
+		err = deleteKey(rctx.Ctx, rctx.Keyring, rctx.EnvironmentManifest.Metadata.Name, repo)
+		if err != nil {
+			return reconciliation.Result{}, fmt.Errorf("deleting deploy key: %w", err)
+		}
+
 		return reconciliation.Result{Requeue: false}, nil
 	}
 
 	return reconciliation.NoopWaitIndecisiveHandler(action)
-}
-
-//nolint:funlen
-func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Client) (reconciliation.Action, error) { //nolint:lll
-	indication := reconciliation.DetermineUserIndication(rctx, rctx.EnvironmentManifest.Spec.Plugins.ArgoCD)
-
-	var (
-		clusterExists   = true
-		componentExists = true
-	)
-
-	_, err := r.cloudProvider.GetCluster(rctx.Ctx, rctx.EnvironmentManifest)
-	if err != nil {
-		if !errors.Is(err, cloud.ErrNotFound) {
-			return "", fmt.Errorf("acquiring cluster: %w", err)
-		}
-
-		clusterExists = false
-	}
-
-	plugin, err := NewPlugin()
-	if err != nil {
-		return "", fmt.Errorf("creating plugin: %w", err)
-	}
-
-	if clusterExists {
-		componentExists, err = helm.Exists(plugin)
-		if err != nil {
-			return "", fmt.Errorf("checking component existence: %w", err)
-		}
-	}
-
-	switch indication {
-	case reconciliation.ActionCreate:
-		if !clusterExists {
-			return reconciliation.ActionWait, nil
-		}
-
-		if componentExists {
-			return reconciliation.ActionNoop, nil
-		}
-
-		return reconciliation.ActionCreate, nil
-	case reconciliation.ActionDelete:
-		if !clusterExists {
-			return reconciliation.ActionNoop, nil
-		}
-
-		if !componentExists {
-			return reconciliation.ActionNoop, nil
-		}
-
-		return reconciliation.ActionDelete, nil
-	}
-
-	return reconciliation.ActionNoop, reconciliation.ErrIndecisive
 }
 
 func (r reconciler) String() string {
