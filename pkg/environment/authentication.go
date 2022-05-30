@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 	"syscall"
 
@@ -34,18 +35,14 @@ func Authenticate(manifest *v1alpha1.Environment) func(cmd *cobra.Command, args 
 			return fmt.Errorf("handling cloud provider authentication: %w", err)
 		}
 
-		successPrint := func(name string) {
-			fmt.Fprintf(cmd.OutOrStdout(), "[%s] %s\n", name, aurora.Green("OK"))
-		}
-
-		successPrint(strings.Title(manifest.Spec.Provider))
+		successPrint(cmd.OutOrStdout(), strings.Title(manifest.Spec.Provider))
 
 		err = handleProvider(cmd.Context(), log, secretsClient, githubProvider)
 		if err != nil {
 			return fmt.Errorf("handling Github authentication: %w", err)
 		}
 
-		successPrint("Github")
+		successPrint(cmd.OutOrStdout(), "Github")
 
 		return nil
 	}
@@ -115,6 +112,10 @@ func prompter(msg string, hidden bool) string {
 	fmt.Print("\n")
 
 	return result
+}
+
+func successPrint(out io.Writer, name string) {
+	fmt.Fprintf(out, "[%s] %s\n", name, aurora.Green("OK"))
 }
 
 const githubProvider = "github"
