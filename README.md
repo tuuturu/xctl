@@ -28,14 +28,12 @@ See [here](https://xctl.tuuturu.org/getting-started/preparation/)
 
 ## Usage
 
-### Authenticate
-
-First, to authenticate, export the environment variable `LINODE_TOKEN` containing your personal access token.
-
-### Provision an environment
+### Scaffold an environment configuration
 
 ```shell
-xctl apply -f - << EOF
+xctl scaffold env > env.yaml
+
+cat env.yaml
 apiVersion: v1alpha1
 kind: Environment
 
@@ -47,7 +45,22 @@ spec:
   provider: linode
   domain: example.com
   repository: git@github.com:tuuturu/iac.git
-EOF
+```
+
+Edit the configuration. 
+
+### Authenticate with the environment
+
+```shell
+xctl login --context env.yaml
+[Linode] OK
+[Github] OK
+```
+
+### Provision the environment
+
+```shell
+xctl apply --file env.yaml
 ```
 
 After a few minutes you'll have a running Kubernetes cluster with the technologies listed
@@ -55,13 +68,13 @@ After a few minutes you'll have a running Kubernetes cluster with the technologi
 
 ### Administrating your environment
 
-To be able to run `kubectl` commands, use `xctl venv -c environment.yaml` to create a subshell with the environment
-variable `KUBECONFIG` set.
+To be able to run `kubectl` commands, use `xctl venv --context environment.yaml` to create a subshell with the
+environment variable `KUBECONFIG` set.
 
 ### Deploying an app
 
 ```shell
-xctl apply -f - << EOF
+xctl --context env.yaml apply -f - << EOF
 apiVersion: v1alpha1
 kind: Application
 
@@ -75,7 +88,14 @@ spec:
 EOF
 ```
 
-After a committing and pushing the changes done by `xctl`, ArgoCD should soon spin up your application.
+Review the generated Kubernetes manifests, then commit and push the result. ArgoCD should soon spin up your application.
+
+To view the status of your application, run the following commands:
+
+```shell
+xctl --context env.yaml get credentials argocd 
+xctl --context env.yaml forward argocd
+```
 
 ## What does xctl provision?
 
