@@ -50,8 +50,13 @@ Below is a list of all configuration attributes for an environment manifest.
 |--------|-------------------|---------|----------------------------------------------------------------------------------------------------------------------------------|
 | string | hello.tuuturu.org | None    | Defines the URL your application will be available on. Only required if the application should be available outside the cluster. |
 
+<!--suppress CssUnusedSymbol -->
 <style>
 span.required {
     color: red;
+}
+
+div.md-typeset__table {
+    width: 100%;
 }
 </style>

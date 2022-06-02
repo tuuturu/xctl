@@ -88,8 +88,13 @@ Below is a list of all configuration attributes for an environment manifest.
 |---------|---------|----------------------------------------------------------------|--------------------------------------|
 | boolean | true    | [chart](https://artifacthub.io/packages/helm/grafana/promtail) | Scrapes logs and pushes them to Loki |
 
+<!--suppress CssUnusedSymbol -->
 <style>
 span.required {
     color: red;
+}
+
+div.md-typeset__table {
+    width: 100%;
 }
 </style>
