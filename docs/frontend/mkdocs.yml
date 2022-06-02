@@ -49,5 +49,6 @@ nav:
       - 'Delete environment': getting-started/delete-environment.md
   - 'Environment':
       - 'Manifest reference': environment/manifest.md
+      - 'Monitoring': environment/monitoring.md
   - 'Application':
       - 'Manifest reference': application/manifest.md
