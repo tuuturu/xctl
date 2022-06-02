@@ -46,9 +46,9 @@ Below is a list of all configuration attributes for an environment manifest.
 
 ### `domain`<span class="required">*</span>
 
-| Type   | Example     | Description                                       |
-|--------|-------------|---------------------------------------------------|
-| string | tuuturu.org | Defines the associated domain for the environment |
+| Type   | Example     | Description                                                                                                                                    |
+|--------|-------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| string | tuuturu.org | Defines the associated domain for the environment. Xctl will attempt to add a wildcard record to this domain pointing it to the node balancer. |
 
 ### `plugins`
 
