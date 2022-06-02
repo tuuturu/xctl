@@ -50,5 +50,6 @@ nav:
   - 'Environment':
       - 'Manifest reference': environment/manifest.md
       - 'Monitoring': environment/monitoring.md
+      - 'Continuous deployment': environment/continuous-deployment.md
   - 'Application':
       - 'Manifest reference': application/manifest.md
