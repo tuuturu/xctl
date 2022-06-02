@@ -1,4 +1,4 @@
-# Environment manifest
+# Application manifest
 
 Below is a list of all configuration attributes for an environment manifest.
 
