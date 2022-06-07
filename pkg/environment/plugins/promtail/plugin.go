@@ -23,7 +23,7 @@ func NewPlugin() v1alpha1.Plugin {
 
 	// URL: https://artifacthub.io/packages/helm/grafana/promtail
 	plugin.Spec.Helm.Chart = "promtail"
-	plugin.Spec.Helm.Version = "4.2.1"
+	plugin.Spec.Helm.Version = "5.1.0"
 
 	plugin.Spec.Helm.Repository.Name = "grafana"
 	plugin.Spec.Helm.Repository.URL = "https://grafana.github.io/helm-charts"
