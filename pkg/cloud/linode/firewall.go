@@ -72,6 +72,7 @@ func (p *provider) createClusterNodesFirewall(ctx context.Context, manifest v1al
 	return firewall.ID, nil
 }
 
+//nolint:unused // CHANGE: nodebalancer doesn't get created until ingress controller is installed
 func (p *provider) createNodebalancerFirewall(ctx context.Context, manifest v1alpha1.Environment, clusterID int) (int, error) {
 	nodes, err := p.getClusterNodes(ctx, clusterID)
 	if err != nil {

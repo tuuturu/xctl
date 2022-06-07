@@ -49,11 +49,6 @@ func (p *provider) CreateCluster(ctx context.Context, manifest v1alpha1.Environm
 		return fmt.Errorf("creating cluster node firewall: %w", err)
 	}
 
-	_, err = p.createNodebalancerFirewall(ctx, manifest, cluster.ID)
-	if err != nil {
-		return fmt.Errorf("creating nodebalancer firewall: %w", err)
-	}
-
 	return nil
 }
 
