@@ -2,5 +2,9 @@ package secrets
 
 import "errors"
 
-// ErrNotFound indicates something is missing
-var ErrNotFound = errors.New("not found")
+var (
+	// ErrNotFound indicates something is missing
+	ErrNotFound = errors.New("not found")
+	// ErrUserAborted indicates user denied the operation
+	ErrUserAborted = errors.New("user aborted")
+)
