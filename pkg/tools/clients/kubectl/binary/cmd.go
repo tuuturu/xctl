@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
+	"path"
 
 	"github.com/deifyed/xctl/pkg/tools/logging"
 )
@@ -17,6 +19,13 @@ type runCommandOpts struct {
 }
 
 func (k kubectlBinaryClient) runCommand(opts runCommandOpts) (io.Reader, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, fmt.Errorf("acquiring user home directory: %w", err)
+	}
+
+	opts.Args = append([]string{"--cache-dir", path.Join(homeDir, ".kube", "cache")}, opts.Args...)
+
 	if opts.Namespace != "" {
 		opts.Args = append([]string{"--namespace", opts.Namespace}, opts.Args...)
 	}
@@ -34,7 +43,7 @@ func (k kubectlBinaryClient) runCommand(opts runCommandOpts) (io.Reader, error) 
 		cmd.Stdin = opts.Stdin
 	}
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		opts.Log.Debug("executing command", commandLogFields{
 			Stdout: stdout.String(),
