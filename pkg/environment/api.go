@@ -60,7 +60,7 @@ func Reconcile(opts ReconcileOpts) error {
 
 	spin := spinner.NewSpinner(spinnerOut)
 	spin.FinalMSG = "✅"
-	spin.Suffix = "Reconciling"
+	spin.Suffix = " Reconciling"
 
 	schedulerOpts := reconciliation.SchedulerOpts{
 		Filesystem:          opts.Filesystem,
