@@ -1,17 +1,11 @@
 package config
 
-import (
-	"time"
-)
-
 // ApplicationName refers to the xctl project name
 const ApplicationName = "xctl"
 
 const ( // Controller / reconciliation
 	// DefaultMaxReconciliationRequeues defines the maximum amount of times to requeue a reconciler
 	DefaultMaxReconciliationRequeues = 3
-	// DefaultReconciliationLoopDelayDuration defines the amount of time to wait between each reconciliation
-	DefaultReconciliationLoopDelayDuration = 1 * time.Second
 )
 
 const ( // Cluster
