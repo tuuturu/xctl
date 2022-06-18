@@ -5,7 +5,7 @@ const ApplicationName = "xctl"
 
 const ( // Controller / reconciliation
 	// DefaultMaxReconciliationRequeues defines the maximum amount of times to requeue a reconciler
-	DefaultMaxReconciliationRequeues = 3
+	DefaultMaxReconciliationRequeues = 5
 )
 
 const ( // Cluster
