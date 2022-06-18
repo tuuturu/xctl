@@ -2,48 +2,91 @@ package reconciliation
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"io"
+
+	"github.com/deifyed/xctl/pkg/config"
+	"github.com/deifyed/xctl/pkg/tools/logging"
 
 	"github.com/deifyed/xctl/pkg/tools/secrets"
 
 	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
-	"github.com/deifyed/xctl/pkg/tools/logging"
 )
+
+type reconciliationResult struct {
+	ID     string
+	Status string
+}
+
+const (
+	statusReady    = "ready"
+	statusNotReady = "notready"
+	statusError    = "error"
+)
+
+type ledgerEntry struct {
+	Status string
+	Count  int
+}
 
 // Run initiates scheduling of reconcilers
 func (c *Scheduler) Run(ctx context.Context) (Result, error) {
 	log := logging.GetLogger(logFeature, "run")
-	queue := NewQueue(c.reconcilers)
+	ledger := generateLedger(c.reconcilers)
 	reconciliationContext := c.metadata(ctx)
 
-	for reconciler := queue.Pop(); reconciler != nil; reconciler = queue.Pop() {
-		c.queueStepFunc(reconciler.String())
+	channel := make(chan reconciliationResult, 1)
+	defer func() {
+		close(channel)
+	}()
 
-		result, err := reconciler.Reconcile(reconciliationContext)
-		if err != nil {
-			if !isQueueableError(err) {
-				return Result{}, fmt.Errorf("reconciling %s: %w", reconciler.String(), err)
-			}
+	for hasThingsToDo(ledger) {
+		log.Debug("Iteration")
+		queue := generateQueue(c.reconcilers, ledger)
+		maxUpdates := len(queue.reconcilers)
+		updates := 0
 
-			result.Requeue = true
+		log.Debug("Starting reconcilers")
+		for reconciler := queue.Pop(); reconciler != nil; reconciler = queue.Pop() {
+			ledger[reconciler.String()].Count++
+
+			go reconcile(channel, reconciliationContext, reconciler)
 		}
 
-		if result.Requeue {
-			log.Debug(fmt.Sprintf("requeueing %s", reconciler.String()))
+		for updates < maxUpdates {
+			log.Debug("Awaiting result")
+			status := <-channel
+			log.Debugf("%s: %s", status.ID, status.Status)
 
-			err = queue.Push(reconciler)
-			if err != nil {
-				return Result{}, fmt.Errorf("passing requeue check for %s: %w", reconciler.String(), err)
+			if status.Status == statusReady {
+				ledger[status.ID].Status = statusReady
 			}
+
+			updates++
 		}
 
-		c.reconciliationLoopDelayFunction()
+		if hasError(ledger) {
+			return Result{}, errors.New("reconciling")
+		}
+
+		if hasTooManyRequeues(ledger) {
+			return Result{}, ErrMaximumReconciliationRequeues
+		}
 	}
 
 	return Result{}, nil
+}
+
+func hasTooManyRequeues(ledger map[string]*ledgerEntry) bool {
+	for _, entry := range ledger {
+		if entry.Count > config.DefaultMaxReconciliationRequeues {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (c *Scheduler) metadata(ctx context.Context) Context {
@@ -71,9 +114,7 @@ func NewScheduler(opts SchedulerOpts, reconcilers ...Reconciler) Scheduler {
 		environmentManifest: opts.EnvironmentManifest,
 		applicationManifest: opts.ApplicationManifest,
 
-		reconciliationLoopDelayFunction: opts.ReconciliationLoopDelayFunction,
-		queueStepFunc:                   opts.QueueStepFunc,
-		reconcilers:                     reconcilers,
+		reconcilers: reconcilers,
 	}
 }
 
@@ -89,12 +130,9 @@ type SchedulerOpts struct {
 
 	// Context of the scheduling. Signifies the intent of the user
 	// PurgeFlag indicates if everything should be deleted
-	PurgeFlag bool
-	// ReconciliationLoopDelayFunction introduces delay to the reconciliation process
-	ReconciliationLoopDelayFunction func()
-	EnvironmentManifest             v1alpha1.Environment
-	ApplicationManifest             v1alpha1.Application
-	QueueStepFunc                   func(identifier string)
+	PurgeFlag           bool
+	EnvironmentManifest v1alpha1.Environment
+	ApplicationManifest v1alpha1.Application
 }
 
 // Scheduler knows how to run reconcilers in a reasonable way
@@ -108,7 +146,5 @@ type Scheduler struct {
 	environmentManifest v1alpha1.Environment
 	applicationManifest v1alpha1.Application
 
-	reconciliationLoopDelayFunction func()
-	queueStepFunc                   func(string)
-	reconcilers                     []Reconciler
+	reconcilers []Reconciler
 }

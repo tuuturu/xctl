@@ -80,10 +80,7 @@ func TestRequeueing(t *testing.T) {
 				reconciles++
 			}
 
-			scheduler := NewScheduler(SchedulerOpts{
-				ReconciliationLoopDelayFunction: func() {},
-				QueueStepFunc:                   func(_ string) {},
-			}, requeueReconciler{
+			scheduler := NewScheduler(SchedulerOpts{}, requeueReconciler{
 				getResult:      getResult,
 				bumpReconciles: bumpReconciles,
 			})
@@ -264,10 +261,7 @@ func TestPreflightDeadlock(t *testing.T) {
 		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
-			scheduler := NewScheduler(SchedulerOpts{
-				ReconciliationLoopDelayFunction: func() {},
-				QueueStepFunc:                   func(_ string) {},
-			}, tc.withReconcilers...)
+			scheduler := NewScheduler(SchedulerOpts{}, tc.withReconcilers...)
 
 			_, err := scheduler.Run(context.Background())
 

@@ -20,8 +20,6 @@ import (
 )
 
 func Reconcile(opts ReconcileOpts) error {
-	log := logging.GetLogger("cmd/apply", "application")
-
 	environmentManifest, err := environment.ExtractManifest(opts.EnvironmentManifest)
 	if err != nil {
 		return fmt.Errorf("extracting environment manifest: %w", err)
@@ -41,20 +39,15 @@ func Reconcile(opts ReconcileOpts) error {
 
 	spin := spinner.NewSpinner(spinnerOut)
 	spin.FinalMSG = "✅"
+	spin.Suffix = "Reconciling"
 
 	schedulerOpts := reconciliation.SchedulerOpts{
-		Filesystem:                      opts.Filesystem,
-		Out:                             opts.Out,
-		PurgeFlag:                       opts.Purge,
-		RootDirectory:                   opts.RepositoryRootDirectory,
-		EnvironmentManifest:             environmentManifest,
-		ApplicationManifest:             applicationManifest,
-		ReconciliationLoopDelayFunction: reconciliation.DefaultDelayFunction,
-		QueueStepFunc: func(identifier string) {
-			log.Debug(fmt.Sprintf("reconciling %s", identifier))
-
-			spin.Suffix = fmt.Sprintf(" Reconciling %s", identifier)
-		},
+		Filesystem:          opts.Filesystem,
+		Out:                 opts.Out,
+		PurgeFlag:           opts.Purge,
+		RootDirectory:       opts.RepositoryRootDirectory,
+		EnvironmentManifest: environmentManifest,
+		ApplicationManifest: applicationManifest,
 	}
 
 	absoluteApplicationDirectory := applicationsDir(opts.RepositoryRootDirectory, applicationManifest.Metadata.Name)

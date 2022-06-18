@@ -33,8 +33,6 @@ import (
 
 // Reconcile knows how to ensure reality for an environment is as declared in an environment manifest
 func Reconcile(opts ReconcileOpts) error {
-	log := logging.GetLogger("cmd/apply", "environment")
-
 	manifest, err := ExtractManifest(opts.Manifest)
 	if err != nil {
 		return fmt.Errorf("extracting manifest: %w", err)
@@ -62,20 +60,15 @@ func Reconcile(opts ReconcileOpts) error {
 
 	spin := spinner.NewSpinner(spinnerOut)
 	spin.FinalMSG = "✅"
+	spin.Suffix = "Reconciling"
 
 	schedulerOpts := reconciliation.SchedulerOpts{
-		Filesystem:                      opts.Filesystem,
-		Out:                             opts.Out,
-		Keyring:                         keyringClient,
-		RootDirectory:                   absoluteRepositoryRootDir,
-		PurgeFlag:                       opts.Purge,
-		ReconciliationLoopDelayFunction: reconciliation.DefaultDelayFunction,
-		EnvironmentManifest:             manifest,
-		QueueStepFunc: func(identifier string) {
-			log.Debug(fmt.Sprintf("reconciling %s", identifier))
-
-			spin.Suffix = fmt.Sprintf(" Reconciling %s", identifier)
-		},
+		Filesystem:          opts.Filesystem,
+		Out:                 opts.Out,
+		Keyring:             keyringClient,
+		RootDirectory:       absoluteRepositoryRootDir,
+		PurgeFlag:           opts.Purge,
+		EnvironmentManifest: manifest,
 	}
 
 	scheduler := reconciliation.NewScheduler(schedulerOpts,
