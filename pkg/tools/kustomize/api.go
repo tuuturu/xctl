@@ -8,7 +8,7 @@ import (
 )
 
 // AddResourceToKustomization knows how to add a resource entry to a kustomization file
-func AddResourceToKustomization(fs *afero.Afero, absoluteWorkDir string, resourcePath string) error {
+func AddResourceToKustomization(fs *afero.Afero, absoluteWorkDir string, resources ...string) error {
 	kustomizationPath := path.Join(absoluteWorkDir, defaultKustomizationFilename)
 
 	kustomizationFile, err := ensureReadKustomizationFile(fs, kustomizationPath)
@@ -16,11 +16,13 @@ func AddResourceToKustomization(fs *afero.Afero, absoluteWorkDir string, resourc
 		return fmt.Errorf("acquiring file: %w", err)
 	}
 
-	if contains(kustomizationFile.Resources, resourcePath) {
-		return nil
-	}
+	for _, resource := range resources {
+		if contains(kustomizationFile.Resources, resource) {
+			continue
+		}
 
-	kustomizationFile.Resources = append(kustomizationFile.Resources, resourcePath)
+		kustomizationFile.Resources = append(kustomizationFile.Resources, resource)
+	}
 
 	err = ensureWriteKustomizationFile(fs, kustomizationPath, kustomizationFile)
 	if err != nil {

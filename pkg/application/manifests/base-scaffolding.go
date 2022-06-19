@@ -8,12 +8,13 @@ import (
 	"path"
 	"text/template"
 
-	"sigs.k8s.io/yaml"
+	"github.com/deifyed/xctl/pkg/tools/kustomize"
+	"github.com/spf13/afero"
 
 	"github.com/deifyed/xctl/pkg/apis/xctl/v1alpha1"
 )
 
-func writeBaseManifests(fs readerWriter, targetDir string, application v1alpha1.Application) error {
+func writeBaseManifests(fs *afero.Afero, targetDir string, application v1alpha1.Application) error {
 	resources := make([]string, 0)
 
 	deployment, err := scaffoldDeployment(application)
@@ -59,14 +60,9 @@ func writeBaseManifests(fs readerWriter, targetDir string, application v1alpha1.
 		}
 	}
 
-	rawKustomization, err := yaml.Marshal(&kustomize{Resources: resources})
+	err = kustomize.AddResourceToKustomization(fs, targetDir, resources...)
 	if err != nil {
-		return fmt.Errorf("marshalling kustomization file: %w", err)
-	}
-
-	err = fs.WriteReader(path.Join(targetDir, "kustomization.yaml"), bytes.NewReader(rawKustomization))
-	if err != nil {
-		return fmt.Errorf("writing kustomization: %w", err)
+		return fmt.Errorf("adding resources to kustomization file: %w", err)
 	}
 
 	return nil

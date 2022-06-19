@@ -13,10 +13,7 @@ import (
 )
 
 func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
-	action := reconciliation.ActionCreate
-	if rctx.Purge {
-		action = reconciliation.ActionDelete
-	}
+	action := reconciliation.DetermineUserIndication(rctx, true)
 
 	applicationBaseDir := path.Join(r.absoluteApplicationDir, config.DefaultApplicationBaseDir)
 	applicationOverlaysDir := path.Join(r.absoluteApplicationDir, config.DefaultApplicationsOverlaysDir)
