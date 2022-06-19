@@ -61,3 +61,8 @@ const ( // Internal filesystem directories
 	// application configuration
 	DefaultApplicationsOverlaysDir = "overlays"
 )
+
+const ( // Applications
+	// DefaultApplicationMainPortName defines the name of the main port of the application
+	DefaultApplicationMainPortName = "main"
+)

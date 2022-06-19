@@ -6,6 +6,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/deifyed/xctl/pkg/application/plugins/prometheus"
+
 	"github.com/deifyed/xctl/pkg/application/plugins/namespace"
 
 	"github.com/deifyed/xctl/pkg/application/plugins/argocd"
@@ -57,6 +59,7 @@ func Reconcile(opts ReconcileOpts) error {
 		manifests.Reconciler(absoluteApplicationDirectory),
 		namespace.Reconciler(absoluteEnvironmentDirectory),
 		argocd.Reconciler(absoluteEnvironmentDirectory),
+		prometheus.Reconciler(absoluteApplicationDirectory),
 	)
 
 	spin.Start()

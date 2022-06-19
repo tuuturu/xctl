@@ -9,9 +9,10 @@ type Application struct {
 }
 
 type ApplicationSpec struct {
-	Image string `json:"image"`
-	Port  string `json:"port"`
-	Url   string `json:"url"`
+	Image   string `json:"image"`
+	Port    string `json:"port"`
+	Url     string `json:"url"`
+	Metrics string `json:"metrics"`
 }
 
 func NewDefaultApplication() Application {

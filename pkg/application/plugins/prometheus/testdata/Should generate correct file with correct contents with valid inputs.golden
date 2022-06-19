@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+
+metadata:
+  name: mock-app
+  labels:
+    app: mock-app
+
+spec:
+  selector:
+    matchLabels:
+      app: mock-app
+  endpoints:
+    - path: /metrics
+      port: main
+      interval: 10s
+
+---
