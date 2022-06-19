@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// DefaultDirectoryPermissions defines the directory permissions used throughout the IAC repository
+const DefaultDirectoryPermissions = 0o600
+
 // AbsoluteRepositoryRootDirectory retrieves the root directory of the git repository xctl gets run in no matter what
 // directory the user is in.
 func AbsoluteRepositoryRootDirectory() (string, error) {
