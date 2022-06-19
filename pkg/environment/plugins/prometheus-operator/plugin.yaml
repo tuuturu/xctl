@@ -1,0 +1,14 @@
+apiVersion: v1alpha1
+kind: Plugin
+
+metadata:
+  name: prometheus-operator
+  namespace: monitoring
+
+spec:
+  helm:
+    chart: kube-prometheus # https://artifacthub.io/packages/helm/bitnami/kube-prometheus
+    version: 8.0.7
+    repository:
+      name: bitnami
+      url: https://charts.bitnami.com/bitnami
