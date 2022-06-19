@@ -8,7 +8,7 @@ metadata:
 spec:
   helm:
     chart: argo-cd # https://artifacthub.io/packages/helm/argo/argo-cd
-    version: 4.8.2
+    version: 4.9.4
     repository:
       name: argo
       url: https://argoproj.github.io/argo-helm
