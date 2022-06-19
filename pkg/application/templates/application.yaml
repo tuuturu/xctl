@@ -15,3 +15,6 @@ spec:
 
   ## Specify the URL the application should be available at. Leaving it empty will deny internet traffic
   #url: hello.tuuturu.org
+
+  ## Specify the path where the application exposes metric data
+  #metrics: /metrics
