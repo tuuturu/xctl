@@ -14,7 +14,7 @@ func newPlugin() v1alpha1.Plugin {
 
 	// URL: https://artifacthub.io/packages/helm/cert-manager/cert-manager
 	plugin.Spec.Helm.Chart = "cert-manager"
-	plugin.Spec.Helm.Version = "1.8.0"
+	plugin.Spec.Helm.Version = "1.8.1"
 	plugin.Spec.Helm.Values = valuesTemplate
 
 	plugin.Spec.Helm.Repository.Name = "jetstack"
