@@ -1,14 +1,14 @@
 
 ## Accessing ArgoCD
 
-First, acquire credentials for Grafana by running the `get credentials`
+First, acquire credentials for ArgoCD by running the `get credentials`
 command:
 
 ```shell
 xctl --context env.yaml get credentials argocd
 ```
 
-After you've gotten the credentials, open a tunnel to the Grafana instance by
+After you've gotten the credentials, open a tunnel to the ArgoCD instance by
 running the following command:
 
 ```shell
