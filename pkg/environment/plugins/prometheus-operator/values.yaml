@@ -484,7 +484,7 @@ operator:
 prometheus:
   ## @param prometheus.enabled Deploy Prometheus to the cluster
   ##
-  enabled: true
+  enabled: false
   ## Bitnami Prometheus image version
   ## ref: https://hub.docker.com/r/bitnami/prometheus/tags/
   ## @param prometheus.image.registry Prometheus image registry
@@ -1397,7 +1397,7 @@ prometheus:
 alertmanager:
   ## @param alertmanager.enabled Deploy Alertmanager to the cluster
   ##
-  enabled: true
+  enabled: false
   ## Bitnami Alertmanager image version
   ## ref: https://hub.docker.com/r/bitnami/prometheus-operator/tags/
   ## @param alertmanager.image.registry Prometheus image registry
