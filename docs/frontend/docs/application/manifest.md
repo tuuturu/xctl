@@ -50,6 +50,12 @@ Below is a list of all configuration attributes for an environment manifest.
 |--------|-------------------|---------|----------------------------------------------------------------------------------------------------------------------------------|
 | string | hello.tuuturu.org | None    | Defines the URL your application will be available on. Only required if the application should be available outside the cluster. |
 
+### `metrics`
+
+| Type   | Example           | Default | Description                                                                                                                      |
+|--------|-------------------|---------|----------------------------------------------------------------------------------------------------------------------------------|
+| string | /metrics | None    | Defines the path of your application which exposes metric data |
+
 <!--suppress CssUnusedSymbol -->
 <style>
 span.required {
