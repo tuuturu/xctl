@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 
+	prometheusOperator "github.com/deifyed/xctl/pkg/environment/plugins/prometheus-operator"
+
 	"github.com/deifyed/xctl/pkg/environment/plugins/argocd"
 	"github.com/deifyed/xctl/pkg/environment/plugins/certmanager"
 	"github.com/deifyed/xctl/pkg/environment/plugins/grafana"
@@ -77,6 +79,7 @@ func Reconcile(opts ReconcileOpts) error {
 		NewDomainReconciler(provider),
 		certmanager.NewReconciler(provider),
 		prometheus.NewReconciler(provider),
+		prometheusOperator.Reconciler(provider),
 		grafana.NewReconciler(provider),
 		loki.NewReconciler(provider),
 		promtail.NewReconciler(provider),
