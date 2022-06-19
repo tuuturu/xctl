@@ -1,9 +1,10 @@
 package prometheus_operator
 
 import (
-	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/deifyed/xctl/pkg/environment/plugins/prometheus"
 
 	"github.com/deifyed/xctl/pkg/config"
 	helmBinary "github.com/deifyed/xctl/pkg/tools/clients/helm/binary"
@@ -64,29 +65,36 @@ func (r reconciler) determineAction(rctx reconciliation.Context, helm helm.Clien
 	indication := reconciliation.DetermineUserIndication(rctx, rctx.EnvironmentManifest.Spec.Plugins.Prometheus)
 
 	var (
-		clusterExists   = true
-		componentExists = true
+		err              error
+		clusterExists    bool
+		componentExists  bool
+		prometheusExists bool
 	)
 
-	_, err := r.cloudProvider.GetCluster(rctx.Ctx, rctx.EnvironmentManifest)
+	clusterExists, err = r.cloudProvider.HasCluster(rctx.Ctx, rctx.EnvironmentManifest)
 	if err != nil {
-		if !errors.Is(err, cloud.ErrNotFound) {
-			return "", fmt.Errorf("acquiring cluster: %w", err)
-		}
-
-		clusterExists = false
+		return "", fmt.Errorf("acquiring cluster: %w", err)
 	}
 
 	if clusterExists {
+		prometheusExists, err = helm.Exists(prometheus.NewPlugin())
+		if err != nil {
+			return "", fmt.Errorf("checking Prometheus existence: %w", err)
+		}
+
 		componentExists, err = helm.Exists(plugin())
 		if err != nil {
-			return "", fmt.Errorf("checking component existence: %w", err)
+			return "", fmt.Errorf("checking Prometheus Operator existence: %w", err)
 		}
 	}
 
 	switch indication {
 	case reconciliation.ActionCreate:
 		if !clusterExists {
+			return reconciliation.ActionWait, nil
+		}
+
+		if !prometheusExists {
 			return reconciliation.ActionWait, nil
 		}
 
