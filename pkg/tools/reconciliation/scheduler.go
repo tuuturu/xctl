@@ -43,12 +43,11 @@ func (c *Scheduler) Run(ctx context.Context) (Result, error) {
 	}()
 
 	for hasThingsToDo(ledger) {
-		log.Debug("Iteration")
+		log.Debug("Reconciliation iteration")
 		queue := generateQueue(c.reconcilers, ledger)
 		maxUpdates := len(queue.reconcilers)
 		updates := 0
 
-		log.Debug("Starting reconcilers")
 		for reconciler := queue.Pop(); reconciler != nil; reconciler = queue.Pop() {
 			ledger[reconciler.String()].Count++
 
@@ -58,7 +57,6 @@ func (c *Scheduler) Run(ctx context.Context) (Result, error) {
 		for updates < maxUpdates {
 			log.Debug("Awaiting result")
 			status := <-channel
-			log.Debugf("%s: %s", status.ID, status.Status)
 
 			if status.Status == statusReady {
 				ledger[status.ID].Status = statusReady
@@ -72,9 +70,13 @@ func (c *Scheduler) Run(ctx context.Context) (Result, error) {
 		}
 
 		if hasTooManyRequeues(ledger) {
+			log.Debugf("Maximum reconciliation requeues reached for ledger: %v", ledger)
+
 			return Result{}, ErrMaximumReconciliationRequeues
 		}
 	}
+
+	log.Debug("Nothing left to do")
 
 	return Result{}, nil
 }

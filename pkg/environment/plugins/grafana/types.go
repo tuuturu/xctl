@@ -7,8 +7,6 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/secrets"
 )
 
-const logFeature = "plugin/grafana"
-
 type reconciler struct {
 	cloudProvider cloud.Provider
 }

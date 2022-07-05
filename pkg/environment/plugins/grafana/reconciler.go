@@ -19,7 +19,7 @@ import (
 )
 
 func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
-	log := logging.GetLogger(logFeature, "reconciliation")
+	log := logging.GetLogger("plugin", r.String())
 
 	clients, err := prepareClients(rctx.Filesystem, rctx.EnvironmentManifest)
 	if err != nil {

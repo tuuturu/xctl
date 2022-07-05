@@ -16,7 +16,7 @@ import (
 
 //nolint:funlen
 func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
-	log := logging.GetLogger(logFeature, "reconciliation")
+	log := logging.GetLogger("plugin", n.String())
 
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
 	if err != nil {
@@ -34,16 +34,15 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 		Ctx:    rctx,
 		Helm:   helmClient,
 		Plugin: plugin,
-		Logger: log,
 	})
 	if err != nil {
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
 
+	log.Debugf("Action: %s", action)
+
 	switch action {
 	case reconciliation.ActionCreate:
-		log.Debug("installing")
-
 		err = helmClient.Install(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing helm chart: %w", err)
@@ -51,8 +50,6 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
-		log.Debug("deleting")
-
 		err = helmClient.Delete(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("uninstalling helm chart: %w", err)
@@ -65,8 +62,6 @@ func (n nginxIngressController) Reconcile(rctx reconciliation.Context) (reconcil
 }
 
 func (n nginxIngressController) determineAction(opts determineActionOpts) (reconciliation.Action, error) {
-	log := opts.Logger
-
 	indication := reconciliation.DetermineUserIndication(
 		opts.Ctx,
 		opts.Ctx.EnvironmentManifest.Spec.Plugins.NginxIngressController,
@@ -89,22 +84,16 @@ func (n nginxIngressController) determineAction(opts determineActionOpts) (recon
 	switch indication {
 	case reconciliation.ActionCreate:
 		if !clusterExists {
-			log.Debug("Waiting due to cluster not ready")
-
 			return reconciliation.ActionWait, nil
 		}
 
 		if ingressExists {
-			log.Debug("NOOP since component already exists")
-
 			return reconciliation.ActionNoop, nil
 		}
 
 		return reconciliation.ActionCreate, nil
 	case reconciliation.ActionDelete:
 		if !ingressExists {
-			log.Debug("NOOP since cluster is already taken down")
-
 			return reconciliation.ActionNoop, nil
 		}
 

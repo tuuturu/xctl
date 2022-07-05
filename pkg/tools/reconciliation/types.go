@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const logFeature = "reconciliationScheduler"
+const logFeature = "scheduler"
 
 // Result contains information about the result of a Reconcile() call
 type Result struct {

@@ -21,7 +21,7 @@ import (
 )
 
 func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
-	log := logging.GetLogger(logFeature, "reconciliation")
+	log := logging.GetLogger("plugin", r.String())
 
 	kubeconfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
 	if err != nil {
@@ -45,10 +45,10 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 	plugin := NewPlugin()
 
+	log.Debugf("Action: %s", action)
+
 	switch action {
 	case reconciliation.ActionCreate:
-		log.Debug("installing")
-
 		err = helmClient.Install(plugin)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
@@ -61,8 +61,6 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
-		log.Debug("deleting")
-
 		err = helmClient.Delete(plugin)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("uninstalling: %w", err)

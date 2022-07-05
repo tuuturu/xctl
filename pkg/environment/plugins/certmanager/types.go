@@ -8,8 +8,6 @@ import (
 	"github.com/deifyed/xctl/pkg/tools/reconciliation"
 )
 
-const logFeature = "plugin/certmanager"
-
 type reconciler struct {
 	cloudProvider cloud.Provider
 }

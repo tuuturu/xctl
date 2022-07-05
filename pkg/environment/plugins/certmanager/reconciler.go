@@ -19,7 +19,7 @@ import (
 
 //nolint:funlen
 func (n reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
-	log := logging.GetLogger(logFeature, "reconciliation")
+	log := logging.GetLogger("plugin", n.String())
 
 	kubeConfigPath, err := config.GetAbsoluteKubeconfigPath(rctx.EnvironmentManifest.Metadata.Name)
 	if err != nil {
@@ -48,16 +48,14 @@ func (n reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		return reconciliation.Result{Requeue: false}, fmt.Errorf("determining course of action: %w", err)
 	}
 
+	log.Debugf("Action: %s", action)
+
 	switch action {
 	case reconciliation.ActionCreate:
-		log.Debug("installing")
-
 		err = helmClient.Install(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("installing helm chart: %w", err)
 		}
-
-		log.Debug("configuring cluster issuer")
 
 		issuerManifest, err := newClusterIssuers(rctx.EnvironmentManifest.Spec.AdminEmail)
 		if err != nil {
@@ -71,8 +69,6 @@ func (n reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
-		log.Debug("deleting")
-
 		err = helmClient.Delete(plugin)
 		if err != nil {
 			return reconciliation.Result{Requeue: false}, fmt.Errorf("uninstalling helm chart: %w", err)

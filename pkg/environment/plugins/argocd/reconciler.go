@@ -17,7 +17,7 @@ import (
 )
 
 func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Result, error) {
-	log := logging.GetLogger(logFeature, "reconciliation")
+	log := logging.GetLogger("plugin", r.String())
 
 	repo := repository{URL: rctx.EnvironmentManifest.Spec.Repository}
 
@@ -46,10 +46,10 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 		return reconciliation.Result{}, fmt.Errorf("creating plugin: %w", err)
 	}
 
+	log.Debugf("Action: %s", action)
+
 	switch action {
 	case reconciliation.ActionCreate:
-		log.Debug("installing")
-
 		err = installArgoCD(rctx, helmClient, kubectlClient, repo)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("installing: %w", err)
@@ -57,8 +57,6 @@ func (r reconciler) Reconcile(rctx reconciliation.Context) (reconciliation.Resul
 
 		return reconciliation.Result{Requeue: false}, nil
 	case reconciliation.ActionDelete:
-		log.Debug("deleting")
-
 		err = helmClient.Delete(plugin)
 		if err != nil {
 			return reconciliation.Result{}, fmt.Errorf("uninstalling: %w", err)
